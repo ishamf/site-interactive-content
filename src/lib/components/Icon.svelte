@@ -5,8 +5,8 @@
 
   const styles = {
     button:
-      'fill-slate-400 group-disabled:fill-slate-300 dark:fill-slate-300 dark:group-disabled:fill-slate-400',
-    text: 'fill-slate-400 group-disabled:fill-slate-500 dark:fill-slate-400 dark:group-disabled:fill-slate-500',
+      'fill-neutral-400 group-disabled:fill-neutral-300 dark:fill-neutral-300 dark:group-disabled:fill-neutral-400',
+    text: 'fill-neutral-400 group-disabled:fill-neutral-500 dark:fill-neutral-400 dark:group-disabled:fill-neutral-500',
   };
 </script>
 
