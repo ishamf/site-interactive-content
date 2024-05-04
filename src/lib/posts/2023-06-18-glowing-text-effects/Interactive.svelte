@@ -24,7 +24,7 @@
 
 <p class="dark:hidden">It looks best on dark backgrounds:</p>
 
-<div class="bg-slate-800 p-4 dark:hidden">
+<div class="bg-neutral-800 p-4 dark:hidden">
   <GlowingText
     color={resultColor}
     lightnessOffset={resultLightness}
@@ -51,7 +51,7 @@
       bind:value={resultLightness}
       min="0"
       max="0.5"
-      class="w-16 ml-2 my-0 dark:bg-slate-600"
+      class="w-16 ml-2 my-0 dark:bg-neutral-600"
     />
   </li>
   <li>
@@ -61,7 +61,7 @@
       bind:value={resultFontLightness}
       min="0"
       max="0.5"
-      class="w-16 ml-2 my-0 dark:bg-slate-600"
+      class="w-16 ml-2 my-0 dark:bg-neutral-600"
     />
   </li>
 </ul>

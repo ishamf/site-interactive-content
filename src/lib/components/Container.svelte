@@ -8,6 +8,6 @@
 
 <style lang="postcss">
   .background {
-    @apply bg-neutral-50 dark:bg-slate-900 p-4 rounded-xl;
+    @apply bg-neutral-50 dark:bg-neutral-900 p-4 rounded-xl;
   }
 </style>

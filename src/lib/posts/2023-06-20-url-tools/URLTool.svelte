@@ -86,9 +86,9 @@
 <Node key={null} bind:url />
 
 <p
-  class="p-4 flex-1 bg-slate-100 dark:bg-slate-700 overflow-hidden break-all"
-  class:text-slate-400={!result}
-  class:dark:text-slate-400={!result}
+  class="p-4 flex-1 bg-neutral-100 dark:bg-neutral-700 overflow-hidden break-all"
+  class:text-neutral-400={!result}
+  class:dark:text-neutral-400={!result}
 >
   {result ? result : 'The results will appear here'}
 </p>
@@ -98,10 +98,10 @@
     href={result}
     rel="nofollow noreferrer external"
     class="px-4 py-2 no-underline font-normal
-             bg-slate-100 hover:bg-slate-200 text-slate-800
-             dark:bg-slate-700 dark:hover:bg-slate-600 dark:text-slate-300
+             bg-neutral-100 hover:bg-neutral-200 text-neutral-800
+             dark:bg-neutral-700 dark:hover:bg-neutral-600 dark:text-neutral-300
 
-              focus:outline-none focus:ring-2 focus:ring-slate-500
+              focus:outline-none focus:ring-2 focus:ring-neutral-500
          "
   >
     Open URL

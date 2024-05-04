@@ -8,7 +8,7 @@
   let cover: HTMLDivElement;
 </script>
 
-<div class="flex relative dark:bg-slate-900 bg-slate-100">
+<div class="flex relative dark:bg-neutral-900 bg-neutral-100">
   <div class="p-1 cover" class:disabled bind:this={cover}>
     <slot />{' '}
   </div>

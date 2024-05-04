@@ -10,7 +10,7 @@
 </script>
 
 <Container>
-  <input class="dark:bg-slate-800 bg-slate-100 p-1" bind:value={firstValue} />
+  <input class="dark:bg-neutral-800 bg-neutral-100 p-1" bind:value={firstValue} />
 
   <p>
     <span class="p-1">{firstValue}</span>
