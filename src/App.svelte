@@ -1,5 +1,5 @@
 <script lang="ts">
-  import './lib/entries/2023-glowing-text'
+  import './lib/entries/2023-glowing-text';
   import './lib/entries/2023-input-styling';
   import './lib/entries/2023-url-tools';
   import './lib/entries/2024-timestamp-converter';

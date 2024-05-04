@@ -6,6 +6,6 @@ export default {
   preprocess: vitePreprocess(),
 
   compilerOptions: {
-    customElement: true
-  }
+    customElement: true,
+  },
 };

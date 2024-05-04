@@ -3,7 +3,7 @@
 />
 
 <script>
-    import { addComponentStylesheet } from '$lib/component';
+  import { addComponentStylesheet } from '$lib/component';
   import Container from '$lib/components/Container.svelte';
   import TimestampConverter from './TimestampConverter.svelte';
 </script>

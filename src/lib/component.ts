@@ -1,14 +1,13 @@
-import appStyles from "./app-css"
-
+import appStyles from './app-css';
 
 export function addComponentStylesheet<X>(Element: any): any {
-    class WrappedElement extends Element {
-        constructor(...props: any) {
-            super(...props)
+  class WrappedElement extends Element {
+    constructor(...props: any) {
+      super(...props);
 
-            this.shadowRoot.adoptedStyleSheets = [appStyles]
-        }
+      this.shadowRoot.adoptedStyleSheets = [appStyles];
     }
+  }
 
-    return WrappedElement
+  return WrappedElement;
 }

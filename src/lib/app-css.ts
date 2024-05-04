@@ -1,7 +1,7 @@
-import appCss from './app.css?inline'
+import appCss from './app.css?inline';
 
-const appStyles = new CSSStyleSheet()
+const appStyles = new CSSStyleSheet();
 
-appStyles.replaceSync(appCss)
+appStyles.replaceSync(appCss);
 
-export default appStyles
+export default appStyles;

@@ -4,7 +4,7 @@
 
 <script lang="ts">
   import { addComponentStylesheet } from '$lib/component';
-    import Container from '$lib/components/Container.svelte';
+  import Container from '$lib/components/Container.svelte';
   import CoveredInput from './CoveredInput.svelte';
 
   let thirdValue =
