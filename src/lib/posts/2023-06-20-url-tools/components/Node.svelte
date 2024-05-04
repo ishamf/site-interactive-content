@@ -4,12 +4,13 @@
   import Input from '$lib/components/Input.svelte';
   import Button from '$lib/components/Button.svelte';
   import type { URLElement } from '../types';
-  import { parseUrlToElement } from '../utils';
+  import { lenientParseUrl, lenientStringifyUrl, parseUrlToElement } from '../utils';
 
   export let key: string | null;
   export let url: URLElement;
   export let disabled = false;
   export let isDraft = false;
+  export let allowRemoveDraft = false;
 
   const dispatch = createEventDispatcher();
 
@@ -17,13 +18,16 @@
   let hasEmbeddedParams = false;
   let parsedUrl: URL | null = null;
 
+  // Refresh flags to control UI elements
   $: isRootNode = typeof key !== 'string';
-  $: shouldShowAddButton = isValidURL && (!url.params || url.params.length === 0);
-  $: shouldShowRemoveButton = typeof key === 'string' && !isDraft;
+  $: shouldShowAddButton =
+    isValidURL && url.value && key && (!url.params || url.params.length === 0);
+  $: shouldShowRemoveButton = typeof key === 'string' && (!isDraft || allowRemoveDraft);
 
+  // Refresh parsed status and values
   $: {
     try {
-      parsedUrl = new URL(url.value);
+      parsedUrl = lenientParseUrl(url.value);
       isValidURL = true;
       hasEmbeddedParams = parsedUrl.searchParams.size > 0;
     } catch (e) {
@@ -33,10 +37,13 @@
     }
   }
 
+  // Create drafts if needed
   $: {
     if (url.params && url.params.every((x) => x.key)) {
+      // Automatically create draft params if all params have key
       url.params = [...(url.params ?? []), { key: '', url: { value: '' } }];
     } else if (isRootNode && url.value && !url.params) {
+      // For root node, it must have a draft
       url.params = [{ key: '', url: { value: '' } }];
     }
   }
@@ -92,7 +99,7 @@
           ];
           const urlWithoutParams = new URL(parsedUrl);
           urlWithoutParams.search = '';
-          url.value = urlWithoutParams.toString();
+          url.value = lenientStringifyUrl(urlWithoutParams);
         }}
       />
     {/if}
@@ -120,9 +127,17 @@
           bind:url={param.url}
           disabled={disabled || !isValidURL}
           isDraft={i === url.params.length - 1}
+          allowRemoveDraft={url.params.length === 1 && !isRootNode}
           on:remove={() => {
             if (!url.params) return;
-            url.params = url.params.filter((x) => x !== param);
+
+            // If it's the draft, clear the entire array
+            if (i === url.params.length - 1) {
+              url.params = undefined;
+            } else {
+              // else, just delete this item
+              url.params = url.params.filter((x) => x !== param);
+            }
           }}
         />
       {/each}

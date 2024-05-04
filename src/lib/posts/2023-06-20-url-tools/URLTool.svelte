@@ -5,7 +5,7 @@
   import TextButton from '../../components/TextButton.svelte';
 
   import type { URLElement } from './types';
-  import { parseUrlToElement } from './utils';
+  import { lenientParseUrl, lenientStringifyUrl, parseUrlToElement } from './utils';
 
   const initialPrefillUrl = new URL(location.href).searchParams.get('url');
 
@@ -20,7 +20,7 @@
   function parseURL(url: URLElement): string {
     let currentURL: URL;
     try {
-      currentURL = new URL(url.value);
+      currentURL = lenientParseUrl(url.value);
     } catch (e) {
       return url.value;
     }
@@ -32,7 +32,7 @@
       }
     }
 
-    return currentURL.toString();
+    return lenientStringifyUrl(currentURL);
   }
 
   $: {
