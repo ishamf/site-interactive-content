@@ -1,6 +1,6 @@
 import appStyles from './app-css';
 
-export function addComponentStylesheet<X>(Element: any): any {
+export function addComponentStylesheet(Element: any): any {
   class WrappedElement extends Element {
     constructor(...props: any) {
       super(...props);
