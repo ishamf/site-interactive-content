@@ -15,7 +15,9 @@ export default defineConfig({
     lib: {
       entry: readdirSync(resolve(__dirname, 'src/lib/entries')).map(x => 'src/lib/entries/' + x),
       formats: ['es'],
-      name: 'dynamicContent'
+      fileName(format, entryName) {
+        return 'entry-' + entryName + '.js'
+      },
     },
     rollupOptions: {
       output: {
