@@ -7,6 +7,8 @@
   import { onMount } from 'svelte';
   import { mdiClose } from '@mdi/js';
   import Button from '$lib/components/Button.svelte';
+  import CopyableIconButton from './CopyableIconButton.svelte';
+  import { InputType, guessAndParseInput, inputTypeLabels } from './utils';
 
   const animationConfig = { duration: 150, easing: circInOut };
 
@@ -16,65 +18,29 @@
 
   let displayMode: 'local' | 'utc' = 'local';
 
+  let interval: ReturnType<typeof setInterval> | undefined;
+
+  function resetInterval() {
+    if (interval) {
+      clearInterval(interval);
+      interval = setInterval(() => {
+        now = DateTime.now();
+      }, 1000);
+    }
+    // Add 1 millisecond so the relative time is always in the past
+    now = DateTime.now().plus({ milliseconds: 1 });
+  }
+
   onMount(() => {
-    const interval = setInterval(() => {
+    interval = setInterval(() => {
       now = DateTime.now();
     }, 1000);
 
     return () => clearInterval(interval);
   });
 
-  enum InputType {
-    TimestampSeconds,
-    TimestampMilliseconds,
-    ISO,
-    RFC2822,
-    GuessedFromDate,
-  }
-
-  const inputTypeLabels = {
-    [InputType.TimestampSeconds]: 'timestamp (seconds)',
-    [InputType.TimestampMilliseconds]: 'timestamp (milliseconds)',
-    [InputType.ISO]: 'ISO 8601',
-    [InputType.RFC2822]: 'RFC 2822',
-    [InputType.GuessedFromDate]: 'parsable by native JS Date',
-  };
-
   let inputType: InputType | undefined;
   let result: DateTime | undefined;
-
-  function guessAndParseInput(input: string): null | [InputType, DateTime] {
-    if (!input) {
-      return null;
-    }
-
-    if (/^[0-9.]+$/.exec(input)) {
-      const amount = parseFloat(input);
-      const magnitude = Math.log10(amount);
-      if (magnitude < 10) {
-        return [InputType.TimestampSeconds, DateTime.fromMillis(amount * 1000)];
-      } else {
-        return [InputType.TimestampMilliseconds, DateTime.fromMillis(amount)];
-      }
-    } else {
-      let parsed = DateTime.fromISO(input);
-      if (parsed.isValid) {
-        return [InputType.ISO, parsed];
-      }
-
-      parsed = DateTime.fromRFC2822(input);
-      if (parsed.isValid) {
-        return [InputType.RFC2822, parsed];
-      }
-
-      const guessed = new Date(input);
-      if (!isNaN(guessed.getTime())) {
-        return [InputType.GuessedFromDate, DateTime.fromJSDate(guessed)];
-      }
-
-      return null;
-    }
-  }
 
   $: {
     const parsed = guessAndParseInput((inputText || '').trim());
@@ -89,8 +55,50 @@
 
   let displayResult = result;
 
+  type DisplayItem = {
+    label: string;
+    value: string | number | null;
+  };
+
+  let displayItems: DisplayItem[] = [];
+
   $: {
     displayResult = displayMode === 'utc' ? result?.setZone('utc') : result;
+
+    if (displayResult) {
+      displayItems = [
+        {
+          label: 'Timestamp (seconds)',
+          value: Math.floor(displayResult.toSeconds()),
+        },
+        {
+          label: 'Timestamp (milliseconds)',
+          value: displayResult.toMillis(),
+        },
+        {
+          label: 'ISO 8601',
+          value: displayResult.toISO(),
+        },
+        {
+          label: 'RFC 2822',
+          value: displayResult.toRFC2822(),
+        },
+        {
+          label: 'Local Format',
+          value: displayResult.toLocaleString(DateTime.DATETIME_FULL),
+        },
+        {
+          label: 'Relative Time',
+          value: displayResult.toRelative({
+            base: now,
+            // Only round if the difference is less than 1 minute
+            round: Math.abs(displayResult.valueOf() - now.valueOf()) < 60000,
+          }),
+        },
+      ];
+    } else {
+      displayItems = [];
+    }
   }
 </script>
 
@@ -112,6 +120,7 @@
   <TextButton
     on:click={() => {
       inputText = DateTime.now().toISO();
+      resetInterval();
     }}>Set to current time</TextButton
   >
 </div>
@@ -139,36 +148,14 @@
         </tr>
       </thead>
       <tbody>
-        <tr>
-          <td>Timestamp (seconds)</td>
-          <td>{displayResult.toSeconds()}</td>
-        </tr>
-        <tr>
-          <td>Timestamp (milliseconds)</td>
-          <td>{displayResult.toMillis()}</td>
-        </tr>
-        <tr>
-          <td>ISO 8601</td>
-          <td>{displayResult.toISO()}</td>
-        </tr>
-        <tr>
-          <td>RFC 2822</td>
-          <td>{displayResult.toRFC2822()}</td>
-        </tr>
-        <tr>
-          <td>Local Format</td>
-          <td>{displayResult.toLocaleString(DateTime.DATETIME_FULL)}</td>
-        </tr>
-        <tr>
-          <td>Relative Time</td>
-          <td
-            >{displayResult.toRelative({
-              base: now,
-              // Only round if the difference is less than 1 minute
-              round: Math.abs(displayResult.valueOf() - now.valueOf()) < 60000,
-            })}</td
-          >
-        </tr>
+        {#each displayItems as item}
+          <tr>
+            <td>{item.label}</td>
+            <td>{item.value}</td>
+            <td><CopyableIconButton content={item.value?.toString() ?? ''}></CopyableIconButton></td
+            >
+          </tr>
+        {/each}
       </tbody>
     </table>
   </div>
