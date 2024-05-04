@@ -1,47 +1,29 @@
 <script lang="ts">
-  import svelteLogo from './assets/svelte.svg';
-  import viteLogo from '/vite.svg';
-  import Counter from './lib/Counter.svelte';
+  import './lib/entries/2023-glowing-text'
+  import './lib/entries/2023-input-styling';
+  import './lib/entries/2023-url-tools';
+  import './lib/entries/2024-timestamp-converter';
 </script>
 
 <main>
-  <div>
-    <a href="https://vitejs.dev" target="_blank" rel="noreferrer">
-      <img src={viteLogo} class="logo" alt="Vite Logo" />
-    </a>
-    <a href="https://svelte.dev" target="_blank" rel="noreferrer">
-      <img src={svelteLogo} class="logo svelte" alt="Svelte Logo" />
-    </a>
-  </div>
-  <h1>Vite + Svelte</h1>
+  <!-- Only used for testing -->
+  <xif-url-tools></xif-url-tools>
 
-  <div class="card">
-    <Counter />
-  </div>
+  <xif-timestamp-converter></xif-timestamp-converter>
 
-  <p>
-    Check out <a href="https://github.com/sveltejs/kit#readme" target="_blank" rel="noreferrer"
-      >SvelteKit</a
-    >, the official Svelte app framework powered by Vite!
-  </p>
+  <xif-input-styling-1></xif-input-styling-1>
 
-  <p class="read-the-docs">Click on the Vite and Svelte logos to learn more</p>
+  <xif-input-styling-2></xif-input-styling-2>
+
+  <xif-input-styling-3></xif-input-styling-3>
+
+  <xif-glowing-text></xif-glowing-text>
 </main>
 
 <style>
-  .logo {
-    height: 6em;
-    padding: 1.5em;
-    will-change: filter;
-    transition: filter 300ms;
-  }
-  .logo:hover {
-    filter: drop-shadow(0 0 2em #646cffaa);
-  }
-  .logo.svelte:hover {
-    filter: drop-shadow(0 0 2em #ff3e00aa);
-  }
-  .read-the-docs {
-    color: #888;
+  main {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
   }
 </style>
