@@ -11,6 +11,12 @@
 
   <xif-timestamp-converter></xif-timestamp-converter>
 
+  <p class="time-display">
+    Current times, in ISO-8601: <xif-current-time type="iso-8601">Not loaded</xif-current-time>
+    Timestamp: <xif-current-time type="timestamp">Not loaded</xif-current-time>
+    Timestamp-ms: <xif-current-time type="timestamp-ms">Not loaded</xif-current-time>
+  </p>
+
   <xif-input-styling-1></xif-input-styling-1>
 
   <xif-input-styling-2></xif-input-styling-2>
@@ -20,10 +26,20 @@
   <xif-glowing-text></xif-glowing-text>
 </main>
 
-<style>
+<style lang="postcss">
   main {
     display: flex;
     flex-direction: column;
     gap: 30px;
+  }
+
+  .time-display {
+    font-size: 16px;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    .time-display {
+      color: white;
+    }
   }
 </style>
