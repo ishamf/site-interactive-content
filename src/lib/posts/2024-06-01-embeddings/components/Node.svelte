@@ -16,7 +16,7 @@
 
 <div class="flex flex-row justify-stretch gap-4">
   <div class="flex-1 flex">
-    <Input bind:value={sentence.value} placeholder={'Enter text...'} />
+    <Input on:focus on:blur bind:value={sentence.value} placeholder={'Enter text...'} />
   </div>
 
   {#if shouldShowRemoveButton}

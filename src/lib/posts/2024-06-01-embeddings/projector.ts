@@ -1,32 +1,36 @@
-import { createEmbedder } from './embedder';
+import { Embedder } from './embedder';
 import { PCA } from 'ml-pca';
 import { Matrix } from 'ml-matrix';
 import type { Sentence } from './types';
 
-export function createProjector() {
-  const embedder = createEmbedder();
+export class Projector {
+  pca: PCA | null = null;
 
-  const projector = {
-    project: async (sentences: Sentence[]) => {
-      const sentenceEmbeddings = await embedder.embedMany(
-        sentences.map((sentence) => sentence.value)
-      );
+  constructor(private embedder: Embedder) {}
 
-      const dataset = new Matrix(sentenceEmbeddings);
+  updatePCA(dataset: Matrix) {
+    this.pca = new PCA(dataset, { center: true });
+  }
 
-      const pca = new PCA(dataset, { center: true });
+  async project(sentences: Sentence[], updatePCA = false) {
+    const sentenceEmbeddings = await this.embedder.embedMany(
+      sentences.map((sentence) => sentence.value)
+    );
 
-      const projected = pca.predict(dataset);
+    const dataset = new Matrix(sentenceEmbeddings);
 
-      return sentences.map((sentence, i) => {
-        return {
-          ...sentence,
-          x: projected.get(i, 0),
-          y: projected.get(i, 1),
-        };
-      });
-    },
-  };
+    if (!this.pca || updatePCA) {
+      this.updatePCA(dataset);
+    }
 
-  return projector;
+    const projected = this.pca!.predict(dataset);
+
+    return sentences.map((sentence, i) => {
+      return {
+        ...sentence,
+        x: projected.get(i, 0),
+        y: projected.get(i, 1),
+      };
+    });
+  }
 }

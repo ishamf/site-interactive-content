@@ -1,57 +1,99 @@
-import { pipeline, env } from '@xenova/transformers';
+import { pipeline, env, FeatureExtractionPipeline } from '@xenova/transformers';
 import { LRUCache } from 'lru-cache';
+import { writable } from 'svelte/store';
+
+// Use some initial data to avoid downloading the embedding model immediately
+import initialCache from './embedding-init.json';
 
 env.allowLocalModels = false;
 
-export function createEmbedder() {
-  let pipelinePromise: ReturnType<typeof loadPipeline> | null = null;
+type EmbedderStatus = 'pending' | 'loading' | 'ready';
 
-  const cache = new LRUCache<string, number[]>({
+export class Embedder {
+  pipelinePromise: Promise<FeatureExtractionPipeline> | null = null;
+
+  statusStore = writable<EmbedderStatus>('pending');
+  loadPercentStore = writable(0);
+
+  cache = new LRUCache<string, number[]>({
     max: 5000,
   });
 
-  function loadPipeline() {
-    return pipeline('feature-extraction', 'Supabase/gte-small', { progress_callback: console.log });
+  constructor() {
+    this.cache.load(initialCache as any);
   }
 
-  function getPipeline() {
-    if (!pipelinePromise) {
-      pipelinePromise = loadPipeline();
+  private loadPipeline() {
+    const totals: Record<string, number> = {};
+    const loadeds: Record<string, number> = {};
+
+    this.statusStore.set('loading');
+
+    const p = pipeline('feature-extraction', 'Supabase/gte-small', {
+      progress_callback: (report: {
+        status: string;
+        file: string;
+        loaded: number;
+        total: number;
+      }) => {
+        if (report.status === 'progress') {
+          totals[report.file] = report.total;
+          loadeds[report.file] = report.loaded;
+
+          // Around 2.2mb of wasm is not reported, so we add it manually
+          const total = Object.values(totals).reduce((a, b) => a + b, 0) + 2200000;
+
+          const loaded = Object.values(loadeds).reduce((a, b) => a + b, 0);
+          
+          this.loadPercentStore.set((loaded / total) * 100);
+        } else if (report.status === 'initiate') {
+          // We don't have the total size of the file at the start, just put 1mb
+          totals[report.file] = 1000000;
+        }
+      },
+    });
+
+    p.then(() => {
+      this.statusStore.set('ready');
+    });
+
+    return p;
+  }
+
+  private getPipeline() {
+    if (!this.pipelinePromise) {
+      this.pipelinePromise = this.loadPipeline();
     }
-    return pipelinePromise;
+    return this.pipelinePromise;
   }
 
-  const embedder = {
-    embed: async (sentence: string) => {
-      if (cache.has(sentence)) {
-        return cache.get(sentence);
-      }
+  async embed(sentence: string) {
+    if (this.cache.has(sentence)) {
+      return this.cache.get(sentence);
+    }
 
-      const pipeline = await getPipeline();
+    const pipeline = await this.getPipeline();
 
-      const res = await pipeline(sentence, { normalize: true, pooling: 'mean' });
+    const res = await pipeline(sentence, { normalize: true, pooling: 'mean' });
 
-      const result: number[] = Array.from(res.data);
+    const result: number[] = Array.from(res.data);
 
-      cache.set(sentence, result);
+    this.cache.set(sentence, result);
 
-      return result;
-    },
+    return result;
+  }
 
-    embedMany: async (sentences: string[]) => {
-      return Promise.all(
-        sentences.map(async (sentence) => {
-          const res = await embedder.embed(sentence);
+  async embedMany(sentences: string[]) {
+    return Promise.all(
+      sentences.map(async (sentence) => {
+        const res = await this.embed(sentence);
 
-          if (!res) {
-            throw new Error('Embedding failed');
-          }
+        if (!res) {
+          throw new Error('Embedding failed');
+        }
 
-          return res;
-        })
-      );
-    },
-  };
-
-  return embedder;
+        return res;
+      })
+    );
+  }
 }

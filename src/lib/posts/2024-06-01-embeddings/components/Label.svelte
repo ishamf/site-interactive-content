@@ -7,7 +7,7 @@
 
 <div
   role="tooltip"
-  class="ms-1 overflow-hidden w-fit absolute"
+  class="ms-1 overflow-hidden w-fit absolute transition-all"
   on:pointerenter={() => {
     isHover = true;
   }}
