@@ -39,7 +39,17 @@ export function createEmbedder() {
     },
 
     embedMany: async (sentences: string[]) => {
-      return Promise.all(sentences.map((sentence) => embedder.embed(sentence)));
+      return Promise.all(
+        sentences.map(async (sentence) => {
+          const res = await embedder.embed(sentence);
+
+          if (!res) {
+            throw new Error('Embedding failed');
+          }
+
+          return res;
+        })
+      );
     },
   };
 
