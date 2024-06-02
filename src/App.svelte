@@ -3,11 +3,12 @@
   import './lib/entries/2023-input-styling';
   import './lib/entries/2023-url-tools';
   import './lib/entries/2024-timestamp-converter';
+  import './lib/entries/2024-embeddings';
 </script>
 
 <main>
   <!-- Only used for testing -->
-  <xif-url-tools></xif-url-tools>
+  <!-- <xif-url-tools></xif-url-tools>
 
   <xif-timestamp-converter></xif-timestamp-converter>
 
@@ -23,7 +24,9 @@
 
   <xif-input-styling-3></xif-input-styling-3>
 
-  <xif-glowing-text></xif-glowing-text>
+  <xif-glowing-text></xif-glowing-text> -->
+
+  <xif-embeddings></xif-embeddings>
 </main>
 
 <style lang="postcss">

@@ -1,0 +1,1 @@
+import '$lib/posts/2024-06-01-embeddings/UI.svelte'
