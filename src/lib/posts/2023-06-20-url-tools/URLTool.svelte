@@ -6,14 +6,41 @@
 
   import type { URLElement } from './types';
   import { lenientParseUrl, lenientStringifyUrl, parseUrlToElement } from './utils';
+  import { onMount } from 'svelte';
 
-  const initialPrefillUrl = new URL(location.href).searchParams.get('url');
+  const testUrl =
+    'https://archive.org/wayback/available?url=https%3A%2F%2Fen.wikipedia.org%2Fw%2Findex.php%3Ftitle%3DWayback_Machine%26action%3Dhistory';
+
+  const initialPrefillUrl = (() => {
+    let initialPrefillUrlFromQuery: string;
+    let initialPrefillUrlFromHash: string;
+
+    const currentURL = new URL(location.href);
+    initialPrefillUrlFromQuery = currentURL.searchParams.get('url') || '';
+
+    const hash = currentURL.hash;
+    if (hash.startsWith('#url=')) {
+      initialPrefillUrlFromHash = decodeURIComponent(hash.slice(5));
+    } else {
+      initialPrefillUrlFromHash = '';
+    }
+
+    return initialPrefillUrlFromHash || initialPrefillUrlFromQuery;
+  })();
+
+  onMount(() => {
+    if (initialPrefillUrl) {
+      outerNode?.scrollIntoView({ behavior: 'instant' });
+    }
+  });
+
+  let outerNode: HTMLElement;
 
   let url: URLElement = initialPrefillUrl ? parseUrlToElement(initialPrefillUrl) : { value: '' };
 
   let result = '';
 
-  export function setUrl(newUrl: string) {
+  function setUrl(newUrl: string) {
     url = parseUrlToElement(newUrl);
   }
 
@@ -40,10 +67,18 @@
   }
 
   $: {
+    const current = new URL(location.href);
     if (result) {
-      history.replaceState(null, '', `?url=${encodeURIComponent(result)}`);
+      if (current.searchParams.has('url')) {
+        current.search = '';
+      }
+      current.hash = 'url=' + encodeURIComponent(result);
+
+      history.replaceState(null, '', current.toString());
     } else {
-      history.replaceState(null, '', ``);
+      current.hash = '';
+
+      history.replaceState(null, '', current.toString());
     }
   }
 
@@ -83,7 +118,17 @@
   }
 </script>
 
-<Node key={null} bind:url />
+{#if !result}
+  <TextButton
+    on:click={() => {
+      setUrl(testUrl);
+    }}
+  >
+    Try it out with a complex url!
+  </TextButton>
+{/if}
+
+<Node key={null} bind:url bind:element={outerNode} />
 
 <p
   class="p-4 flex-1 bg-neutral-100 dark:bg-neutral-700 overflow-hidden break-all"

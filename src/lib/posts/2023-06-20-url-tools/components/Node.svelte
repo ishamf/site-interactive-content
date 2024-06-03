@@ -8,6 +8,7 @@
 
   export let key: string | null;
   export let url: URLElement;
+  export let element: HTMLElement;
   export let disabled = false;
   export let isDraft = false;
   export let allowRemoveDraft = false;
@@ -49,7 +50,7 @@
   }
 </script>
 
-<div class="my-4">
+<div class="my-4" bind:this={element}>
   <div class="flex flex-row justify-stretch">
     {#if typeof key === 'string'}
       <Input bind:value={key} {disabled} placeholder="Key..." />

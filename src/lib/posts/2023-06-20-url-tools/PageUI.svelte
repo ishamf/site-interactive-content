@@ -15,22 +15,12 @@
     isBrowser = true;
   });
 
-  let urlTool: URLTool;
-  const testUrl =
-    'https://archive.org/wayback/available?url=https%3A%2F%2Fen.wikipedia.org%2Fw%2Findex.php%3Ftitle%3DWayback_Machine%26action%3Dhistory';
+
 </script>
 
 <Container>
   {#if isBrowser}
-    <TextButton
-      on:click={() => {
-        urlTool?.setUrl(testUrl);
-      }}
-    >
-      Try it out with a complex url!
-    </TextButton>
-
-    <URLTool bind:this={urlTool} />
+    <URLTool  />
   {:else}
     <p>Loading URL tool...</p>
   {/if}
