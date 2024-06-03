@@ -30,7 +30,13 @@
 
   onMount(() => {
     if (initialPrefillUrl) {
-      outerNode?.scrollIntoView({ behavior: 'instant' });
+      const rect = outerNode?.getBoundingClientRect();
+
+      if (rect) {
+        window.scrollTo({
+          top: rect.top + window.scrollY - 32,
+        });
+      }
     }
   });
 
