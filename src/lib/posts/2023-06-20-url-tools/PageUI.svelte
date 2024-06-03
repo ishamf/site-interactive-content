@@ -5,7 +5,6 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import URLTool from './URLTool.svelte';
-  import TextButton from '$lib/components/TextButton.svelte';
   import { addComponentStylesheet } from '$lib/component';
   import Container from '$lib/components/Container.svelte';
 
@@ -14,13 +13,11 @@
   onMount(() => {
     isBrowser = true;
   });
-
-
 </script>
 
 <Container>
   {#if isBrowser}
-    <URLTool  />
+    <URLTool />
   {:else}
     <p>Loading URL tool...</p>
   {/if}
