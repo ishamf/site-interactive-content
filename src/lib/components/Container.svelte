@@ -2,7 +2,7 @@
   export let background = true;
 </script>
 
-<div class:background class="prose prose-neutral dark:prose-invert font-sans">
+<div class:background class="prose prose-neutral dark:prose-invert font-sans max-w-none">
   <slot />
 </div>
 

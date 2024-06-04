@@ -1,11 +1,12 @@
 <script lang="ts">
+  import './lib/app.css';
   import './lib/entries/2023-glowing-text';
   import './lib/entries/2023-input-styling';
   import './lib/entries/2023-url-tools';
   import './lib/entries/2024-timestamp-converter';
 </script>
 
-<main>
+<main class="max-w-3xl">
   <!-- Only used for testing -->
   <xif-url-tools></xif-url-tools>
 
