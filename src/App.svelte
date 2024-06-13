@@ -4,6 +4,7 @@
   import './lib/entries/2023-input-styling';
   import './lib/entries/2023-url-tools';
   import './lib/entries/2024-timestamp-converter';
+  import './lib/entries/2024-embeddings';
 </script>
 
 <main class="max-w-3xl">
@@ -25,6 +26,12 @@
   <xif-input-styling-3></xif-input-styling-3>
 
   <xif-glowing-text></xif-glowing-text>
+
+  <xif-embeddings></xif-embeddings>
+
+  <xif-embedding-figure
+    sentences="good app,bad app,hard to use,easy to use,responsive,unresponsive,quick load times,slow load times"
+  ></xif-embedding-figure>
 </main>
 
 <style lang="postcss">

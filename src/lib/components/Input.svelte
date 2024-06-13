@@ -7,6 +7,8 @@
 <input
   type="text"
   bind:value
+  on:focus
+  on:blur
   {disabled}
   {placeholder}
   class="flex-1 px-4 py-2 block min-w-0 min-h-12
