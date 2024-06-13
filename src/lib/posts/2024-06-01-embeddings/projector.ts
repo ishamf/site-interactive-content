@@ -1,12 +1,13 @@
-import { Embedder } from './embedder';
+import { globalEmbedder } from './embedder';
 import { PCA } from 'ml-pca';
 import { Matrix } from 'ml-matrix';
 import type { Sentence } from './types';
 
 export class Projector {
   pca: PCA | null = null;
+  embedder = globalEmbedder;
 
-  constructor(private embedder: Embedder) {}
+  constructor() {}
 
   updatePCA(dataset: Matrix) {
     this.pca = new PCA(dataset, { center: true });
@@ -16,6 +17,9 @@ export class Projector {
     const sentenceEmbeddings = await this.embedder.embedMany(
       sentences.map((sentence) => sentence.value)
     );
+
+    // Used to prepare the cache
+    // console.log('embeddingsCache:', JSON.stringify(globalEmbedder.cache.dump()));
 
     const dataset = new Matrix(sentenceEmbeddings);
 

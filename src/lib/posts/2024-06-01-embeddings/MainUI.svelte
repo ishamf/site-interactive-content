@@ -6,18 +6,17 @@
   import { addComponentStylesheet } from '$lib/component';
   import { asyncDerived, writable } from '@square/svelte-store';
   import Node from './components/Node.svelte';
-  import { Embedder } from './embedder';
+  import { globalEmbedder } from './embedder';
   import type { Sentence } from './types';
-  import Input from '$lib/components/Input.svelte';
+
   import { Projector } from './projector';
-  import Container from '$lib/components/Container.svelte';
-  import Label from './components/Label.svelte';
+
   import TextButton from '$lib/components/TextButton.svelte';
+  import SentenceDisplay from './components/SentenceDisplay.svelte';
 
   const sentences = writable(
     ['man', 'woman', 'king', 'queen', 'actor', 'actress'].map((x) => ({
       value: x,
-      label: 't',
     })) as Sentence[]
   );
 
@@ -29,8 +28,8 @@
     }
   }
 
-  const embedder = new Embedder();
-  const projector = new Projector(embedder);
+  const embedder = globalEmbedder;
+  const projector = new Projector();
 
   const embedderStatus = embedder.statusStore;
   const loadPercent = embedder.loadPercentStore;
@@ -70,21 +69,11 @@
 </script>
 
 <div
-  class="flex flex-wrap gap-y-4 text-neutral-800 dark:text-neutral-200 text-base max-w-4xl mx-auto"
+  class="flex flex-wrap gap-4 text-neutral-800 dark:text-neutral-200 text-base max-w-4xl px-4 mx-auto"
 >
   <div class="flex justify-center flex-grow">
     <div class="sticky top-4">
-      <div class="h-80 w-80 bg-neutral-100 dark:bg-neutral-800 text-sm relative">
-        {#each $result as sentence, i (i)}
-          <div
-            class="absolute overflow-visible w-1 h-1 bg-neutral-800 dark:bg-neutral-200 rounded-full transition-all"
-            style={`top: ${sentence.y * 100 + 50}%; left: ${sentence.x * 100 + 50}%`}
-          ></div>
-          <Label style={`top: ${sentence.y * 100 + 50}%; left: ${sentence.x * 100 + 50}%`}>
-            {sentence.value}
-          </Label>
-        {/each}
-      </div>
+      <SentenceDisplay sentences={$result}></SentenceDisplay>
       <div class="flex items-center p-4 gap-4">
         <input bind:checked={autoUpdate} type="checkbox" id="checkbox-auto-update" />
         <label for="checkbox-auto-update">Auto Update Projection</label>
@@ -98,10 +87,17 @@
           Update Projection
         </TextButton>
       {/if}
+      <!-- <TextButton
+        on:click={() => {
+          caches.keys().then((xs) => Promise.all(xs.map((x) => caches.delete(x))));
+        }}
+      >
+        Clear Cache
+      </TextButton> -->
     </div>
   </div>
 
-  <div class="min-w-80 flex-1 flex-grow-[9999] px-4">
+  <div class="min-w-80 flex-1 flex-grow-[9999]">
     {#each $sentences as sentence, i}
       <div class:my-4={i > 0}>
         <Node
@@ -111,7 +107,11 @@
             focusedSentence = sentence;
           }}
           on:blur={() => {
-            if (focusedSentence === sentence) {
+            if (
+              focusedSentence === sentence &&
+              // If we're loading, we just always show some kind of progress
+              $embedderStatus !== 'loading'
+            ) {
               focusedSentence = null;
             }
           }}
@@ -123,8 +123,8 @@
         {#if focusedSentence === sentence && $embedderStatus !== 'ready'}
           <div class="p-2 bg-neutral-100 dark:bg-neutral-800 text-sm mt-4">
             {#if $embedderStatus === 'pending'}
-              If you modify the text, you'll need to load around 40MB of model data and additional
-              code to compute the embeddings.
+              If you {sentence.value ? 'modify this text' : 'write some text here'}, you'll need to
+              load around 40MB of model data and additional code to compute the embeddings.
             {:else if $embedderStatus === 'loading'}
               Loading... {Math.round($loadPercent)}%
             {/if}

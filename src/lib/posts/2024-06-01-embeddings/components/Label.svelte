@@ -1,13 +1,12 @@
 <script lang="ts">
-  export let style: string
-  
+  export let style: string;
+
   let isHover = false;
-  
 </script>
 
 <div
   role="tooltip"
-  class="ms-1 overflow-hidden w-fit absolute transition-all"
+  class="ms-1 overflow-hidden w-fit absolute transition-all break-all"
   on:pointerenter={() => {
     isHover = true;
   }}

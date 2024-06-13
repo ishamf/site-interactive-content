@@ -29,22 +29,27 @@ export class Embedder {
 
     this.statusStore.set('loading');
 
-    const p = pipeline('feature-extraction', 'Supabase/gte-small', {
+    // Obtained by letting it run once
+    const totalSizeOfModel = 34726889;
+
+    const p = pipeline('feature-extraction', 'Supabase/bge-small-en', {
       progress_callback: (report: {
         status: string;
         file: string;
         loaded: number;
         total: number;
       }) => {
+        console.log('Progress:', report)
         if (report.status === 'progress') {
           totals[report.file] = report.total;
           loadeds[report.file] = report.loaded;
 
           // Around 2.2mb of wasm is not reported, so we add it manually
-          const total = Object.values(totals).reduce((a, b) => a + b, 0) + 2200000;
+          const total =
+            (totalSizeOfModel || Object.values(totals).reduce((a, b) => a + b, 0)) + 2200000;
 
           const loaded = Object.values(loadeds).reduce((a, b) => a + b, 0);
-          
+
           this.loadPercentStore.set((loaded / total) * 100);
         } else if (report.status === 'initiate') {
           // We don't have the total size of the file at the start, just put 1mb
@@ -54,6 +59,8 @@ export class Embedder {
     });
 
     p.then(() => {
+      // console.log('Actual total sum of all files:', Object.values(totals).reduce((a, b) => a + b, 0));
+
       this.statusStore.set('ready');
     });
 
@@ -97,3 +104,5 @@ export class Embedder {
     );
   }
 }
+
+export const globalEmbedder = new Embedder();
