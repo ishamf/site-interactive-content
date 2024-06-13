@@ -39,7 +39,7 @@ export class Embedder {
         loaded: number;
         total: number;
       }) => {
-        console.log('Progress:', report)
+        console.log('Progress:', report);
         if (report.status === 'progress') {
           totals[report.file] = report.total;
           loadeds[report.file] = report.loaded;

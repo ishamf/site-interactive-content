@@ -30,10 +30,15 @@
 
   <xif-embedding-figure sentences="cat,cats,dog,dogs,one,two,three,four,five,six,seven"
   ></xif-embedding-figure>
-  <xif-embedding-figure sentences="England,English king,Germany,German king,Italy,Italian king,King,Country"
+  <xif-embedding-figure
+    sentences="England,English king,Germany,German king,Italy,Italian king,King,Country"
   ></xif-embedding-figure>
-  <xif-embedding-figure sentences="fast,slow,very fast,very slow, extremely fast, extremely slow,mindblowingly fast"></xif-embedding-figure>
-  <xif-embedding-figure sentences="good app,bad app,hard to use,easy to use,responsive,unresponsive,quick load times,slow load times"></xif-embedding-figure>
+  <xif-embedding-figure
+    sentences="fast,slow,very fast,very slow, extremely fast, extremely slow,mindblowingly fast"
+  ></xif-embedding-figure>
+  <xif-embedding-figure
+    sentences="good app,bad app,hard to use,easy to use,responsive,unresponsive,quick load times,slow load times"
+  ></xif-embedding-figure>
 </main>
 
 <style lang="postcss">
