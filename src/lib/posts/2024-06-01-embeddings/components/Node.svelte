@@ -1,6 +1,6 @@
 <script lang="ts">
   import { createEventDispatcher } from 'svelte';
-  import { mdiPlus, mdiClose, mdiSetSplit } from '@mdi/js';
+  import { mdiClose } from '@mdi/js';
   import Input from '$lib/components/Input.svelte';
   import Button from '$lib/components/Button.svelte';
   import type { Sentence } from '../types';
