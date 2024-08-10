@@ -42,9 +42,6 @@ importers:
       '@sveltejs/vite-plugin-svelte':
         specifier: ^3.0.2
         version: 3.1.0(svelte@4.2.15)(vite@5.2.11(@types/node@20.12.8))
-      '@thedutchcoder/postcss-rem-to-px':
-        specifier: ^0.0.2
-        version: 0.0.2(postcss@8.4.38)
       '@tsconfig/svelte':
         specifier: ^5.0.2
         version: 5.0.4
@@ -468,12 +465,6 @@ packages:
     resolution: {integrity: sha512-ADGcJ8dX21dVVHIwTRgzrcunY6YY9uSlAHHGVKvkA+vLc5qLwEszvKts40lx7z0qc4clpjclwLeK5rVCV2P/uw==}
     peerDependencies:
       tailwindcss: '>=3.0.0 || insiders'
-
-  '@thedutchcoder/postcss-rem-to-px@0.0.2':
-    resolution: {integrity: sha512-M2T3bJSTgLtZF8+KDYDtSDAFGuTlaxYfitpjkmNswnfJ8AjbQ/g7NC+bqgAAViYWFV9I3tdrQuQ3Bu8j7GrjwA==}
-    engines: {node: '>=12.0.0'}
-    peerDependencies:
-      postcss: ^8.3.0
 
   '@tsconfig/svelte@5.0.4':
     resolution: {integrity: sha512-BV9NplVgLmSi4mwKzD8BD/NQ8erOY/nUE/GpgWe2ckx+wIQF5RyRirn/QsSSCPeulVpc3RA/iJt6DpfTIZps0Q==}
@@ -2267,10 +2258,6 @@ snapshots:
       lodash.merge: 4.6.2
       postcss-selector-parser: 6.0.10
       tailwindcss: 3.4.3
-
-  '@thedutchcoder/postcss-rem-to-px@0.0.2(postcss@8.4.38)':
-    dependencies:
-      postcss: 8.4.38
 
   '@tsconfig/svelte@5.0.4': {}
 

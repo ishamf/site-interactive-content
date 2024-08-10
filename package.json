@@ -16,7 +16,6 @@
   },
   "devDependencies": {
     "@sveltejs/vite-plugin-svelte": "^3.0.2",
-    "@thedutchcoder/postcss-rem-to-px": "^0.0.2",
     "@tsconfig/svelte": "^5.0.2",
     "@types/luxon": "^3.4.2",
     "@types/node": "^20.12.8",
