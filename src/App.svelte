@@ -5,11 +5,12 @@
   import './lib/entries/2023-url-tools';
   import './lib/entries/2024-timestamp-converter';
   import './lib/entries/2024-embeddings';
+  import './lib/entries/2024-image-key';
 </script>
 
 <main class="max-w-3xl">
   <!-- Only used for testing -->
-  <xif-url-tools></xif-url-tools>
+  <!-- <xif-url-tools></xif-url-tools>
 
   <xif-timestamp-converter></xif-timestamp-converter>
 
@@ -31,7 +32,9 @@
 
   <xif-embedding-figure
     sentences="good app,bad app,hard to use,easy to use,responsive,unresponsive,quick load times,slow load times"
-  ></xif-embedding-figure>
+  ></xif-embedding-figure> -->
+
+  <xif-image-key></xif-image-key>
 </main>
 
 <style lang="postcss">
