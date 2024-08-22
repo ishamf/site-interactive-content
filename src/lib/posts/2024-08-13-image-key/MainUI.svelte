@@ -1,17 +1,21 @@
 <svelte:options
-  customElement={{ tag: 'xif-image-key', mode: 'open', extend: addComponentStylesheet }}
+  customElement={{
+    tag: 'xif-image-key',
+    mode: 'open',
+    extend: createComponentExtender({ onConnect }),
+  }}
 />
 
 <script lang="ts">
-  import { addComponentStylesheet } from '$lib/component';
+  import { createComponentExtender } from '$lib/component';
   import Button from '$lib/components/Button.svelte';
-  import { mdiCamera, mdiUpload } from '@mdi/js';
+  import { mdiCamera } from '@mdi/js';
   import Capturer from './components/Capturer.svelte';
 
-  import { images } from './testImages';
   import { globalEmbedder } from './embedder';
   import { closestEmbedding, embeddingSimilarity } from './utils';
-  import TextButton from '$lib/components/TextButton.svelte';
+  import type { StoredData } from './types';
+  import { getInitialData } from './initialData';
 
   let capturer: Capturer;
   let data: string | undefined;
@@ -20,13 +24,24 @@
   let embedding: number[] | undefined;
   let embeddedData: string | undefined;
 
-  type StoredData = {
-    originalImage: string;
-    embedding: number[];
-    data: string;
-  };
-
   let storedData: StoredData[] = [];
+
+  function onConnect() {
+    const style = document.documentElement.style;
+
+    if (!style.scrollSnapType) {
+      style.scrollSnapType = 'y proximity';
+
+      return () => {
+        style.scrollSnapType = '';
+      };
+    }
+  }
+
+  getInitialData().then((res) => {
+    storedData.push(...res);
+    storedData = storedData;
+  });
 
   $: {
     if (!data) {
@@ -82,17 +97,10 @@
   }
 </script>
 
-<div
-  class="flex flex-wrap gap-4 text-neutral-800 dark:text-neutral-200 text-base max-w-4xl px-4 mx-auto"
->
-  <div class="flex flex-grow">
-    <div class="sticky top-4 w-80 grid gap-4 camera-grid">
-      <!-- Image Container -->
-      <div class="camera min-h-80 bg-neutral-100 dark:bg-neutral-800">
-        <Capturer bind:this={capturer}></Capturer>
-      </div>
-
-      <Button fullWidth icon={mdiUpload} title="Upload"></Button>
+<div class="container">
+  <div class="camera">
+    <Capturer bind:this={capturer}></Capturer>
+    <div class="absolute bottom-16 left-1/2 -translate-x-1/2">
       <Button
         fullWidth
         icon={mdiCamera}
@@ -104,46 +112,70 @@
     </div>
   </div>
 
-  <div class="min-w-80 flex-1 flex-grow-[9999]">
-    <p>Put data here</p>
-    {#if data}
-      <img class="w-20 h-20" src={data} />
-      {#if processingData}
-        <p>Processing...</p>
-      {/if}
-      <p>{distanceFromCurrent}</p>
-    {/if}
-
-    {#if closestStoredData}
-      <img class="w-20 h-20" src={closestStoredData.originalImage} />
-      <textarea bind:value={closestStoredData.data}></textarea>
-    {/if}
-
-    <TextButton on:click={addCurrent}>Add new</TextButton>
+  <div class="notes-container">
+    {#each storedData as note}
+      <div class="note">
+        <img class="original-image" src={note.originalImage} />
+        <textarea class="note-area" bind:value={note.data}></textarea>
+      </div>
+    {/each}
   </div>
 </div>
 
-<ul>
-  {#each images as image}
-    <li>
-      <a
-        href="#"
-        on:click={(e) => {
-          loadImage(e, image);
-        }}
-      >
-        <img src={image} class="w-10 h-10" />
-      </a>
-    </li>
-  {/each}
-</ul>
-
 <style lang="postcss">
-  .camera-grid {
-    grid: 'camera camera' auto 'btn1 btn2' auto / 1fr 1fr;
+  .container {
+    @apply text-neutral-800 dark:text-neutral-200 text-base max-w-4xl mx-auto;
+    scroll-snap-align: start;
   }
 
   .camera {
-    grid-area: camera;
+    background-color: red;
+    position: sticky;
+    height: 100dvh;
+    z-index: 5;
+
+    top: 0;
+
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1rem;
+  }
+
+  .notes-container {
+    position: relative;
+    z-index: 10;
+
+    scroll-snap-align: start;
+    height: 100dvh;
+
+    display: flex;
+    flex-direction: row;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+  }
+
+  .note {
+    width: 100vw;
+    flex: 0 0 auto;
+
+    display: flex;
+    flex-direction: column;
+    scroll-snap-align: start;
+    gap: 1rem;
+    padding: 1rem;
+    align-items: center;
+  }
+
+  .original-image {
+    width: 16rem;
+    height: 16rem;
+    object-fit: cover;
+  }
+
+  .note-area {
+    width: 100%;
+    height: 10rem;
+    resize: none;
   }
 </style>

@@ -1,8 +1,5 @@
-export type Sentence = {
-  value: string;
-};
-
-export type ProjectedSentence = Sentence & {
-  x: number;
-  y: number;
+export type StoredData = {
+  originalImage: string;
+  embedding: number[];
+  data: string;
 };

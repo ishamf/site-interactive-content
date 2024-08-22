@@ -76,9 +76,10 @@ export class Embedder {
     return this.pipelinePromise;
   }
 
-  async embed(imageUrl: string) {
-    if (this.cache.has(imageUrl)) {
-      return this.cache.get(imageUrl);
+  async embed(imageUrl: string): Promise<number[]> {
+    const cachedData = this.cache.get(imageUrl);
+    if (cachedData) {
+      return cachedData;
     }
 
     const pipeline = await this.getPipeline();

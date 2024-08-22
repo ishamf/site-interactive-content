@@ -9,6 +9,11 @@
 </script>
 
 <main class="max-w-3xl">
+  <p>
+    Lorem ipsum dolor sit amet consectetur adipisicing elit. Earum voluptate sequi velit sit quis
+    alias explicabo illo dolorem consequuntur beatae!
+  </p>
+
   <!-- Only used for testing -->
   <!-- <xif-url-tools></xif-url-tools>
 
@@ -35,6 +40,11 @@
   ></xif-embedding-figure> -->
 
   <xif-image-key></xif-image-key>
+
+  <p>
+    Lorem ipsum dolor sit, amet consectetur adipisicing elit. Excepturi officia iste veniam ut
+    mollitia rerum nemo porro veritatis, eligendi aliquam.
+  </p>
 </main>
 
 <style lang="postcss">
