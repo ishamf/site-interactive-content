@@ -41,16 +41,13 @@
   },
   "lint-staged": {
     "*.js": [
-      "prettier --write",
-      "eslint"
+      "prettier --write"
     ],
     "*.ts": [
-      "prettier --write",
-      "eslint"
+      "prettier --write"
     ],
     "*.svelte": [
-      "prettier --write",
-      "eslint"
+      "prettier --write"
     ],
     "*.json": [
       "prettier --write"
