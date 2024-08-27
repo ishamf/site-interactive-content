@@ -54,3 +54,7 @@ export function sortedNoteBySimilarity(
 
   return res;
 }
+
+export function randomId() {
+  return Math.random().toString(32).slice(2);
+}

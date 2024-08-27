@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { createEventDispatcher } from 'svelte';
+  import { createEventDispatcher, onDestroy } from 'svelte';
   import type { NoteData } from '../types';
   import TextButton from '$lib/components/TextButton.svelte';
 
@@ -7,6 +7,28 @@
   export let match: number | undefined = undefined;
 
   const dispatch = createEventDispatcher();
+
+  let isConfirmingDelete = false;
+
+  let deleteTimeout: ReturnType<typeof setTimeout> | undefined;
+
+  onDestroy(() => {
+    if (deleteTimeout) {
+      clearTimeout(deleteTimeout);
+    }
+  });
+
+  function onDeletePress() {
+    if (!isConfirmingDelete) {
+      isConfirmingDelete = true;
+
+      deleteTimeout = setTimeout(() => {
+        isConfirmingDelete = false;
+      }, 3000);
+    } else {
+      dispatch('delete');
+    }
+  }
 </script>
 
 <div class="note" class:with-match={typeof match === 'number'}>
@@ -28,10 +50,8 @@
         }}>Replace Photo</TextButton
       >
     {/if}
-    <TextButton
-      on:click={() => {
-        dispatch('delete');
-      }}>Delete</TextButton
+    <TextButton on:click={onDeletePress} danger={isConfirmingDelete}
+      >{isConfirmingDelete ? 'Confirm' : 'Delete'}</TextButton
     >
   </div>
 </div>

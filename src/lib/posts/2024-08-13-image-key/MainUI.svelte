@@ -14,7 +14,7 @@
   import { set as idbSet, get as idbGet } from 'idb-keyval';
 
   import { globalEmbedder } from './embedder';
-  import { closestEmbedding, embeddingSimilarity, sortedNoteBySimilarity } from './utils';
+  import { closestEmbedding, embeddingSimilarity, randomId, sortedNoteBySimilarity } from './utils';
   import type { NoteData } from './types';
   import { getInitialData } from './initialData';
   import Note from './components/Note.svelte';
@@ -83,7 +83,7 @@
 
   function addCurrent() {
     if (embedding) {
-      storedData.push({ embedding, note: '', originalImage: embeddedData || '' });
+      storedData.push({ embedding, note: '', originalImage: embeddedData || '', id: randomId() });
       storedData = storedData;
     }
   }
@@ -132,7 +132,7 @@
     </div>
   {/if}
 
-  {#each sortedNoteBySimilarity(storedData, embedding) as scannedNote}
+  {#each sortedNoteBySimilarity(storedData, embedding) as scannedNote (scannedNote.note.id)}
     <Note
       note={scannedNote.note}
       match={scannedNote.similarity}
