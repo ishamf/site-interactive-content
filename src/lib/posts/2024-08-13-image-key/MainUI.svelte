@@ -11,6 +11,7 @@
   import Button from '$lib/components/Button.svelte';
   import { mdiCamera } from '@mdi/js';
   import Capturer from './components/Capturer.svelte';
+  import { set as idbSet, get as idbGet } from 'idb-keyval';
 
   import { globalEmbedder } from './embedder';
   import { closestEmbedding, embeddingSimilarity, sortedNoteBySimilarity } from './utils';
@@ -40,13 +41,24 @@
     // }
   }
 
-  getInitialData().then((res) => {
-    storedData.push(...res);
-    storedData = storedData;
+  const storageKey = 'image-key-data';
+  let hasLoadedStorage = false;
 
-    // FIXME:
-    // takenImageUri = storedData[0].originalImage;
+  idbGet(storageKey).then(async (res) => {
+    if (res) {
+      storedData = res;
+    } else {
+      storedData = await getInitialData();
+    }
+
+    hasLoadedStorage = true;
   });
+
+  $: {
+    if (hasLoadedStorage) {
+      idbSet(storageKey, storedData);
+    }
+  }
 
   $: {
     if (!takenImageUri) {
