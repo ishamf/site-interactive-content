@@ -30,7 +30,7 @@ export class Embedder {
     this.statusStore.set('loading');
 
     // Obtained by letting it run once
-    const totalSizeOfModel = 34726889;
+    const totalSizeOfModel = 89122045;
 
     const p = pipeline('image-feature-extraction', 'Xenova/clip-vit-base-patch32', {
       progress_callback: (report: {
@@ -59,7 +59,10 @@ export class Embedder {
     });
 
     p.then(() => {
-      // console.log('Actual total sum of all files:', Object.values(totals).reduce((a, b) => a + b, 0));
+      console.log(
+        'Actual total sum of all files:',
+        Object.values(totals).reduce((a, b) => a + b, 0)
+      );
 
       this.statusStore.set('ready');
     });

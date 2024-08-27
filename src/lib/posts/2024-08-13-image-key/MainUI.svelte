@@ -27,6 +27,10 @@
   let embedding: number[] | undefined;
   let embeddedData: string | undefined;
 
+  const embedderStatus = globalEmbedder.statusStore;
+  const loadPercent = globalEmbedder.loadPercentStore;
+  $: roundedLoadPercent = Math.round($loadPercent);
+
   let storedData: NoteData[] = [];
 
   let takenPhotoPosition: HTMLDivElement;
@@ -77,29 +81,6 @@
     }
   }
 
-  $: closestStoredDataIndex = embedding
-    ? closestEmbedding(
-        storedData.map((x) => x.embedding),
-        embedding
-      )
-    : -1;
-
-  $: closestStoredData =
-    closestStoredDataIndex !== -1 ? storedData[closestStoredDataIndex] : undefined;
-
-  $: distanceFromCurrent =
-    closestStoredData && embedding
-      ? embeddingSimilarity(embedding, closestStoredData.embedding)
-      : 0;
-
-  $: {
-    console.log({
-      closestStoredDataIndex,
-      closestStoredData,
-      storedData,
-    });
-  }
-
   function addCurrent() {
     if (embedding) {
       storedData.push({ embedding, note: '', originalImage: embeddedData || '' });
@@ -139,7 +120,13 @@
         <p class="mb-4">Current image</p>
 
         <p>
-          <TextButton on:click={addCurrent}>Add Note</TextButton>
+          {#if $embedderStatus !== 'ready'}
+            <p>Loading model... ({roundedLoadPercent}%)</p>
+          {:else if takenImageUri === processingData && takenImageUri !== embeddedData}
+            <p>Processing image...</p>
+          {:else}
+            <TextButton on:click={addCurrent}>Add Note</TextButton>
+          {/if}
         </p>
       </div>
     </div>
@@ -173,7 +160,7 @@
   .camera {
     background-color: black;
     position: relative;
-    height: 40rem;
+    height: min(40rem, 100svh);
 
     top: 0;
 

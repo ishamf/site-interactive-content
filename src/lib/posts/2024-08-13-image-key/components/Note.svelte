@@ -38,7 +38,7 @@
 
 <style lang="postcss">
   .note {
-    @apply gap-4 p-4 bg-neutral-50;
+    @apply gap-4 p-4 bg-neutral-50 dark:bg-neutral-800;
 
     display: grid;
     grid:
@@ -66,7 +66,9 @@
     grid-area: text;
     resize: none;
 
-    @apply p-4;
+    @apply p-4 bg-neutral-100  text-neutral-800
+		dark:bg-neutral-700  dark:text-neutral-200
+    focus:outline-none focus:ring-2 focus:ring-neutral-500;
   }
 
   .match {
