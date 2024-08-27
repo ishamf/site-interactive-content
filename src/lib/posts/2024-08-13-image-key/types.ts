@@ -1,5 +1,5 @@
-export type StoredData = {
+export type NoteData = {
   originalImage: string;
   embedding: number[];
-  data: string;
+  note: string;
 };

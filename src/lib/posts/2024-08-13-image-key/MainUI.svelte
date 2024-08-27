@@ -13,42 +13,47 @@
   import Capturer from './components/Capturer.svelte';
 
   import { globalEmbedder } from './embedder';
-  import { closestEmbedding, embeddingSimilarity } from './utils';
-  import type { StoredData } from './types';
+  import { closestEmbedding, embeddingSimilarity, sortedNoteBySimilarity } from './utils';
+  import type { NoteData } from './types';
   import { getInitialData } from './initialData';
+  import Note from './components/Note.svelte';
+  import TextButton from '$lib/components/TextButton.svelte';
 
   let capturer: Capturer;
-  let data: string | undefined;
+  let takenImageUri: string | undefined;
 
   let processingData: string | undefined;
   let embedding: number[] | undefined;
   let embeddedData: string | undefined;
 
-  let storedData: StoredData[] = [];
+  let storedData: NoteData[] = [];
+
+  let takenPhotoPosition: HTMLDivElement;
 
   function onConnect() {
-    const style = document.documentElement.style;
-
-    if (!style.scrollSnapType) {
-      style.scrollSnapType = 'y proximity';
-
-      return () => {
-        style.scrollSnapType = '';
-      };
-    }
+    // const style = document.documentElement.style;
+    // if (!style.scrollSnapType) {
+    //   style.scrollSnapType = 'y proximity';
+    //   return () => {
+    //     style.scrollSnapType = '';
+    //   };
+    // }
   }
 
   getInitialData().then((res) => {
     storedData.push(...res);
     storedData = storedData;
+
+    // FIXME:
+    // takenImageUri = storedData[0].originalImage;
   });
 
   $: {
-    if (!data) {
+    if (!takenImageUri) {
       processingData = undefined;
       embedding = undefined;
-    } else if (data !== embeddedData) {
-      const currentData = data;
+    } else if (takenImageUri !== embeddedData) {
+      const currentData = takenImageUri;
       processingData = currentData;
       globalEmbedder.embed(currentData).then((res) => {
         if (res && processingData === currentData) {
@@ -83,15 +88,9 @@
     });
   }
 
-  function loadImage(event: MouseEvent, imageUrl: string) {
-    event.preventDefault();
-
-    data = imageUrl;
-  }
-
   function addCurrent() {
     if (embedding) {
-      storedData.push({ embedding, data: '', originalImage: embeddedData || '' });
+      storedData.push({ embedding, note: '', originalImage: embeddedData || '' });
       storedData = storedData;
     }
   }
@@ -100,82 +99,76 @@
 <div class="container">
   <div class="camera">
     <Capturer bind:this={capturer}></Capturer>
+
     <div class="absolute bottom-16 left-1/2 -translate-x-1/2">
       <Button
         fullWidth
         icon={mdiCamera}
         on:click={() => {
-          data = capturer.takePhoto();
+          const res = capturer.takePhoto();
+
+          if (res) {
+            takenImageUri = res;
+            takenPhotoPosition.scrollIntoView({ behavior: 'smooth' });
+          }
         }}
         title="Take Photo"
       ></Button>
     </div>
   </div>
 
-  <div class="notes-container">
-    {#each storedData as note}
-      <div class="note">
-        <img class="original-image" src={note.originalImage} />
-        <textarea class="note-area" bind:value={note.data}></textarea>
+  <div bind:this={takenPhotoPosition} class="-mb-4"></div>
+
+  {#if takenImageUri}
+    <div class="flex flex-row gap-4 px-4">
+      <img class="w-24 h-24 object-cover" src={takenImageUri} alt="Taken" />
+
+      <div>
+        <p class="mb-4">Current image</p>
+
+        <p>
+          <TextButton on:click={addCurrent}>Add Note</TextButton>
+        </p>
       </div>
-    {/each}
-  </div>
+    </div>
+  {/if}
+
+  {#each sortedNoteBySimilarity(storedData, embedding) as scannedNote}
+    <Note
+      note={scannedNote.note}
+      match={scannedNote.similarity}
+      on:replace={() => {
+        if (takenImageUri && embedding && embeddedData === takenImageUri) {
+          scannedNote.note.originalImage = takenImageUri;
+          scannedNote.note.embedding = embedding;
+        }
+      }}
+      on:delete={() => {
+        const currentNote = scannedNote.note;
+
+        storedData = storedData.filter((x) => x !== currentNote);
+      }}
+    />
+  {/each}
 </div>
 
 <style lang="postcss">
   .container {
-    @apply text-neutral-800 dark:text-neutral-200 text-base max-w-4xl mx-auto;
-    scroll-snap-align: start;
+    @apply text-neutral-800 dark:text-neutral-200 text-base max-w-4xl mx-auto
+      flex flex-col gap-4;
   }
 
   .camera {
-    background-color: red;
-    position: sticky;
-    height: 100dvh;
-    z-index: 5;
+    background-color: black;
+    position: relative;
+    height: 40rem;
 
     top: 0;
 
     display: flex;
     flex-direction: column;
     align-items: stretch;
+    justify-content: center;
     gap: 1rem;
-  }
-
-  .notes-container {
-    position: relative;
-    z-index: 10;
-
-    scroll-snap-align: start;
-    height: 100dvh;
-
-    display: flex;
-    flex-direction: row;
-    overflow-x: auto;
-    scroll-snap-type: x mandatory;
-  }
-
-  .note {
-    width: 100vw;
-    flex: 0 0 auto;
-
-    display: flex;
-    flex-direction: column;
-    scroll-snap-align: start;
-    gap: 1rem;
-    padding: 1rem;
-    align-items: center;
-  }
-
-  .original-image {
-    width: 16rem;
-    height: 16rem;
-    object-fit: cover;
-  }
-
-  .note-area {
-    width: 100%;
-    height: 10rem;
-    resize: none;
   }
 </style>

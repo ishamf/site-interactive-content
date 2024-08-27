@@ -3,8 +3,7 @@ import { LRUCache } from 'lru-cache';
 import { writable } from 'svelte/store';
 
 // Use some initial data to avoid downloading the embedding model immediately
-// TODO: Load initial cache
-// import initialCache from './embedding-init.json';
+import initialCache from './embedding-init.json';
 
 env.allowLocalModels = false;
 
@@ -21,8 +20,7 @@ export class Embedder {
   });
 
   constructor() {
-    // TODO: Load initial cache
-    // this.cache.load(initialCache as any);
+    this.cache.load(initialCache as any);
   }
 
   private loadPipeline() {
@@ -91,6 +89,9 @@ export class Embedder {
     const result: number[] = Array.from(res.data);
 
     this.cache.set(imageUrl, result);
+
+    // Used to prepare the cache
+    console.log('embeddingsCache:', JSON.stringify(this.cache.dump()));
 
     return result;
   }

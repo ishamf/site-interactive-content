@@ -1,3 +1,5 @@
+import type { NoteData } from './types';
+
 export function embeddingSimilarity(a: number[], b: number[]) {
   // Using cosine similarity
 
@@ -35,4 +37,20 @@ export function closestEmbedding(embeddings: number[][], target: number[]) {
   }
 
   return bestIndex;
+}
+
+export function sortedNoteBySimilarity(
+  embeddings: NoteData[],
+  target: number[] | undefined
+): { note: NoteData; similarity: number | undefined }[] {
+  const res = embeddings.map((note) => ({
+    note,
+    similarity: target ? embeddingSimilarity(note.embedding, target) : undefined,
+  }));
+
+  if (target) {
+    return res.sort((a, b) => b.similarity! - a.similarity!);
+  }
+
+  return res;
 }

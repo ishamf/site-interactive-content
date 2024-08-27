@@ -2,7 +2,7 @@ import appStyles from './app-css';
 
 type Remover = () => void;
 
-export function createComponentExtender({ onConnect }: { onConnect?: () => Remover | undefined }) {
+export function createComponentExtender({ onConnect }: { onConnect?: () => Remover | void }) {
   return function extender(Element: any): any {
     class WrappedElement extends Element {
       onConnectRemover: Remover | undefined;
@@ -16,7 +16,11 @@ export function createComponentExtender({ onConnect }: { onConnect?: () => Remov
       connectedCallback() {
         super.connectedCallback?.();
         if (onConnect) {
-          this.onConnectRemover = onConnect();
+          const remover = onConnect();
+
+          if (remover) {
+            this.onConnectRemover = remover;
+          }
         }
       }
 
