@@ -1,4 +1,3 @@
-import shoesPhoto from './builtin/shoes.jpg?url';
 import mugPhoto from './builtin/mug.jpg?url';
 import glassesPhoto from './builtin/glasses.jpg?url';
 import walletPhoto from './builtin/wallet.jpg?url';
@@ -13,7 +12,7 @@ export async function getInitialData(): Promise<NoteData[]> {
     {
       originalImage: walletPhoto,
       note: 'A wallet',
-      embedding: await globalEmbedder.embed(shoesPhoto),
+      embedding: await globalEmbedder.embed(walletPhoto),
     },
     {
       originalImage: mugPhoto,
