@@ -2,9 +2,6 @@ import { pipeline, env, ImageFeatureExtractionPipeline } from '@xenova/transform
 import { LRUCache } from 'lru-cache';
 import { writable } from 'svelte/store';
 
-// Use some initial data to avoid downloading the embedding model immediately
-import initialCache from './embedding-init.json';
-
 env.allowLocalModels = false;
 
 type EmbedderStatus = 'pending' | 'loading' | 'ready';
@@ -19,8 +16,8 @@ export class Embedder {
     max: 5000,
   });
 
-  constructor() {
-    this.cache.load(initialCache as any);
+  loadInitialCache(data: any) {
+    this.cache.load(data);
   }
 
   private loadPipeline() {

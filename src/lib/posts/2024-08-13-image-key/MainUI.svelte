@@ -58,6 +58,11 @@
     hasLoadedStorage = true;
   });
 
+  // Promise.resolve().then(async () => {
+  //   storedData = await getInitialData();
+  //   hasLoadedStorage = true;
+  // });
+
   $: {
     if (hasLoadedStorage) {
       idbSet(storageKey, storedData);
