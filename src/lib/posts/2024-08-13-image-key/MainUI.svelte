@@ -8,19 +8,16 @@
 
 <script lang="ts">
   import { createComponentExtender } from '$lib/component';
-  import Button from '$lib/components/Button.svelte';
-  import { mdiCamera } from '@mdi/js';
   import Capturer from './components/Capturer.svelte';
   import { set as idbSet, get as idbGet } from 'idb-keyval';
 
   import { globalEmbedder } from './embedder';
-  import { closestEmbedding, embeddingSimilarity, randomId, sortedNoteBySimilarity } from './utils';
+  import { randomId, sortedNoteBySimilarity } from './utils';
   import type { NoteData } from './types';
   import { getInitialData } from './initialData';
   import Note from './components/Note.svelte';
   import TextButton from '$lib/components/TextButton.svelte';
 
-  let capturer: Capturer;
   let takenImageUri: string | undefined;
 
   let processingData: string | undefined;
