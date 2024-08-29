@@ -9,13 +9,8 @@
 </script>
 
 <main class="max-w-3xl">
-  <p>
-    Lorem ipsum dolor sit amet consectetur adipisicing elit. Earum voluptate sequi velit sit quis
-    alias explicabo illo dolorem consequuntur beatae!
-  </p>
-
   <!-- Only used for testing -->
-  <!-- <xif-url-tools></xif-url-tools>
+  <xif-url-tools></xif-url-tools>
 
   <xif-timestamp-converter></xif-timestamp-converter>
 
@@ -37,14 +32,9 @@
 
   <xif-embedding-figure
     sentences="good app,bad app,hard to use,easy to use,responsive,unresponsive,quick load times,slow load times"
-  ></xif-embedding-figure> -->
+  ></xif-embedding-figure>
 
   <xif-image-key></xif-image-key>
-
-  <p>
-    Lorem ipsum dolor sit, amet consectetur adipisicing elit. Excepturi officia iste veniam ut
-    mollitia rerum nemo porro veritatis, eligendi aliquam.
-  </p>
 </main>
 
 <style lang="postcss">
