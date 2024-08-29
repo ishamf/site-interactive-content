@@ -91,7 +91,7 @@ export class Embedder {
     this.cache.set(imageUrl, result);
 
     // Used to prepare the cache
-    console.log('embeddingsCache:', JSON.stringify(this.cache.dump()));
+    // console.log('embeddingsCache:', JSON.stringify(this.cache.dump()));
 
     return result;
   }

@@ -92,28 +92,15 @@
       storedData = storedData;
     }
   }
+
+  function onPhoto(event: CustomEvent<string>) {
+    takenImageUri = event.detail;
+    takenPhotoPosition.scrollIntoView({ behavior: 'smooth' });
+  }
 </script>
 
 <div class="container">
-  <div class="camera">
-    <Capturer bind:this={capturer}></Capturer>
-
-    <div class="absolute bottom-16 left-1/2 -translate-x-1/2">
-      <Button
-        fullWidth
-        icon={mdiCamera}
-        on:click={() => {
-          const res = capturer.takePhoto();
-
-          if (res) {
-            takenImageUri = res;
-            takenPhotoPosition.scrollIntoView({ behavior: 'smooth' });
-          }
-        }}
-        title="Take Photo"
-      ></Button>
-    </div>
-  </div>
+  <Capturer on:photo={onPhoto}></Capturer>
 
   <div bind:this={takenPhotoPosition} class="-mb-4"></div>
 
@@ -160,19 +147,5 @@
   .container {
     @apply text-neutral-800 dark:text-neutral-200 text-base max-w-4xl mx-auto
       flex flex-col gap-4;
-  }
-
-  .camera {
-    background-color: black;
-    position: relative;
-    height: min(40rem, 100svh);
-
-    top: 0;
-
-    display: flex;
-    flex-direction: column;
-    align-items: stretch;
-    justify-content: center;
-    gap: 1rem;
   }
 </style>
