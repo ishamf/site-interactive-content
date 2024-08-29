@@ -40,7 +40,12 @@
     </div>
   {/if}
 
-  <textarea bind:value={note.note}></textarea>
+  <textarea
+    value={note.note}
+    on:input={(e) => {
+      dispatch('note-change', { value: e.currentTarget.value });
+    }}
+  ></textarea>
 
   <div class="buttons">
     {#if match}

@@ -62,8 +62,23 @@
 
   $: {
     if (hasLoadedStorage) {
-      idbSet(storageKey, storedData);
+      queueSave(storedData);
     }
+  }
+
+  let currentSavePromise: Promise<void> | undefined;
+  let currentSaveTimeout: ReturnType<typeof setTimeout> | undefined;
+
+  async function queueSave(data: NoteData[]) {
+    if (currentSaveTimeout) {
+      clearTimeout(currentSaveTimeout);
+    }
+
+    currentSaveTimeout = setTimeout(() => {
+      currentSavePromise = (currentSavePromise || Promise.resolve()).then(() => {
+        return idbSet(storageKey, data);
+      });
+    }, 500);
   }
 
   $: {
@@ -125,6 +140,9 @@
     <Note
       note={scannedNote.note}
       match={scannedNote.similarity}
+      on:note-change={(e) => {
+        scannedNote.note.note = e.detail.value;
+      }}
       on:replace={() => {
         if (takenImageUri && embedding && embeddedData === takenImageUri) {
           scannedNote.note.originalImage = takenImageUri;
