@@ -3,6 +3,7 @@
   import Icon from '$lib/components/Icon.svelte';
   import { mdiArrowDownThin, mdiCamera } from '@mdi/js';
   import { createEventDispatcher } from 'svelte';
+  import QRCode from 'qrcode';
 
   let video: HTMLVideoElement;
   let hasStartedTakingPhoto = false;
@@ -70,6 +71,16 @@
       hasStartedTakingPhoto = true;
     }
   }
+
+  let qrCode: string = '';
+  const qrUrl = new URL(window.location.href);
+  qrUrl.searchParams.set('ref', 'qr');
+
+  QRCode.toDataURL(qrUrl.toString(), { type: 'image/png', errorCorrectionLevel: 'M' }).then(
+    (code) => {
+      qrCode = code;
+    }
+  );
 </script>
 
 <!-- svelte-ignore a11y-media-has-caption -->
@@ -83,6 +94,13 @@
               flex flex-col items-center text-white text-center gap-4"
   >
     {#if !hasStartedTakingPhoto}
+      {#if qrCode}
+        <div class="flex flex-row mb-8 gap-4 items-center">
+          <p class="flex-1">You can open this page in another device using this QR code.</p>
+          <img src={qrCode} alt="QR code to this page" />
+        </div>
+      {/if}
+
       <p>Press the button below to enable the camera.</p>
       <p>All images are processed and stored locally.</p>
       <p>
