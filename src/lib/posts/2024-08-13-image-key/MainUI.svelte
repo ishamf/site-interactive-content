@@ -14,7 +14,6 @@
   import { globalEmbedder } from './embedder';
   import { randomId, sortedNoteBySimilarity } from './utils';
   import type { NoteData } from './types';
-  import { getInitialData } from './initialData';
   import Note from './components/Note.svelte';
   import TextButton from '$lib/components/TextButton.svelte';
 
@@ -49,6 +48,9 @@
     if (res) {
       storedData = res;
     } else {
+      // Only load initial data if needed
+      const { getInitialData } = await import('./initialData');
+
       storedData = await getInitialData();
     }
 

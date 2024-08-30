@@ -11,6 +11,7 @@ const needRebase = new URL(import.meta.url).origin !== location.origin;
 
 function rebaseWithScriptDomain(assetUrl: string) {
   if (!needRebase) return assetUrl;
+  if (!assetUrl.startsWith('/')) return assetUrl;
 
   const url = new URL(import.meta.url);
 
@@ -23,21 +24,20 @@ const mugPhoto = rebaseWithScriptDomain(mugPhotoRaw);
 const glassesPhoto = rebaseWithScriptDomain(glassesPhotoRaw);
 const walletPhoto = rebaseWithScriptDomain(walletPhotoRaw);
 
-const rebaseMap = {
-  [mugPhotoRaw]: mugPhoto,
-  [glassesPhotoRaw]: glassesPhoto,
-  [walletPhotoRaw]: walletPhoto,
-};
-
 export async function getInitialData(): Promise<NoteData[]> {
   // Use some initial data to avoid downloading the embedding model immediately
-  const rebasedInitialCache = needRebase
-    ? (initialCache as [string, any][]).map(([k, v]) => [rebaseMap[k] || k, v])
-    : initialCache;
-  globalEmbedder.loadInitialCache(rebasedInitialCache as any);
+  const [walletEmbedding, mugEmbedding, glassesEmbedding] = initialCache;
+  globalEmbedder.preloadEmbeddingForImage(walletPhoto, walletEmbedding);
+  globalEmbedder.preloadEmbeddingForImage(mugPhoto, mugEmbedding);
+  globalEmbedder.preloadEmbeddingForImage(glassesPhoto, glassesEmbedding);
 
   // Embed the images and load into the cache
-  await Promise.all([walletPhoto, mugPhoto, glassesPhoto].map((i) => globalEmbedder.embed(i)));
+  await Promise.all([walletPhoto, mugPhoto, glassesPhoto].map((i) => globalEmbedder.embed(i))).then(
+    (res) => {
+      // Used to prepare the cache
+      console.log('embeddingsCache:', JSON.stringify(res));
+    }
+  );
 
   return [
     {

@@ -16,8 +16,8 @@ export class Embedder {
     max: 5000,
   });
 
-  loadInitialCache(data: any) {
-    this.cache.load(data);
+  preloadEmbeddingForImage(imageUrl: string, embedding: number[]) {
+    this.cache.set(imageUrl, embedding);
   }
 
   private loadPipeline() {
@@ -89,9 +89,6 @@ export class Embedder {
     const result: number[] = Array.from(res.data);
 
     this.cache.set(imageUrl, result);
-
-    // Used to prepare the cache
-    // console.log('embeddingsCache:', JSON.stringify(this.cache.dump()));
 
     return result;
   }
