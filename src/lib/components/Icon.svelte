@@ -7,6 +7,7 @@
     button:
       'fill-neutral-400 group-disabled:fill-neutral-300 dark:fill-neutral-300 dark:group-disabled:fill-neutral-400',
     text: 'fill-neutral-400 group-disabled:fill-neutral-500 dark:fill-neutral-400 dark:group-disabled:fill-neutral-500',
+    white: 'fill-white',
   };
 </script>
 
