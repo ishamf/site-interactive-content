@@ -2,12 +2,12 @@
   customElement={{
     tag: 'xif-image-key',
     mode: 'open',
-    extend: createComponentExtender({ onConnect }),
+    extend: addComponentStylesheet,
   }}
 />
 
 <script lang="ts">
-  import { createComponentExtender } from '$lib/component';
+  import { addComponentStylesheet } from '$lib/component';
   import Capturer from './components/Capturer.svelte';
   import { set as idbSet, get as idbGet } from 'idb-keyval';
 
@@ -30,16 +30,6 @@
   let storedData: NoteData[] = [];
 
   let takenPhotoPosition: HTMLDivElement;
-
-  function onConnect() {
-    // const style = document.documentElement.style;
-    // if (!style.scrollSnapType) {
-    //   style.scrollSnapType = 'y proximity';
-    //   return () => {
-    //     style.scrollSnapType = '';
-    //   };
-    // }
-  }
 
   const storageKey = 'image-key-data';
   let hasLoadedStorage = false;
