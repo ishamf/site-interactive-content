@@ -6,6 +6,7 @@
   import './lib/entries/2024-timestamp-converter';
   import './lib/entries/2024-embeddings';
   import './lib/entries/2024-image-key';
+  import './lib/entries/2024-window-position';
 </script>
 
 <main class="max-w-3xl">
@@ -35,6 +36,8 @@
   ></xif-embedding-figure>
 
   <xif-image-key></xif-image-key>
+
+  <xif-window-display></xif-window-display>
 </main>
 
 <style lang="postcss">
