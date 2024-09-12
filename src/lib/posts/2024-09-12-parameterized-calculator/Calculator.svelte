@@ -10,16 +10,29 @@
 
   const state = new CalculatorState();
 
-  state.mainCalculation.updateText('3x^2 + 17x - 6');
-  state.variables['x']?.updateText('1/3');
+  state.mainCalculation.updateText('3a^2 + 2 a b - 5');
+  state.variables['a']?.updateText('1/3');
+  state.variables['b']?.updateText('7');
+
+  export function updateText(text: string, variables?: Record<string, string>) {
+    state.mainCalculation.updateText(text);
+
+    if (variables) {
+      for (const [name, value] of Object.entries(variables)) {
+        state.variables[name]?.updateText(value);
+      }
+    }
+  }
 
   const validVariablePairs = createStoreFromMobx(() => Object.entries(state.validVariables));
+
+  const variableColors = createStoreFromMobx(() => state.variableColors);
 </script>
 
-<div class="flex flex-col gap-4 max-w-4xl p-4">
+<div class="flex flex-col gap-4 p-4 prose prose-neutral dark:prose-invert font-sans max-w-none">
   <CalculationEditor calculation={state.mainCalculation}></CalculationEditor>
 
   {#each $validVariablePairs as [name, calculation]}
-    <VariableEditor {name} {calculation}></VariableEditor>
+    <VariableEditor {name} color={$variableColors[name] || 'red'} {calculation}></VariableEditor>
   {/each}
 </div>

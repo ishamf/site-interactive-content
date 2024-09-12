@@ -12,7 +12,7 @@
 
 <main class="max-w-3xl">
   <!-- Only used for testing -->
-  <!-- <xif-url-tools></xif-url-tools>
+  <xif-url-tools></xif-url-tools>
 
   <xif-timestamp-converter></xif-timestamp-converter>
 
@@ -38,7 +38,7 @@
 
   <xif-image-key></xif-image-key>
 
-  <xif-window-display></xif-window-display> -->
+  <xif-window-display></xif-window-display>
 
   <xif-calculator></xif-calculator>
 </main>

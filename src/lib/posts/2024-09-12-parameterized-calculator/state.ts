@@ -1,8 +1,14 @@
 import { makeAutoObservable } from 'mobx';
-import { arithmeticGrammar, calcSemantics } from './parser';
+import {
+  arithmeticGrammar,
+  calcSemantics,
+  getDisplaySegments,
+  type DisplaySegments,
+} from './parser';
 import type { Value } from './value';
 
 type Variables = Record<string, Value>;
+type VariableColors = Record<string, string>;
 
 type CalculationParams = {
   onUpdate?: () => void;
@@ -17,14 +23,17 @@ export class Calculation {
 
   variables: Variables = {};
 
+  variableColors: VariableColors = {};
+
   updateText(text: string) {
     this.inputText = text;
 
     this.params.onUpdate?.();
   }
 
-  updateVariables(variables: Variables) {
+  updateVariables(variables: Variables, variableColors: VariableColors) {
     this.variables = variables;
+    this.variableColors = variableColors;
   }
 
   get match() {
@@ -50,6 +59,14 @@ export class Calculation {
   get isValid() {
     return !!(this.value && !this.value.invalidReason);
   }
+
+  get displaySegments(): DisplaySegments {
+    if (!this.semantics) {
+      return [{ type: 'string', value: this.inputText }];
+    }
+
+    return getDisplaySegments(this.semantics);
+  }
 }
 
 export class CalculatorState {
@@ -59,16 +76,19 @@ export class CalculatorState {
     this.mainCalculation = new Calculation({
       onUpdate: () => {
         if (this.mainCalculation.semantics) {
-          this.lastValidVariables = this.mainCalculation.semantics.variables;
+          this.lastValidVariables = Array.from(
+            new Set(this.mainCalculation.semantics.variablesDuplicate)
+          );
+          this.mainCalculation.updateVariables(this.validVariableValues, this.variableColors);
 
           for (const variableName of this.lastValidVariables) {
             if (!this.variables[variableName]) {
               this.variables[variableName] = new Calculation({
                 onUpdate: () => {
-                  console.log('onUpdate', this.validVariableValues);
-                  const validVariableValues = this.validVariableValues;
-
-                  this.mainCalculation.updateVariables(validVariableValues);
+                  this.mainCalculation.updateVariables(
+                    this.validVariableValues,
+                    this.variableColors
+                  );
                 },
               });
             }
@@ -95,11 +115,22 @@ export class CalculatorState {
     return result;
   }
 
+  get variableColors() {
+    const colors = {} as Record<string, string>;
+
+    const colorStep = (1.8 * 180) / Math.PI;
+
+    const variableNames = this.lastValidVariables;
+    for (let i = 0; i < variableNames.length; i++) {
+      colors[variableNames[i]] = `oklch(60% 0.1 ${(i * colorStep) % 360})`;
+    }
+
+    return colors;
+  }
+
   get validVariableValues(): Record<string, Value> {
-    console.log('vvv computed');
     const result = {} as Record<string, Value>;
     for (const [name, calculation] of Object.entries(this.validVariables)) {
-      console.log(name, calculation, !!(calculation.isValid && calculation.value));
       if (calculation.isValid && calculation.value) {
         result[name] = calculation.value;
       }

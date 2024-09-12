@@ -1,5 +1,5 @@
 import Fraction from 'fraction.js';
-import type { Node } from 'ohm-js';
+import type { IterationNode, Node, NonterminalNode } from 'ohm-js';
 
 import arithmeticGrammar from './arithmetic.ohm-bundle';
 import { Value } from './value';
@@ -120,7 +120,7 @@ calcSemantics.addOperation<Value>('value(variables)', {
   },
 });
 
-calcSemantics.addAttribute<string[]>('variables', {
+calcSemantics.addAttribute<string[]>('variablesDuplicate', {
   ident(_arg0, _arg1) {
     return [this.sourceString];
   },
@@ -138,9 +138,76 @@ calcSemantics.addAttribute<string[]>('variables', {
   },
 
   _nonterminal(...children) {
-    return children.map((x) => x.variables).flat();
+    return children.map((x) => x.variablesDuplicate).flat();
   },
 });
+
+type InternalSegments = (string | { isVariable: true; variable: string })[];
+
+function displaySegmentsInternalMultiChild(
+  node: NonterminalNode | IterationNode,
+  children: Node[]
+) {
+  const offset = node.source.startIdx;
+  let lastIdx = offset;
+
+  const result: InternalSegments = [];
+
+  for (const child of children) {
+    const childStart = child.source.startIdx;
+    if (lastIdx !== childStart) {
+      result.push(node.sourceString.slice(lastIdx - offset, childStart - offset));
+    }
+    result.push(...child.displaySegmentsInternal());
+    lastIdx = child.source.endIdx;
+  }
+
+  if (lastIdx - offset < node.sourceString.length) {
+    result.push(node.sourceString.slice(lastIdx - offset));
+  }
+
+  return result;
+}
+calcSemantics.addOperation<InternalSegments>('displaySegmentsInternal', {
+  _terminal() {
+    return [this.sourceString];
+  },
+  ident(_arg0, _arg1) {
+    return [{ isVariable: true, variable: this.sourceString }];
+  },
+  _nonterminal(...children) {
+    return displaySegmentsInternalMultiChild(this, children);
+  },
+  _iter(...children) {
+    return displaySegmentsInternalMultiChild(this, children);
+  },
+});
+
+export type DisplaySegments = { type: 'string' | 'variable'; value: string }[];
+
+export function getDisplaySegments(sem: any) {
+  const internalSegments: InternalSegments = sem.displaySegmentsInternal();
+
+  const result: DisplaySegments = [];
+
+  let pendingStringSegments: string[] = [];
+
+  for (const segment of internalSegments) {
+    if (typeof segment === 'string') {
+      pendingStringSegments.push(segment);
+    } else {
+      result.push({ type: 'string', value: pendingStringSegments.join('') });
+      pendingStringSegments = [];
+      result.push({ type: 'variable', value: segment.variable });
+    }
+  }
+
+  if (pendingStringSegments.length > 0) {
+    result.push({ type: 'string', value: pendingStringSegments.join('') });
+  }
+
+  return result;
+}
 
 type Result = { ok: true; value: Value } | { ok: false; error: string };
 
