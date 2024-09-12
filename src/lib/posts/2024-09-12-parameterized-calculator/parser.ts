@@ -48,7 +48,7 @@ calcSemantics.addOperation('text', {
   ident: textWithoutSpace2,
 });
 
-calcSemantics.addAttribute<Value>('value', {
+calcSemantics.addOperation<Value>('value(variables)', {
   number_fract(_arg0, _arg1, _arg2) {
     return new Value(new Fraction(this.sourceString));
   },
@@ -58,47 +58,87 @@ calcSemantics.addAttribute<Value>('value', {
   },
 
   ident(_arg0, _arg1) {
-    return new Value(new Fraction('1'));
+    const variables: Record<string, Value | undefined> = this.args.variables;
+
+    const name = this.sourceString;
+
+    const value = variables[name];
+
+    if (value) {
+      return value;
+    } else {
+      return Value.invalid(`Variable ${name} is not defined`);
+    }
   },
 
   AddExp_plus(arg0, _arg1, arg2) {
-    return arg0.value.add(arg2.value);
+    const variables = this.args.variables;
+    return arg0.value(variables).add(arg2.value(variables));
   },
 
   AddExp_minus(arg0, _arg1, arg2) {
-    return arg0.value.add(arg2.value.neg());
+    const variables = this.args.variables;
+    return arg0.value(variables).subtract(arg2.value(variables));
   },
 
   MulExp_times(arg0, _arg1, arg2) {
-    return arg0.value.mul(arg2.value);
+    const variables = this.args.variables;
+    return arg0.value(variables).mul(arg2.value(variables));
   },
 
   SMulExp_shortTimes(arg0, arg1) {
-    return arg0.value.mul(arg1.value);
+    const variables = this.args.variables;
+    return arg0.value(variables).mul(arg1.value(variables));
   },
 
   MulExp_divide(arg0, _arg1, arg2) {
-    return arg0.value.div(arg2.value);
+    const variables = this.args.variables;
+    return arg0.value(variables).div(arg2.value(variables));
   },
 
   ExpExp_power(arg0, _arg1, arg2) {
-    return arg0.value.exp(arg2.value);
+    const variables = this.args.variables;
+    return arg0.value(variables).exp(arg2.value(variables));
   },
 
   ExpExp_powerRSign(arg0, _arg1, arg2) {
-    return arg0.value.exp(arg2.value);
+    const variables = this.args.variables;
+    return arg0.value(variables).exp(arg2.value(variables));
   },
 
   PriExp_paren(_arg0, arg1, _arg2) {
-    return arg1.value;
+    const variables = this.args.variables;
+    return arg1.value(variables);
   },
 
   SignExp_pos(_arg0, arg1) {
-    return arg1.value;
+    return arg1.value(this.args.variables);
   },
 
   SignExp_neg(_arg0, arg1) {
-    return arg1.value.neg();
+    return arg1.value(this.args.variables).neg();
+  },
+});
+
+calcSemantics.addAttribute<string[]>('variables', {
+  ident(_arg0, _arg1) {
+    return [this.sourceString];
+  },
+
+  number_fract(_arg0, _arg1, _arg2) {
+    return [];
+  },
+
+  number_whole(_arg0) {
+    return [];
+  },
+
+  _terminal() {
+    return [];
+  },
+
+  _nonterminal(...children) {
+    return children.map((x) => x.variables).flat();
   },
 });
 
@@ -108,7 +148,7 @@ export function parseValue(s: string): Result {
   const m = arithmeticGrammar.match(s);
   if (m.failed()) return { ok: false, error: `Cannot parse "${s}"` };
   const r = calcSemantics(m);
-  const value: Value = r.value;
+  const value: Value = r.value({ a: Value.fromNumber(20) });
 
   if (value.invalidReason) {
     return { ok: false, error: `Invalid expression ${s}: ${value.invalidReason}` };

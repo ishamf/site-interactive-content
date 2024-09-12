@@ -44,6 +44,9 @@ importers:
       ml-pca:
         specifier: ^4.1.1
         version: 4.1.1
+      mobx:
+        specifier: ^6.13.2
+        version: 6.13.2
       ohm-js:
         specifier: ^16
         version: 16.6.0
@@ -1329,6 +1332,9 @@ packages:
 
   ml-pca@4.1.1:
     resolution: {integrity: sha512-HQwswMK1dObj+ppk3EPcQMR2djWK0Cri8mAFd2nITtXHkLfO4DBBsEtiCT5KiR+2e3hQjp+lI0UyqZpdf04AlQ==}
+
+  mobx@6.13.2:
+    resolution: {integrity: sha512-GIubI2qf+P6lG6rSEG0T2pg3jV9/0+O0ncF09+0umRe75+Cbnh1KNLM1GvbTY9RSc7QuU+LcPNZfxDY8B+3XRg==}
 
   mri@1.2.0:
     resolution: {integrity: sha512-tzzskb3bG8LvYGFF/mDTpq3jpI6Q9wc3LEmBaghu+DdCssd1FakN7Bc0hVNmEyGq1bq3RgfkCb3cmQLpNPOroA==}
@@ -3184,6 +3190,8 @@ snapshots:
   ml-pca@4.1.1:
     dependencies:
       ml-matrix: 6.11.0
+
+  mobx@6.13.2: {}
 
   mri@1.2.0: {}
 

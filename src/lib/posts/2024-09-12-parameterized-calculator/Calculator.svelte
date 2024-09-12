@@ -3,17 +3,23 @@
 <script lang="ts">
   import { addComponentStylesheet } from '$lib/component';
   import Container from '$lib/components/Container.svelte';
-  import Input from '$lib/components/Input.svelte';
-  import { parseValue } from './parser';
+  import { createStoreFromMobx } from '$lib/utils';
+  import CalculationEditor from './CalculationEditor.svelte';
+  import { CalculatorState } from './state';
+  import VariableEditor from './VariableEditor.svelte';
 
-  let text = '2 + 2';
+  const state = new CalculatorState();
 
-  $: result = parseValue(text);
+  state.mainCalculation.updateText('3x^2 + 17x - 6');
+  state.variables['x']?.updateText('1/3');
 
-  $: calcResult = result.ok ? result.value.toString() : result.error;
+  const validVariablePairs = createStoreFromMobx(() => Object.entries(state.validVariables));
 </script>
 
-<Container>
-  <Input placeholder="Enter something..." bind:value={text}></Input>
-  {calcResult}
-</Container>
+<div class="flex flex-col gap-4 max-w-4xl p-4">
+  <CalculationEditor calculation={state.mainCalculation}></CalculationEditor>
+
+  {#each $validVariablePairs as [name, calculation]}
+    <VariableEditor {name} {calculation}></VariableEditor>
+  {/each}
+</div>
