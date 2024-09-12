@@ -1,6 +1,4 @@
-<svelte:options
-  customElement={{ tag: 'xif-input-styling-2', mode: 'open', extend: addComponentStylesheet }}
-/>
+<svelte:options customElement={{ tag: 'xif-input-styling-2', extend: addComponentStylesheet }} />
 
 <script lang="ts">
   import { addComponentStylesheet } from '$lib/component';

@@ -1,7 +1,7 @@
 <svelte:options
   customElement={{
     tag: 'xif-image-key',
-    mode: 'open',
+
     extend: addComponentStylesheet,
   }}
 />

@@ -1,5 +1,5 @@
 <svelte:options
-  customElement={{ tag: 'xif-timestamp-converter', mode: 'open', extend: addComponentStylesheet }}
+  customElement={{ tag: 'xif-timestamp-converter', extend: addComponentStylesheet }}
 />
 
 <script>

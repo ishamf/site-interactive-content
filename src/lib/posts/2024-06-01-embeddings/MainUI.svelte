@@ -1,6 +1,4 @@
-<svelte:options
-  customElement={{ tag: 'xif-embeddings', mode: 'open', extend: addComponentStylesheet }}
-/>
+<svelte:options customElement={{ tag: 'xif-embeddings', extend: addComponentStylesheet }} />
 
 <script lang="ts">
   import { addComponentStylesheet } from '$lib/component';

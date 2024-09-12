@@ -1,6 +1,4 @@
-<svelte:options
-  customElement={{ tag: 'xif-glowing-text', mode: 'open', extend: addComponentStylesheet }}
-/>
+<svelte:options customElement={{ tag: 'xif-glowing-text', extend: addComponentStylesheet }} />
 
 <script>
   import { addComponentStylesheet } from '$lib/component';

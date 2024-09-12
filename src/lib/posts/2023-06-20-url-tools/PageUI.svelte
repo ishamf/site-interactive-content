@@ -1,6 +1,4 @@
-<svelte:options
-  customElement={{ tag: 'xif-url-tools', mode: 'open', extend: addComponentStylesheet }}
-/>
+<svelte:options customElement={{ tag: 'xif-url-tools', extend: addComponentStylesheet }} />
 
 <script lang="ts">
   import { onMount } from 'svelte';
