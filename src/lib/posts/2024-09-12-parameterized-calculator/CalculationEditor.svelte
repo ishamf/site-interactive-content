@@ -20,10 +20,8 @@
 </script>
 
 <CoveredInput bind:value={$mainText} padding="medium"
-  ><span class="whitespace-pre-wrap"
-    >{#each $displaySegments as segment}{#if segment.type === 'string'}{segment.value}{:else}<span
-          style={`color: ${$variableColors[segment.value] || 'red'}`}>{segment.value}</span
-        >{/if}{/each}{#if shouldShowResult}<span class="text-neutral-500 ml-1">= {$calcResult}</span
-      >{/if}</span
-  ></CoveredInput
+  >{#each $displaySegments as segment}{#if segment.type === 'string'}{segment.value}{:else}<span
+        style={`color: ${$variableColors[segment.value] || 'red'}`}>{segment.value}</span
+      >{/if}{/each}{#if shouldShowResult}<span class="text-neutral-500 ml-1">= {$calcResult}</span
+    >{/if}</CoveredInput
 >

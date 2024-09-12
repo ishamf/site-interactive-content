@@ -146,29 +146,31 @@ type InternalSegments = (string | { isVariable: true; variable: string })[];
 
 function displaySegmentsInternalMultiChild(
   node: NonterminalNode | IterationNode,
-  children: Node[]
+  children: Node[],
+  outermost = false
 ) {
-  const offset = node.source.startIdx;
-  let lastIdx = offset;
+  let lastIdx = outermost ? 0 : node.source.startIdx;
 
   const result: InternalSegments = [];
 
   for (const child of children) {
     const childStart = child.source.startIdx;
     if (lastIdx !== childStart) {
-      result.push(node.sourceString.slice(lastIdx - offset, childStart - offset));
+      result.push(node.source.sourceString.slice(lastIdx, childStart));
     }
-    result.push(...child.displaySegmentsInternal());
+    result.push(...child.displaySegmentsInternal(false));
     lastIdx = child.source.endIdx;
   }
 
-  if (lastIdx - offset < node.sourceString.length) {
-    result.push(node.sourceString.slice(lastIdx - offset));
+  if (lastIdx < node.source.sourceString.length) {
+    result.push(
+      node.source.sourceString.slice(lastIdx, outermost ? undefined : node.source.endIdx)
+    );
   }
 
   return result;
 }
-calcSemantics.addOperation<InternalSegments>('displaySegmentsInternal', {
+calcSemantics.addOperation<InternalSegments>('displaySegmentsInternal(start)', {
   _terminal() {
     return [this.sourceString];
   },
@@ -176,17 +178,17 @@ calcSemantics.addOperation<InternalSegments>('displaySegmentsInternal', {
     return [{ isVariable: true, variable: this.sourceString }];
   },
   _nonterminal(...children) {
-    return displaySegmentsInternalMultiChild(this, children);
+    return displaySegmentsInternalMultiChild(this, children, this.args.start);
   },
   _iter(...children) {
-    return displaySegmentsInternalMultiChild(this, children);
+    return displaySegmentsInternalMultiChild(this, children, this.args.start);
   },
 });
 
 export type DisplaySegments = { type: 'string' | 'variable'; value: string }[];
 
 export function getDisplaySegments(sem: any) {
-  const internalSegments: InternalSegments = sem.displaySegmentsInternal();
+  const internalSegments: InternalSegments = sem.displaySegmentsInternal(true);
 
   const result: DisplaySegments = [];
 
