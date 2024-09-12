@@ -12,7 +12,7 @@
   $: paddingClass = padding === 'small' ? 'p-1' : 'p-2';
 </script>
 
-<div class="flex relative dark:bg-neutral-900 bg-neutral-100">
+<div class="flex relative dark:bg-neutral-800 bg-neutral-100">
   <div class={'cover ' + paddingClass} class:disabled bind:this={cover}>
     <slot />{' '}
   </div>
