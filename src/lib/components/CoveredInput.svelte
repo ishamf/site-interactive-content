@@ -1,22 +1,23 @@
 <script lang="ts">
   export let disabled = false;
   export let value: string;
+  export let padding: 'small' | 'medium' = 'small';
+  export let placeholder = 'Type stuff here!';
   export let rows = 1;
   export let caretColor: 'white' | 'auto' = 'auto';
 
   let textarea: HTMLTextAreaElement;
   let cover: HTMLDivElement;
+
+  $: paddingClass = padding === 'small' ? 'p-1' : 'p-2';
 </script>
 
-<div class="flex relative dark:bg-neutral-900 bg-neutral-100">
-  <div class="p-1 cover" class:disabled bind:this={cover}>
-    <slot />{' '}
-  </div>
-
+<div class="flex relative dark:bg-neutral-800 bg-neutral-100">
   <textarea
     {rows}
-    placeholder="Type stuff here!"
-    class="p-1 input bg-transparent"
+    {placeholder}
+    class={'input focus:outline-none focus:ring-2 focus:ring-neutral-500 bg-transparent ' +
+      paddingClass}
     class:disabled
     class:force-caret-white={caretColor === 'white'}
     bind:value
@@ -27,6 +28,10 @@
       cover.scrollLeft = textarea.scrollLeft;
     }}
   />
+
+  <div class={'cover ' + paddingClass} class:disabled bind:this={cover}>
+    <slot />{' '}
+  </div>
 </div>
 
 <style>

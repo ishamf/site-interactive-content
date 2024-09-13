@@ -7,6 +7,7 @@
   import './lib/entries/2024-embeddings';
   import './lib/entries/2024-image-key';
   import './lib/entries/2024-window-position';
+  import './lib/entries/2024-parameterized-calculator';
 </script>
 
 <main class="max-w-3xl">
@@ -38,6 +39,8 @@
   <xif-image-key></xif-image-key>
 
   <xif-window-display></xif-window-display>
+
+  <xif-calculator></xif-calculator>
 </main>
 
 <style lang="postcss">

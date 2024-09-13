@@ -1,0 +1,42 @@
+Arithmetic {
+  Exp
+    = AddExp
+
+  AddExp
+    = AddExp "+" MulExp  -- plus
+    | AddExp "-" MulExp  -- minus
+    | MulExp
+
+  MulExp
+    = MulExp "*" SMulExp  -- times
+    | MulExp "/" SMulExp  -- divide
+    | SMulExp
+
+  SMulExp
+    = SMulExp ExpExp -- shortTimes
+    | SignExp
+
+  SignExp
+   = "+" ExpExp   -- pos
+    | "-" ExpExp   -- neg
+    | ExpExp
+
+  ExpExp
+    = PriExp "^" ExpExp  -- power
+    | ExpExp "^" SignExp -- powerRSign
+    | PriExp
+
+  PriExp
+    = "(" Exp ")"  -- paren
+    | ident
+    | number
+
+  ident  (an identifier)
+    = letter alnum*
+
+  number  (a number)
+    = digit* "." digit+  -- fract
+    | digit+             -- whole
+
+  space += "\u{00A0}"
+}

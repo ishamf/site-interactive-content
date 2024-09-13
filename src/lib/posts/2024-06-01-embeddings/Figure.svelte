@@ -1,6 +1,4 @@
-<svelte:options
-  customElement={{ tag: 'xif-embedding-figure', mode: 'open', extend: addComponentStylesheet }}
-/>
+<svelte:options customElement={{ tag: 'xif-embedding-figure', extend: addComponentStylesheet }} />
 
 <script lang="ts">
   import { writable } from 'svelte/store';

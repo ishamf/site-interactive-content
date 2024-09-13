@@ -1,7 +1,7 @@
 <svelte:options
   customElement={{
     tag: 'xif-window-display',
-    mode: 'open',
+
     extend: addComponentStylesheet,
   }}
 />

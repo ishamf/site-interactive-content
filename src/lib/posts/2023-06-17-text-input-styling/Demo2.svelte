@@ -1,11 +1,9 @@
-<svelte:options
-  customElement={{ tag: 'xif-input-styling-2', mode: 'open', extend: addComponentStylesheet }}
-/>
+<svelte:options customElement={{ tag: 'xif-input-styling-2', extend: addComponentStylesheet }} />
 
 <script lang="ts">
   import { addComponentStylesheet } from '$lib/component';
   import Container from '$lib/components/Container.svelte';
-  import CoveredInput from './CoveredInput.svelte';
+  import CoveredInput from '$lib/components/CoveredInput.svelte';
 
   let secondValue =
     'This looks identical to the above input, but the text inside is rendered differently.';
