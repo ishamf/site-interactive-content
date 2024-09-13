@@ -13,10 +13,6 @@
 </script>
 
 <div class="flex relative dark:bg-neutral-800 bg-neutral-100">
-  <div class={'cover ' + paddingClass} class:disabled bind:this={cover}>
-    <slot />{' '}
-  </div>
-
   <textarea
     {rows}
     {placeholder}
@@ -31,6 +27,10 @@
       cover.scrollLeft = textarea.scrollLeft;
     }}
   />
+
+  <div class={'cover ' + paddingClass} class:disabled bind:this={cover}>
+    <slot />{' '}
+  </div>
 </div>
 
 <style>
