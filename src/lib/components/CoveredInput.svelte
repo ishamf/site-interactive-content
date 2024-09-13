@@ -16,7 +16,8 @@
   <textarea
     {rows}
     {placeholder}
-    class={'input bg-transparent ' + paddingClass}
+    class={'input focus:outline-none focus:ring-2 focus:ring-neutral-500 bg-transparent ' +
+      paddingClass}
     class:disabled
     class:force-caret-white={caretColor === 'white'}
     bind:value
