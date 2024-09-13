@@ -16,7 +16,7 @@
 </script>
 
 <ul>
-  {#each examples as { text, expression, variables }, i}
+  {#each examples as { text, expression, variables }}
     <li>
       <a
         href={`#${targetId}`}

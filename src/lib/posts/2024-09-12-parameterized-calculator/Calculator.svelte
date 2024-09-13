@@ -2,7 +2,6 @@
 
 <script lang="ts">
   import { addComponentStylesheet } from '$lib/component';
-  import Container from '$lib/components/Container.svelte';
   import { createStoreFromMobx } from '$lib/utils';
   import CalculationEditor from './CalculationEditor.svelte';
   import { CalculatorState } from './state';
