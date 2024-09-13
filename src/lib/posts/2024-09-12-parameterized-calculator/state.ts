@@ -118,11 +118,11 @@ export class CalculatorState {
   get variableColors() {
     const colors = {} as Record<string, string>;
 
-    const colorStep = (1.8 * 180) / Math.PI;
+    const hues = [60, 180, 300, 0, 120, 240];
 
     const variableNames = this.lastValidVariables;
     for (let i = 0; i < variableNames.length; i++) {
-      colors[variableNames[i]] = `oklch(60% 0.1 ${(i * colorStep) % 360})`;
+      colors[variableNames[i]] = `oklch(70% 0.1 ${hues[i % hues.length]})`;
     }
 
     return colors;
