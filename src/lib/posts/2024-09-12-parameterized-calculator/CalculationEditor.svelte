@@ -55,7 +55,7 @@
         >{segment.value}</span
       >{/if}{/each}{#if shouldShowResult}<span class="text-neutral-500 ml-1"
       ><span class="cover"
-        >= <!-- adding this comment to prevent prettier from adding newline
+        >{'= '}<!-- adding this comment to prevent prettier from adding newline
         --></span
       ><!-- 
       svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions
