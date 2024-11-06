@@ -1,6 +1,8 @@
 <svelte:options customElement={{ tag: 'xif-embeddings', extend: addComponentStylesheet }} />
 
 <script lang="ts">
+  import { run } from 'svelte/legacy';
+
   import { addComponentStylesheet } from '$lib/component';
   import { asyncDerived, writable } from '@square/svelte-store';
   import Node from './components/Node.svelte';
@@ -19,12 +21,12 @@
   );
 
   // Create drafts if needed
-  $: {
+  run(() => {
     if ($sentences.every((x) => !!x.value)) {
       // Automatically create draft sentences if all is filled
       $sentences = [...$sentences, { value: '' }];
     }
-  }
+  });
 
   const embedder = globalEmbedder;
   const projector = new Projector();
@@ -34,7 +36,7 @@
 
   let isInitial = true;
 
-  let focusedSentence: unknown = null;
+  let focusedSentence: unknown = $state(null);
 
   const debouncedSentences = asyncDerived([sentences], async ([text]) => {
     if (isInitial) {
@@ -46,7 +48,7 @@
     return text;
   });
 
-  let autoUpdate = true;
+  let autoUpdate = $state(true);
   const desiredUpdateCount = writable(0);
   let updateCount = 0;
 

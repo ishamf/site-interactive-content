@@ -1,23 +1,29 @@
-<script lang="ts" context="module">
+<script lang="ts" module>
   import { sRGB, ColorSpace, OKLCH } from 'colorjs.io/fn';
   ColorSpace.register(sRGB);
   ColorSpace.register(OKLCH);
 </script>
 
 <script lang="ts">
+  import { run } from 'svelte/legacy';
+
   import { parse, to as convert, serialize, clone } from 'colorjs.io/fn';
   import GlowingTextPrecalculated from './GlowingTextPrecalculated.svelte';
 
-  export let color: string;
-  export let text: string;
-  export let lightnessOffset = 0.2;
-  export let fontLightnessOffset = 0.2;
+  interface Props {
+    color: string;
+    text: string;
+    lightnessOffset?: number;
+    fontLightnessOffset?: number;
+  }
 
-  let colorObj: ReturnType<typeof convert>;
-  let lighterColor: typeof colorObj;
-  let lighterFontColor: typeof colorObj;
+  let { color, text, lightnessOffset = 0.2, fontLightnessOffset = 0.2 }: Props = $props();
 
-  $: {
+  let colorObj: ReturnType<typeof convert> = $state();
+  let lighterColor: typeof colorObj = $state();
+  let lighterFontColor: typeof colorObj = $state();
+
+  run(() => {
     colorObj = convert(parse(color), OKLCH);
     lighterColor = clone(colorObj);
     lighterColor.coords[0] = Math.max(colorObj.coords[0] + lightnessOffset, lightnessOffset);
@@ -27,7 +33,7 @@
       colorObj.coords[0] + fontLightnessOffset,
       fontLightnessOffset
     );
-  }
+  });
 </script>
 
 <GlowingTextPrecalculated

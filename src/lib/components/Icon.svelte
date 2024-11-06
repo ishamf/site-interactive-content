@@ -1,7 +1,11 @@
 <script lang="ts">
-  export let title: string;
-  export let icon: string; // @mdi/js icon path
-  export let style: keyof typeof styles;
+  interface Props {
+    title: string;
+    icon: string; // @mdi/js icon path
+    style: keyof typeof styles;
+  }
+
+  let { title, icon, style }: Props = $props();
 
   const styles = {
     button:

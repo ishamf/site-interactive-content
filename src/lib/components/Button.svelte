@@ -1,15 +1,22 @@
 <script lang="ts">
+  import { createBubbler } from 'svelte/legacy';
+
+  const bubble = createBubbler();
   import Icon from './Icon.svelte';
 
-  export let title: string;
-  export let icon: string;
-  export let disabled = false;
-  export let fullWidth = false;
+  interface Props {
+    title: string;
+    icon: string;
+    disabled?: boolean;
+    fullWidth?: boolean;
+  }
+
+  let { title, icon, disabled = false, fullWidth = false }: Props = $props();
 </script>
 
 <button
   {disabled}
-  on:click
+  onclick={bubble('click')}
   class:w-12={!fullWidth}
   class="transition-colors group flex justify-center
 bg-neutral-100 enabled:hover:bg-neutral-200 disabled:bg-neutral-200

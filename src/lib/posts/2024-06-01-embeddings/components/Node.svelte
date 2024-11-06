@@ -5,13 +5,17 @@
   import Button from '$lib/components/Button.svelte';
   import type { Sentence } from '../types';
 
-  export let sentence: Sentence;
-  export let isDraft = false;
+  interface Props {
+    sentence: Sentence;
+    isDraft?: boolean;
+  }
+
+  let { sentence = $bindable(), isDraft = false }: Props = $props();
 
   const dispatch = createEventDispatcher();
 
   // Refresh flags to control UI elements
-  $: shouldShowRemoveButton = !isDraft;
+  let shouldShowRemoveButton = $derived(!isDraft);
 </script>
 
 <div class="flex flex-row justify-stretch gap-4">

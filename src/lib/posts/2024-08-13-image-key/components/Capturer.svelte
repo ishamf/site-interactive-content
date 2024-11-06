@@ -5,14 +5,14 @@
   import { createEventDispatcher } from 'svelte';
   import QRCode from 'qrcode';
 
-  let video: HTMLVideoElement;
-  let hasStartedTakingPhoto = false;
-  let canvas: HTMLCanvasElement;
+  let video: HTMLVideoElement = $state();
+  let hasStartedTakingPhoto = $state(false);
+  let canvas: HTMLCanvasElement = $state();
 
   const width = 320;
   let height = 0;
 
-  let isUsingRearCamera = false;
+  let isUsingRearCamera = $state(false);
 
   const dispatch = createEventDispatcher();
 
@@ -72,7 +72,7 @@
     }
   }
 
-  let qrCode: string = '';
+  let qrCode: string = $state('');
   const qrUrl = new URL(window.location.href);
   qrUrl.searchParams.set('ref', 'qr');
 
@@ -83,10 +83,10 @@
   );
 </script>
 
-<!-- svelte-ignore a11y-media-has-caption -->
+<!-- svelte-ignore a11y_media_has_caption -->
 <!-- class="" -->
 <div class="camera">
-  <video bind:this={video} on:canplay={onCanPlay} class:-scale-x-100={!isUsingRearCamera}></video>
+  <video bind:this={video} oncanplay={onCanPlay} class:-scale-x-100={!isUsingRearCamera}></video>
   <canvas bind:this={canvas} class="hidden"></canvas>
 
   <div

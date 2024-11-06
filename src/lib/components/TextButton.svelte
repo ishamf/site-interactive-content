@@ -1,9 +1,17 @@
 <script lang="ts">
-  export let danger = false;
+  import { createBubbler } from 'svelte/legacy';
+
+  const bubble = createBubbler();
+  interface Props {
+    danger?: boolean;
+    children?: import('svelte').Snippet;
+  }
+
+  let { danger = false, children }: Props = $props();
 </script>
 
 <button
-  on:click
+  onclick={bubble('click')}
   class="px-4 py-2
         bg-neutral-100 hover:bg-neutral-200
         dark:bg-neutral-700 dark:hover:bg-neutral-600
@@ -12,7 +20,7 @@
     "
   class:danger
 >
-  <slot />
+  {@render children?.()}
 </button>
 
 <style lang="postcss">
