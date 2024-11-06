@@ -18,7 +18,7 @@
   <div class="row">
     <Button
       icon={mdiBackspace}
-      on:click={() => {
+      onclick={() => {
         dispatch('back');
       }}
       title="Back"

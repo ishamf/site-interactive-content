@@ -19,8 +19,11 @@
 
   let { color, text, lightnessOffset = 0.2, fontLightnessOffset = 0.2 }: Props = $props();
 
+  // @ts-expect-error to fix after refactoring the run() code
   let colorObj: ReturnType<typeof convert> = $state();
+  // @ts-expect-error to fix after refactoring the run() code
   let lighterColor: typeof colorObj = $state();
+  // @ts-expect-error to fix after refactoring the run() code
   let lighterFontColor: typeof colorObj = $state();
 
   run(() => {

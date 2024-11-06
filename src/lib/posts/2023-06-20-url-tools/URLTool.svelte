@@ -42,7 +42,7 @@
     }
   });
 
-  let outerNode: HTMLElement = $state();
+  let outerNode: HTMLElement | undefined = $state();
 
   let url: URLElement = $state(
     initialPrefillUrl ? parseUrlToElement(initialPrefillUrl) : { value: '' }
@@ -130,7 +130,7 @@
 
 {#if !result}
   <TextButton
-    on:click={() => {
+    onclick={() => {
       setUrl(testUrl);
     }}
   >
@@ -162,7 +162,7 @@
     Open URL
   </a>
   <TextButton
-    on:click={async () => {
+    onclick={async () => {
       try {
         await navigator.clipboard.writeText(result);
         hasCopied = true;
@@ -174,14 +174,14 @@
     {hasCopied ? 'Copied!' : 'Copy URL'}
   </TextButton>
   <TextButton
-    on:click={async () => {
+    onclick={async () => {
       showQRCode = !showQRCode;
     }}
   >
     {showQRCode ? 'Hide QR Code' : 'Show QR Code'}
   </TextButton>
   <TextButton
-    on:click={async () => {
+    onclick={async () => {
       try {
         await navigator.clipboard.writeText(location.href);
         hasCopiedShareUrl = true;

@@ -117,11 +117,11 @@
 
         <p>
           {#if $embedderStatus !== 'ready'}
-            <p>Loading model... ({roundedLoadPercent}%)</p>
+            Loading model... ({roundedLoadPercent}%)
           {:else if takenImageUri === processingData && takenImageUri !== embeddedData}
-            <p>Processing image...</p>
+            Processing image...
           {:else}
-            <TextButton on:click={addCurrent}>Add Note</TextButton>
+            <TextButton onclick={addCurrent}>Add Note</TextButton>
           {/if}
         </p>
       </div>

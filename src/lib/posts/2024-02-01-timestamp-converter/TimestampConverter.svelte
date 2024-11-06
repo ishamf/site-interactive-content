@@ -55,6 +55,7 @@
     }
   });
 
+  // svelte-ignore state_referenced_locally intended to not update
   let displayResult = $state(result);
 
   type DisplayItem = {
@@ -112,7 +113,7 @@
       <Button
         title="Clear input"
         icon={mdiClose}
-        on:click={() => {
+        onclick={() => {
           inputText = '';
         }}
       ></Button>
@@ -120,7 +121,7 @@
   </div>
 
   <TextButton
-    on:click={() => {
+    onclick={() => {
       inputText = DateTime.now().toISO();
       resetInterval();
     }}>Set to current time</TextButton

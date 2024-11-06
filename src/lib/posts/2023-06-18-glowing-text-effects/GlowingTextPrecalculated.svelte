@@ -27,20 +27,22 @@
 
   let { text, color, lighterColor, lighterFontColor }: Props = $props();
 
-  let span: HTMLSpanElement = $state();
+  let span: HTMLSpanElement | undefined = $state();
   let isActive = $state(!observer); // Turn it on by default on SSR
 
   onMount(() => {
-    if (!observer) return;
+    if (!observer || !span) return;
 
-    observer.observe(span);
-    callbacks.set(span, (active) => {
+    const observedElement = span;
+
+    observer.observe(observedElement);
+    callbacks.set(observedElement, (active) => {
       isActive = active;
     });
 
     return () => {
-      observer.unobserve(span);
-      callbacks.delete(span);
+      observer.unobserve(observedElement);
+      callbacks.delete(observedElement);
     };
   });
 </script>

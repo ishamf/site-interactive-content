@@ -12,7 +12,7 @@
   interface Props {
     key: string | null;
     url: URLElement;
-    element: HTMLElement;
+    element?: HTMLElement;
     disabled?: boolean;
     isDraft?: boolean;
     allowRemoveDraft?: boolean;
@@ -82,7 +82,7 @@
         title="Add parameter"
         icon={mdiPlus}
         disabled={disabled || !isValidURL}
-        on:click={() => {
+        onclick={() => {
           if (!url.params) url.params = [];
 
           url.params = [
@@ -104,7 +104,7 @@
         title="Parse params"
         icon={mdiSetSplit}
         disabled={disabled || !isValidURL}
-        on:click={() => {
+        onclick={() => {
           if (!parsedUrl) return;
           url.params = [
             ...(Array.from(parsedUrl.searchParams.entries()).map(([key, value]) => ({
@@ -126,7 +126,7 @@
         title="Remove parameter"
         icon={mdiClose}
         {disabled}
-        on:click={() => {
+        onclick={() => {
           dispatch('remove', key);
         }}
       />

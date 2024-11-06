@@ -54,12 +54,12 @@
   <div class="buttons">
     {#if match}
       <TextButton
-        on:click={() => {
+        onclick={() => {
           dispatch('replace');
         }}>Replace Photo</TextButton
       >
     {/if}
-    <TextButton on:click={onDeletePress} danger={isConfirmingDelete}
+    <TextButton onclick={onDeletePress} danger={isConfirmingDelete}
       >{isConfirmingDelete ? 'Confirm' : 'Delete'}</TextButton
     >
   </div>

@@ -80,7 +80,7 @@
       </div>
       {#if !autoUpdate}
         <TextButton
-          on:click={() => {
+          onclick={() => {
             $desiredUpdateCount += 1;
           }}
         >
@@ -88,7 +88,7 @@
         </TextButton>
       {/if}
       <!-- <TextButton
-        on:click={() => {
+        onclick={() => {
           caches.keys().then((xs) => Promise.all(xs.map((x) => caches.delete(x))));
         }}
       >
@@ -103,10 +103,10 @@
         <Node
           bind:sentence={$sentences[i]}
           isDraft={i === $sentences.length - 1}
-          on:focus={() => {
+          onfocus={() => {
             focusedSentence = sentence;
           }}
-          on:blur={() => {
+          onblur={() => {
             if (
               focusedSentence === sentence &&
               // If we're loading, we just always show some kind of progress
@@ -115,7 +115,7 @@
               focusedSentence = null;
             }
           }}
-          on:remove={() => {
+          onremove={() => {
             $sentences = $sentences.filter((s) => s !== sentence);
           }}
         />

@@ -5,9 +5,9 @@
   import { createEventDispatcher } from 'svelte';
   import QRCode from 'qrcode';
 
-  let video: HTMLVideoElement = $state();
+  let video: HTMLVideoElement | undefined = $state();
   let hasStartedTakingPhoto = $state(false);
-  let canvas: HTMLCanvasElement = $state();
+  let canvas: HTMLCanvasElement | undefined = $state();
 
   const width = 320;
   let height = 0;
@@ -47,11 +47,20 @@
   export function takePhoto() {
     if (!hasStartedTakingPhoto) {
       getCameraStream().then(({ stream, isRear }) => {
+        if (!video) {
+          console.error('Video element not found');
+          return;
+        }
+
         isUsingRearCamera = isRear;
         video.srcObject = stream;
         video.play();
       });
     } else {
+      if (!video || !canvas) {
+        console.error('Video or canvas element not found');
+        return;
+      }
       const context = canvas.getContext('2d');
 
       context?.drawImage(video, 0, 0, width, height);
@@ -63,6 +72,11 @@
 
   function onCanPlay() {
     if (!hasStartedTakingPhoto) {
+      if (!video || !canvas) {
+        console.error('Video or canvas element not found');
+        return;
+      }
+
       height = video.videoHeight / (video.videoWidth / width);
 
       canvas.width = width;
@@ -114,7 +128,7 @@
     <Button
       fullWidth
       icon={mdiCamera}
-      on:click={() => {
+      onclick={() => {
         const res = takePhoto();
 
         if (res) {
