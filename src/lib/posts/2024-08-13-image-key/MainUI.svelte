@@ -30,7 +30,7 @@
 
   let storedData: NoteData[] = $state([]);
 
-  let takenPhotoPosition: HTMLDivElement = $state();
+  let takenPhotoPosition: HTMLDivElement | undefined = $state();
 
   const storageKey = 'image-key-data';
   let hasLoadedStorage = $state(false);
@@ -58,7 +58,7 @@
 
     currentSaveTimeout = setTimeout(() => {
       currentSavePromise = (currentSavePromise || Promise.resolve()).then(() => {
-        return idbSet(storageKey, data);
+        return idbSet(storageKey, $state.snapshot(data));
       });
     }, 500);
   }
@@ -72,7 +72,7 @@
 
   function onPhoto(event: CustomEvent<string>) {
     takenImageUri = event.detail;
-    takenPhotoPosition.scrollIntoView({ behavior: 'smooth' });
+    takenPhotoPosition?.scrollIntoView({ behavior: 'smooth' });
   }
   let roundedLoadPercent = $derived(Math.round($loadPercent));
   // Promise.resolve().then(async () => {

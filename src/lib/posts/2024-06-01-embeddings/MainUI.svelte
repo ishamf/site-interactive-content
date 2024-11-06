@@ -101,7 +101,7 @@
     {#each $sentences as sentence, i}
       <div class:my-4={i > 0}>
         <Node
-          bind:sentence
+          bind:sentence={$sentences[i]}
           isDraft={i === $sentences.length - 1}
           on:focus={() => {
             focusedSentence = sentence;
