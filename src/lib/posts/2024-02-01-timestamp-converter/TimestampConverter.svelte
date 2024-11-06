@@ -55,7 +55,8 @@
     }
   });
 
-  // svelte-ignore state_referenced_locally intended to not update
+  // intended to not update
+  // svelte-ignore state_referenced_locally
   let displayResult = $state(result);
 
   type DisplayItem = {
