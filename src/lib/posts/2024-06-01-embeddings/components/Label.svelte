@@ -1,22 +1,27 @@
 <script lang="ts">
-  export let style: string;
+  interface Props {
+    style: string;
+    children?: import('svelte').Snippet;
+  }
 
-  let isHover = false;
+  let { style, children }: Props = $props();
+
+  let isHover = $state(false);
 </script>
 
 <div
   role="tooltip"
   class="ms-1 overflow-hidden w-fit absolute transition-all break-all"
-  on:pointerenter={() => {
+  onpointerenter={() => {
     isHover = true;
   }}
-  on:pointerleave={() => {
+  onpointerleave={() => {
     isHover = false;
   }}
   class:hover={isHover}
   {style}
 >
-  <slot />
+  {@render children?.()}
 </div>
 
 <style lang="postcss">

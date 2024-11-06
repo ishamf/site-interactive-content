@@ -1,18 +1,24 @@
 <script lang="ts">
+  import { run } from 'svelte/legacy';
+
   import Icon from '$lib/components/Icon.svelte';
   import { mdiContentCopy, mdiCheckCircle } from '@mdi/js';
 
-  export let content: string;
+  interface Props {
+    content: string;
+  }
 
-  let done = false;
+  let { content }: Props = $props();
 
-  $: {
+  let done = $state(false);
+
+  run(() => {
     if (done) {
       setTimeout(() => {
         done = false;
       }, 1000);
     }
-  }
+  });
 </script>
 
 <div class="inline-block align-middle">
@@ -23,7 +29,7 @@
   {:else}
     <button
       class="w-4 h-4"
-      on:click={async () => {
+      onclick={async () => {
         try {
           await navigator.clipboard.writeText(content);
           done = true;

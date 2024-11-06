@@ -5,14 +5,14 @@
   import { createEventDispatcher } from 'svelte';
   import QRCode from 'qrcode';
 
-  let video: HTMLVideoElement;
-  let hasStartedTakingPhoto = false;
-  let canvas: HTMLCanvasElement;
+  let video: HTMLVideoElement | undefined = $state();
+  let hasStartedTakingPhoto = $state(false);
+  let canvas: HTMLCanvasElement | undefined = $state();
 
   const width = 320;
   let height = 0;
 
-  let isUsingRearCamera = false;
+  let isUsingRearCamera = $state(false);
 
   const dispatch = createEventDispatcher();
 
@@ -47,11 +47,20 @@
   export function takePhoto() {
     if (!hasStartedTakingPhoto) {
       getCameraStream().then(({ stream, isRear }) => {
+        if (!video) {
+          console.error('Video element not found');
+          return;
+        }
+
         isUsingRearCamera = isRear;
         video.srcObject = stream;
         video.play();
       });
     } else {
+      if (!video || !canvas) {
+        console.error('Video or canvas element not found');
+        return;
+      }
       const context = canvas.getContext('2d');
 
       context?.drawImage(video, 0, 0, width, height);
@@ -63,6 +72,11 @@
 
   function onCanPlay() {
     if (!hasStartedTakingPhoto) {
+      if (!video || !canvas) {
+        console.error('Video or canvas element not found');
+        return;
+      }
+
       height = video.videoHeight / (video.videoWidth / width);
 
       canvas.width = width;
@@ -72,7 +86,7 @@
     }
   }
 
-  let qrCode: string = '';
+  let qrCode: string = $state('');
   const qrUrl = new URL(window.location.href);
   qrUrl.searchParams.set('ref', 'qr');
 
@@ -83,10 +97,10 @@
   );
 </script>
 
-<!-- svelte-ignore a11y-media-has-caption -->
+<!-- svelte-ignore a11y_media_has_caption -->
 <!-- class="" -->
 <div class="camera">
-  <video bind:this={video} on:canplay={onCanPlay} class:-scale-x-100={!isUsingRearCamera}></video>
+  <video bind:this={video} oncanplay={onCanPlay} class:-scale-x-100={!isUsingRearCamera}></video>
   <canvas bind:this={canvas} class="hidden"></canvas>
 
   <div
@@ -114,7 +128,7 @@
     <Button
       fullWidth
       icon={mdiCamera}
-      on:click={() => {
+      onclick={() => {
         const res = takePhoto();
 
         if (res) {

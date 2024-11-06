@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { run } from 'svelte/legacy';
+
   import Input from '$lib/components/Input.svelte';
   import { DateTime } from 'luxon';
   import { slide } from 'svelte/transition';
@@ -12,11 +14,11 @@
 
   const animationConfig = { duration: 150, easing: circInOut };
 
-  let inputText = '';
+  let inputText = $state('');
 
-  let now = DateTime.now();
+  let now = $state(DateTime.now());
 
-  let displayMode: 'local' | 'utc' = 'local';
+  let displayMode: 'local' | 'utc' = $state('local');
 
   let interval: ReturnType<typeof setInterval> | undefined;
 
@@ -39,10 +41,10 @@
     return () => clearInterval(interval);
   });
 
-  let inputType: InputType | undefined;
-  let result: DateTime | undefined;
+  let inputType: InputType | undefined = $state();
+  let result: DateTime | undefined = $state();
 
-  $: {
+  run(() => {
     const parsed = guessAndParseInput((inputText || '').trim());
 
     if (parsed) {
@@ -51,18 +53,20 @@
       inputType = undefined;
       result = undefined;
     }
-  }
+  });
 
-  let displayResult = result;
+  // intended to not update
+  // svelte-ignore state_referenced_locally
+  let displayResult = $state(result);
 
   type DisplayItem = {
     label: string;
     value: string | number | null;
   };
 
-  let displayItems: DisplayItem[] = [];
+  let displayItems: DisplayItem[] = $state([]);
 
-  $: {
+  run(() => {
     displayResult = displayMode === 'utc' ? result?.setZone('utc') : result;
 
     if (displayResult) {
@@ -99,7 +103,7 @@
     } else {
       displayItems = [];
     }
-  }
+  });
 </script>
 
 <div class="flex flex-wrap flex-row gap-4">
@@ -110,7 +114,7 @@
       <Button
         title="Clear input"
         icon={mdiClose}
-        on:click={() => {
+        onclick={() => {
           inputText = '';
         }}
       ></Button>
@@ -118,7 +122,7 @@
   </div>
 
   <TextButton
-    on:click={() => {
+    onclick={() => {
       inputText = DateTime.now().toISO();
       resetInterval();
     }}>Set to current time</TextButton

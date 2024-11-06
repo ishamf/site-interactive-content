@@ -10,14 +10,14 @@
   import { addComponentStylesheet } from '$lib/component';
   import { onMount } from 'svelte';
 
-  let screenWidth = 1920;
-  let screenHeight = 1080;
+  let screenWidth = $state(1920);
+  let screenHeight = $state(1080);
 
-  let windowWidth = 800;
-  let windowHeight = 600;
+  let windowWidth = $state(800);
+  let windowHeight = $state(600);
 
-  let screenTop = 100;
-  let screenLeft = 100;
+  let screenTop = $state(100);
+  let screenLeft = $state(100);
 
   onMount(() => {
     const interval = setInterval(() => {
@@ -39,27 +39,27 @@
   });
 
   const screenDivHeight = 20; // in rem
-  $: ratio = screenDivHeight / screenHeight;
+  let ratio = $derived(screenDivHeight / screenHeight);
 
-  $: screenDivWidth = screenWidth * ratio;
+  let screenDivWidth = $derived(screenWidth * ratio);
 
-  $: windowDivHeight = windowHeight * ratio;
-  $: windowDivWidth = windowWidth * ratio;
+  let windowDivHeight = $derived(windowHeight * ratio);
+  let windowDivWidth = $derived(windowWidth * ratio);
 
-  $: windowDivTop = screenTop * ratio;
-  $: windowDivLeft = screenLeft * ratio;
+  let windowDivTop = $derived(screenTop * ratio);
+  let windowDivLeft = $derived(screenLeft * ratio);
 
-  $: screenStyle = `
+  let screenStyle = $derived(`
     height: ${screenDivHeight}rem;
     width: ${screenDivWidth}rem;
-  `;
+  `);
 
-  $: windowStyle = `
+  let windowStyle = $derived(`
     height: ${windowDivHeight}rem;
     width: ${windowDivWidth}rem;
     top: ${windowDivTop}rem;
     left: ${windowDivLeft}rem;
-    `;
+    `);
 </script>
 
 <div class="container">

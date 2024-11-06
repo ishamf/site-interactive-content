@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { run } from 'svelte/legacy';
+
   import QRCode from 'qrcode';
 
   import Node from './components/Node.svelte';
@@ -40,11 +42,13 @@
     }
   });
 
-  let outerNode: HTMLElement;
+  let outerNode: HTMLElement | undefined = $state();
 
-  let url: URLElement = initialPrefillUrl ? parseUrlToElement(initialPrefillUrl) : { value: '' };
+  let url: URLElement = $state(
+    initialPrefillUrl ? parseUrlToElement(initialPrefillUrl) : { value: '' }
+  );
 
-  let result = '';
+  let result = $state('');
 
   function setUrl(newUrl: string) {
     url = parseUrlToElement(newUrl);
@@ -68,11 +72,11 @@
     return lenientStringifyUrl(currentURL);
   }
 
-  $: {
+  run(() => {
     result = parseURL(url);
-  }
+  });
 
-  $: {
+  run(() => {
     const current = new URL(location.href);
     if (result) {
       if (current.searchParams.has('url')) {
@@ -86,33 +90,33 @@
 
       history.replaceState(null, '', current.toString());
     }
-  }
+  });
 
-  let hasCopied = false;
+  let hasCopied = $state(false);
 
-  $: {
+  run(() => {
     if (hasCopied) {
       setTimeout(() => {
         hasCopied = false;
       }, 1000);
     }
-  }
+  });
 
-  let hasCopiedShareUrl = false;
+  let hasCopiedShareUrl = $state(false);
 
-  $: {
+  run(() => {
     if (hasCopiedShareUrl) {
       setTimeout(() => {
         hasCopiedShareUrl = false;
       }, 1000);
     }
-  }
+  });
 
-  let showQRCode = false;
+  let showQRCode = $state(false);
 
-  let currentQRCodeImage = '';
+  let currentQRCodeImage = $state('');
 
-  $: {
+  run(() => {
     if (showQRCode && result) {
       QRCode.toDataURL(result, {
         type: 'image/png',
@@ -121,12 +125,12 @@
         currentQRCodeImage = code;
       });
     }
-  }
+  });
 </script>
 
 {#if !result}
   <TextButton
-    on:click={() => {
+    onclick={() => {
       setUrl(testUrl);
     }}
   >
@@ -158,7 +162,7 @@
     Open URL
   </a>
   <TextButton
-    on:click={async () => {
+    onclick={async () => {
       try {
         await navigator.clipboard.writeText(result);
         hasCopied = true;
@@ -170,14 +174,14 @@
     {hasCopied ? 'Copied!' : 'Copy URL'}
   </TextButton>
   <TextButton
-    on:click={async () => {
+    onclick={async () => {
       showQRCode = !showQRCode;
     }}
   >
     {showQRCode ? 'Hide QR Code' : 'Show QR Code'}
   </TextButton>
   <TextButton
-    on:click={async () => {
+    onclick={async () => {
       try {
         await navigator.clipboard.writeText(location.href);
         hasCopiedShareUrl = true;

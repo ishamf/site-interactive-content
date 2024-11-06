@@ -5,14 +5,17 @@
   import Container from '$lib/components/Container.svelte';
   import CoveredInput from '$lib/components/CoveredInput.svelte';
 
-  let thirdValue =
+  let thirdValue = $state(
     'This is some text inside a text input which shows every word with "text" in it in red.' +
-    ' You can edit the text and it will automatically update.';
+      ' You can edit the text and it will automatically update.'
+  );
 
-  $: transformedThirdValue = thirdValue.split(' ').map((text, i) => ({
-    text: i === 0 ? text : ' ' + text,
-    style: text.toLowerCase().includes('text') ? 'red' : 'normal',
-  }));
+  let transformedThirdValue = $derived(
+    thirdValue.split(' ').map((text, i) => ({
+      text: i === 0 ? text : ' ' + text,
+      style: text.toLowerCase().includes('text') ? 'red' : 'normal',
+    }))
+  );
 </script>
 
 <Container>

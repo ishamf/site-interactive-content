@@ -3,12 +3,16 @@
   import type { NoteData } from '../types';
   import TextButton from '$lib/components/TextButton.svelte';
 
-  export let note: NoteData;
-  export let match: number | undefined = undefined;
+  interface Props {
+    note: NoteData;
+    match?: number | undefined;
+  }
+
+  let { note, match = undefined }: Props = $props();
 
   const dispatch = createEventDispatcher();
 
-  let isConfirmingDelete = false;
+  let isConfirmingDelete = $state(false);
 
   let deleteTimeout: ReturnType<typeof setTimeout> | undefined;
 
@@ -42,7 +46,7 @@
 
   <textarea
     value={note.note}
-    on:input={(e) => {
+    oninput={(e) => {
       dispatch('note-change', { value: e.currentTarget.value });
     }}
   ></textarea>
@@ -50,12 +54,12 @@
   <div class="buttons">
     {#if match}
       <TextButton
-        on:click={() => {
+        onclick={() => {
           dispatch('replace');
         }}>Replace Photo</TextButton
       >
     {/if}
-    <TextButton on:click={onDeletePress} danger={isConfirmingDelete}
+    <TextButton onclick={onDeletePress} danger={isConfirmingDelete}
       >{isConfirmingDelete ? 'Confirm' : 'Delete'}</TextButton
     >
   </div>

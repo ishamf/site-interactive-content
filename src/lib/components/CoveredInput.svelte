@@ -1,15 +1,28 @@
 <script lang="ts">
-  export let disabled = false;
-  export let value: string;
-  export let padding: 'small' | 'medium' = 'small';
-  export let placeholder = 'Type stuff here!';
-  export let rows = 1;
-  export let caretColor: 'white' | 'auto' = 'auto';
+  interface Props {
+    disabled?: boolean;
+    value: string;
+    padding?: 'small' | 'medium';
+    placeholder?: string;
+    rows?: number;
+    caretColor?: 'white' | 'auto';
+    children?: import('svelte').Snippet;
+  }
 
-  let textarea: HTMLTextAreaElement;
-  let cover: HTMLDivElement;
+  let {
+    disabled = false,
+    value = $bindable(),
+    padding = 'small',
+    placeholder = 'Type stuff here!',
+    rows = 1,
+    caretColor = 'auto',
+    children,
+  }: Props = $props();
 
-  $: paddingClass = padding === 'small' ? 'p-1' : 'p-2';
+  let textarea: HTMLTextAreaElement | undefined = $state();
+  let cover: HTMLDivElement | undefined = $state();
+
+  let paddingClass = $derived(padding === 'small' ? 'p-1' : 'p-2');
 </script>
 
 <div class="flex relative dark:bg-neutral-800 bg-neutral-100">
@@ -22,15 +35,15 @@
     class:force-caret-white={caretColor === 'white'}
     bind:value
     bind:this={textarea}
-    on:scroll={() => {
+    onscroll={() => {
       if (!cover || !textarea) return;
       cover.scrollTop = textarea.scrollTop;
       cover.scrollLeft = textarea.scrollLeft;
     }}
-  />
+  ></textarea>
 
   <div class={'cover ' + paddingClass} class:disabled bind:this={cover}>
-    <slot />{' '}
+    {@render children?.()}{' '}
   </div>
 </div>
 

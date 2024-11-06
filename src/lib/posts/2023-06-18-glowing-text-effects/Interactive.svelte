@@ -2,11 +2,11 @@
   import { onMount } from 'svelte';
   import GlowingText from './GlowingText.svelte';
 
-  let resultColor = '#cc00cc';
-  let resultFontLightness = 0.1;
-  let resultLightness = 0.2;
+  let resultColor = $state('#cc00cc');
+  let resultFontLightness = $state(0.1);
+  let resultLightness = $state(0.2);
 
-  let browser = false;
+  let browser = $state(false);
 
   onMount(() => {
     browser = true;
