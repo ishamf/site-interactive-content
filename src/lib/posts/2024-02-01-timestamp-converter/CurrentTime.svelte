@@ -1,18 +1,12 @@
 <svelte:options customElement={{ tag: 'xif-current-time' }} />
 
 <script lang="ts">
-  import { run } from 'svelte/legacy';
-
   import { DateTime } from 'luxon';
   import { onMount } from 'svelte';
 
-  interface Props {
-    type: 'iso-8601' | 'timestamp' | 'timestamp-ms';
-  }
+  export let type: 'iso-8601' | 'timestamp' | 'timestamp-ms';
 
-  let { type }: Props = $props();
-
-  let currentTime = $state(DateTime.now());
+  let currentTime = DateTime.now();
 
   onMount(() => {
     const interval = setInterval(() => {
@@ -24,9 +18,9 @@
     };
   });
 
-  let resultText = $state('');
+  let resultText = '';
 
-  run(() => {
+  $: {
     switch (type) {
       case 'iso-8601':
         resultText = currentTime.set({ millisecond: 0 }).toISO({ suppressMilliseconds: true });
@@ -38,7 +32,7 @@
         resultText = currentTime.valueOf().toString();
         break;
     }
-  });
+  }
 </script>
 
 <span>

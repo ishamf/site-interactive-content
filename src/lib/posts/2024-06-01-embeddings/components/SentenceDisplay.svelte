@@ -2,11 +2,7 @@
   import type { ProjectedSentence } from '../types';
   import Label from './Label.svelte';
 
-  interface Props {
-    sentences: ProjectedSentence[];
-  }
-
-  let { sentences }: Props = $props();
+  export let sentences: ProjectedSentence[];
 </script>
 
 <div class="h-80 w-80 bg-neutral-100 dark:bg-neutral-800 text-sm relative">

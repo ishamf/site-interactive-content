@@ -4,7 +4,7 @@
   import { addComponentStylesheet } from '$lib/component';
   import Container from '$lib/components/Container.svelte';
 
-  let firstValue = $state('This is some text inside a text input');
+  let firstValue = 'This is some text inside a text input';
 </script>
 
 <Container>

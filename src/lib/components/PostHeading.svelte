@@ -1,11 +1,7 @@
 <script lang="ts">
-  interface Props {
-    title: string;
-    link: string;
-    created: Date;
-  }
-
-  let { title, link, created }: Props = $props();
+  export let title: string;
+  export let link: string;
+  export let created: Date;
 </script>
 
 <a href={link}>

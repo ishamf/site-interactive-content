@@ -1,17 +1,9 @@
 <script lang="ts">
-  import type { HTMLButtonAttributes } from 'svelte/elements';
-
-  interface Props {
-    danger?: boolean;
-    onclick?: HTMLButtonAttributes['onclick'];
-    children?: import('svelte').Snippet;
-  }
-
-  let { danger = false, children, onclick }: Props = $props();
+  export let danger = false;
 </script>
 
 <button
-  {onclick}
+  on:click
   class="px-4 py-2
         bg-neutral-100 hover:bg-neutral-200
         dark:bg-neutral-700 dark:hover:bg-neutral-600
@@ -20,7 +12,7 @@
     "
   class:danger
 >
-  {@render children?.()}
+  <slot />
 </button>
 
 <style lang="postcss">

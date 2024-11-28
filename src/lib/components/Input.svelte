@@ -1,22 +1,14 @@
 <script lang="ts">
-  import type { HTMLInputAttributes } from 'svelte/elements';
-
-  interface Props {
-    value: string;
-    placeholder: string;
-    disabled?: boolean;
-    onfocus?: HTMLInputAttributes['onfocus'];
-    onblur?: HTMLInputAttributes['onblur'];
-  }
-
-  let { value = $bindable(), placeholder, disabled = false, onfocus, onblur }: Props = $props();
+  export let value: string;
+  export let placeholder: string;
+  export let disabled = false;
 </script>
 
 <input
   type="text"
   bind:value
-  {onfocus}
-  {onblur}
+  on:focus
+  on:blur
   {disabled}
   {placeholder}
   class="flex-1 px-4 py-2 block min-w-0 min-h-12

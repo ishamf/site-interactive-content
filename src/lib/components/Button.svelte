@@ -1,21 +1,15 @@
 <script lang="ts">
-  import type { HTMLButtonAttributes } from 'svelte/elements';
   import Icon from './Icon.svelte';
 
-  interface Props {
-    title: string;
-    icon: string;
-    disabled?: boolean;
-    onclick?: HTMLButtonAttributes['onclick'];
-    fullWidth?: boolean;
-  }
-
-  let { title, icon, disabled = false, fullWidth = false, onclick }: Props = $props();
+  export let title: string;
+  export let icon: string;
+  export let disabled = false;
+  export let fullWidth = false;
 </script>
 
 <button
   {disabled}
-  {onclick}
+  on:click
   class:w-12={!fullWidth}
   class="transition-colors group flex justify-center
 bg-neutral-100 enabled:hover:bg-neutral-200 disabled:bg-neutral-200

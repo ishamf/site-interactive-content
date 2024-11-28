@@ -5,9 +5,8 @@
   import Container from '$lib/components/Container.svelte';
   import CoveredInput from '$lib/components/CoveredInput.svelte';
 
-  let secondValue = $state(
-    'This looks identical to the above input, but the text inside is rendered differently.'
-  );
+  let secondValue =
+    'This looks identical to the above input, but the text inside is rendered differently.';
 </script>
 
 <Container>
