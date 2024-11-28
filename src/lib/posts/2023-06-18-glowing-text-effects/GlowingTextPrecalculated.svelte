@@ -1,4 +1,4 @@
-<script lang="ts" module>
+<script lang="ts" context="module">
   const observer =
     typeof IntersectionObserver === 'undefined'
       ? undefined // SSR
@@ -18,31 +18,25 @@
 <script lang="ts">
   import { onMount } from 'svelte';
 
-  interface Props {
-    text: string;
-    color: string;
-    lighterColor: string;
-    lighterFontColor: string;
-  }
+  export let text: string;
+  export let color: string;
+  export let lighterColor: string;
+  export let lighterFontColor: string;
 
-  let { text, color, lighterColor, lighterFontColor }: Props = $props();
-
-  let span: HTMLSpanElement | undefined = $state();
-  let isActive = $state(!observer); // Turn it on by default on SSR
+  let span: HTMLSpanElement;
+  let isActive = !observer; // Turn it on by default on SSR
 
   onMount(() => {
-    if (!observer || !span) return;
+    if (!observer) return;
 
-    const observedElement = span;
-
-    observer.observe(observedElement);
-    callbacks.set(observedElement, (active) => {
+    observer.observe(span);
+    callbacks.set(span, (active) => {
       isActive = active;
     });
 
     return () => {
-      observer.unobserve(observedElement);
-      callbacks.delete(observedElement);
+      observer.unobserve(span);
+      callbacks.delete(span);
     };
   });
 </script>

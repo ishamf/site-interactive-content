@@ -26,17 +26,6 @@ module.exports = {
       parserOptions: {
         parser: '@typescript-eslint/parser',
       },
-      rules: {
-        // The ignore comment parsing of the eslint plugin seems inconsistent with
-        // svelte check and vscode plugin, disable this for now
-        'svelte/valid-compile': [
-          'error',
-          {
-            ignoreWarnings: true,
-          },
-        ],
-        'svelte/no-unused-svelte-ignore': 'off',
-      },
     },
   ],
 

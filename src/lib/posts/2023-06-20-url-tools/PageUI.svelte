@@ -6,7 +6,7 @@
   import { addComponentStylesheet } from '$lib/component';
   import Container from '$lib/components/Container.svelte';
 
-  let isBrowser = $state(false);
+  let isBrowser = false;
 
   onMount(() => {
     isBrowser = true;

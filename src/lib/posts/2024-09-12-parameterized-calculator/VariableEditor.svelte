@@ -2,13 +2,9 @@
   import CalculationEditor from './CalculationEditor.svelte';
   import type { Calculation } from './state';
 
-  interface Props {
-    name: string;
-    color: string;
-    calculation: Calculation;
-  }
-
-  let { name, color, calculation }: Props = $props();
+  export let name: string;
+  export let color: string;
+  export let calculation: Calculation;
 </script>
 
 <div class="flex flex-row gap-1 items-center pl-2">

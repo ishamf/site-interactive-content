@@ -7,8 +7,6 @@
 />
 
 <script lang="ts">
-  import { run } from 'svelte/legacy';
-
   import { addComponentStylesheet } from '$lib/component';
   import Capturer from './components/Capturer.svelte';
   import { set as idbSet, get as idbGet } from 'idb-keyval';
@@ -19,21 +17,22 @@
   import Note from './components/Note.svelte';
   import TextButton from '$lib/components/TextButton.svelte';
 
-  let takenImageUri: string | undefined = $state();
+  let takenImageUri: string | undefined;
 
-  let processingData: string | undefined = $state();
-  let embedding: number[] | undefined = $state();
-  let embeddedData: string | undefined = $state();
+  let processingData: string | undefined;
+  let embedding: number[] | undefined;
+  let embeddedData: string | undefined;
 
   const embedderStatus = globalEmbedder.statusStore;
   const loadPercent = globalEmbedder.loadPercentStore;
+  $: roundedLoadPercent = Math.round($loadPercent);
 
-  let storedData: NoteData[] = $state([]);
+  let storedData: NoteData[] = [];
 
-  let takenPhotoPosition: HTMLDivElement | undefined = $state();
+  let takenPhotoPosition: HTMLDivElement;
 
   const storageKey = 'image-key-data';
-  let hasLoadedStorage = $state(false);
+  let hasLoadedStorage = false;
 
   idbGet(storageKey).then(async (res) => {
     if (res) {
@@ -48,6 +47,17 @@
     hasLoadedStorage = true;
   });
 
+  // Promise.resolve().then(async () => {
+  //   storedData = await getInitialData();
+  //   hasLoadedStorage = true;
+  // });
+
+  $: {
+    if (hasLoadedStorage) {
+      queueSave(storedData);
+    }
+  }
+
   let currentSavePromise: Promise<void> | undefined;
   let currentSaveTimeout: ReturnType<typeof setTimeout> | undefined;
 
@@ -58,34 +68,12 @@
 
     currentSaveTimeout = setTimeout(() => {
       currentSavePromise = (currentSavePromise || Promise.resolve()).then(() => {
-        return idbSet(storageKey, $state.snapshot(data));
+        return idbSet(storageKey, data);
       });
     }, 500);
   }
 
-  function addCurrent() {
-    if (embedding) {
-      storedData.push({ embedding, note: '', originalImage: embeddedData || '', id: randomId() });
-      storedData = storedData;
-    }
-  }
-
-  function onPhoto(event: CustomEvent<string>) {
-    takenImageUri = event.detail;
-    takenPhotoPosition?.scrollIntoView({ behavior: 'smooth' });
-  }
-  let roundedLoadPercent = $derived(Math.round($loadPercent));
-  // Promise.resolve().then(async () => {
-  //   storedData = await getInitialData();
-  //   hasLoadedStorage = true;
-  // });
-
-  run(() => {
-    if (hasLoadedStorage) {
-      queueSave(storedData);
-    }
-  });
-  run(() => {
+  $: {
     if (!takenImageUri) {
       processingData = undefined;
       embedding = undefined;
@@ -100,7 +88,19 @@
         }
       });
     }
-  });
+  }
+
+  function addCurrent() {
+    if (embedding) {
+      storedData.push({ embedding, note: '', originalImage: embeddedData || '', id: randomId() });
+      storedData = storedData;
+    }
+  }
+
+  function onPhoto(event: CustomEvent<string>) {
+    takenImageUri = event.detail;
+    takenPhotoPosition.scrollIntoView({ behavior: 'smooth' });
+  }
 </script>
 
 <div class="container">
@@ -117,11 +117,11 @@
 
         <p>
           {#if $embedderStatus !== 'ready'}
-            Loading model... ({roundedLoadPercent}%)
+            <p>Loading model... ({roundedLoadPercent}%)</p>
           {:else if takenImageUri === processingData && takenImageUri !== embeddedData}
-            Processing image...
+            <p>Processing image...</p>
           {:else}
-            <TextButton onclick={addCurrent}>Add Note</TextButton>
+            <TextButton on:click={addCurrent}>Add Note</TextButton>
           {/if}
         </p>
       </div>

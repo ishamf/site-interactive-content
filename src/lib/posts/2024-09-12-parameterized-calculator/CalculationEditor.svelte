@@ -3,13 +3,9 @@
   import CoveredInput from '$lib/components/CoveredInput.svelte';
   import type { Calculation } from './state';
 
-  interface Props {
-    calculation: Calculation;
-  }
+  export let calculation: Calculation;
 
-  let { calculation }: Props = $props();
-
-  let resultNode: HTMLSpanElement | undefined = $state();
+  let resultNode: HTMLSpanElement | undefined;
 
   function onResultClick() {
     if (resultNode) {
@@ -22,21 +18,18 @@
     }
   }
 
-  let mainText = $derived(
-    createStoreFromMobx(
-      () => calculation.inputText,
-      (text) => calculation.updateText(text)
-    )
+  $: mainText = createStoreFromMobx(
+    () => calculation.inputText,
+    (text) => calculation.updateText(text)
   );
 
-  let calcResult = $derived(createStoreFromMobx(() => calculation.value));
-  let displaySegments = $derived(createStoreFromMobx(() => calculation.displaySegments));
+  $: calcResult = createStoreFromMobx(() => calculation.value);
+  $: displaySegments = createStoreFromMobx(() => calculation.displaySegments);
 
-  let variableColors = $derived(createStoreFromMobx(() => calculation.variableColors));
+  $: variableColors = createStoreFromMobx(() => calculation.variableColors);
 
-  let shouldShowResult = $derived(
-    $calcResult && !$calcResult.invalidReason && $calcResult.toString().trim() !== $mainText.trim()
-  );
+  $: shouldShowResult =
+    $calcResult && !$calcResult.invalidReason && $calcResult.toString().trim() !== $mainText.trim();
 </script>
 
 <!-- 
@@ -55,14 +48,14 @@
         >{segment.value}</span
       >{/if}{/each}{#if shouldShowResult}<span class="text-neutral-500 ml-1"
       ><span class="cover"
-        >{'= '}<!-- adding this comment to prevent prettier from adding newline
+        >= <!-- adding this comment to prevent prettier from adding newline
         --></span
       ><!-- 
-      svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions
+      svelte-ignore a11y-click-events-have-key-events a11y-no-static-element-interactions
       --><span
         class="result"
         bind:this={resultNode}
-        onclick={onResultClick}>{$calcResult?.toString()}</span
+        on:click={onResultClick}>{$calcResult?.toString()}</span
       ></span
     >{/if}</CoveredInput
 >

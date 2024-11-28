@@ -2,11 +2,7 @@
 
 <script lang="ts">
   import type Calculator from './Calculator.svelte';
-  interface Props {
-    targetId: string;
-  }
-
-  let { targetId }: Props = $props();
+  export let targetId: string;
 
   function getCalc() {
     return document.getElementById(targetId) as Calculator | null;
@@ -24,7 +20,7 @@
     <li>
       <a
         href={`#${targetId}`}
-        onclick={(e) => {
+        on:click={(e) => {
           e.preventDefault();
           getCalc()?.updateText(expression, variables);
         }}>{text}</a

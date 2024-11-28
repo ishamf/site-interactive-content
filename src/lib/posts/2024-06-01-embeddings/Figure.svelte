@@ -1,8 +1,6 @@
 <svelte:options customElement={{ tag: 'xif-embedding-figure', extend: addComponentStylesheet }} />
 
 <script lang="ts">
-  import { run } from 'svelte/legacy';
-
   import { writable } from 'svelte/store';
   import type { Sentence } from './types';
   import { asyncDerived } from '@square/svelte-store';
@@ -10,20 +8,16 @@
   import SentenceDisplay from './components/SentenceDisplay.svelte';
   import { addComponentStylesheet } from '$lib/component';
 
-  interface Props {
-    /**
-     * Comma separated list of sentences to display
-     */
-    sentences: string;
-  }
-
-  let { sentences }: Props = $props();
+  /**
+   * Comma separated list of sentences to display
+   */
+  export let sentences: string;
 
   const sentencesArray = writable([] as Sentence[]);
 
-  run(() => {
+  $: {
     $sentencesArray = sentences.split(',').map((x) => ({ value: x }));
-  });
+  }
 
   const projector = new Projector();
 

@@ -4,12 +4,9 @@
   import type { NoteData } from '../types';
   import { createEventDispatcher } from 'svelte';
 
-  interface Props {
-    takenPhoto: string;
-    existingNote: NoteData;
-  }
+  export let takenPhoto: string;
 
-  let { takenPhoto, existingNote = $bindable() }: Props = $props();
+  export let existingNote: NoteData;
 
   const dispatch = createEventDispatcher();
 </script>
@@ -18,7 +15,7 @@
   <div class="row">
     <Button
       icon={mdiBackspace}
-      onclick={() => {
+      on:click={() => {
         dispatch('back');
       }}
       title="Back"
