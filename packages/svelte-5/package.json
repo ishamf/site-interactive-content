@@ -8,8 +8,6 @@
     "build": "vite build && pnpm minify-output",
     "minify-output": "find dist -name '*.js' -exec esbuild --minify --allow-overwrite '{}' '--outfile={}' ';'",
     "preview": "vite preview",
-    "prepare": "npm run build-grammar-bundles",
-    "build-grammar-bundles": "find src -name '*.ohm' | xargs ohm generateBundles --esm --withTypes",
     "check": "svelte-check --tsconfig ./tsconfig.json",
     "lint": "prettier --check . && eslint .",
     "format": "prettier --write ."
