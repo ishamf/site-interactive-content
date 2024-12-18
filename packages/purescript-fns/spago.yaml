@@ -13,7 +13,7 @@ package:
     - prelude
     - strings
     - test-unit
-  name: my-project
+  name: site-interactive-content-fns
 workspace:
   extraPackages: {}
   packageSet:
