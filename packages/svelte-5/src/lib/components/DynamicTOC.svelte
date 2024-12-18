@@ -1,10 +1,14 @@
 <script lang="ts">
   import { onMount } from 'svelte';
 
-  export let headings: { text: string; slug: string; depth: number }[];
+  interface Props {
+    headings: { text: string; slug: string; depth: number }[];
+  }
 
-  let scrollPosition = 0;
-  let idPositions: Record<string, number> = {};
+  let { headings }: Props = $props();
+
+  let scrollPosition = $state(0);
+  let idPositions: Record<string, number> = $state({});
 
   onMount(() => {
     const listener = () => {
@@ -24,9 +28,9 @@
     };
   });
 
-  $: currentItemSlug = headings.findLast(
-    (item) => scrollPosition >= idPositions[item.slug] - 10
-  )?.slug;
+  let currentItemSlug = $derived(
+    headings.findLast((item) => scrollPosition >= idPositions[item.slug] - 10)?.slug
+  );
 </script>
 
 <nav class="toc-nav">

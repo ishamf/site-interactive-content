@@ -1,9 +1,14 @@
 <script lang="ts">
-  export let background = true;
+  interface Props {
+    background?: boolean;
+    children?: import('svelte').Snippet;
+  }
+
+  let { background = true, children }: Props = $props();
 </script>
 
 <div class:background class="prose prose-neutral dark:prose-invert font-sans max-w-none">
-  <slot />
+  {@render children?.()}
 </div>
 
 <style lang="postcss">
