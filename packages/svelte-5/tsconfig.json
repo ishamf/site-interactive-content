@@ -19,7 +19,7 @@
     }
   },
   "include": ["src/**/*.ts", "src/**/*.js", "src/**/*.svelte"],
-  "exclude": ["src/**/*.ohm-bundle.js"],
+  "exclude": ["src/**/*.ohm-bundle.js", "dist/*"],
   "references": [
     {
       "path": "./tsconfig.node.json"

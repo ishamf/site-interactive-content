@@ -1,6 +1,6 @@
 <script lang="ts">
   import './lib/app.css';
-  import './lib/entries/2024-timestamp-converter';
+  import './lib/entries/2024-timestamp-converter-2';
 </script>
 
 <main class="max-w-3xl">

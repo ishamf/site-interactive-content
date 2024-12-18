@@ -112,7 +112,7 @@
       <Button
         title="Clear input"
         icon={mdiClose}
-        on:click={() => {
+        onclick={() => {
           inputText = '';
         }}
       ></Button>
@@ -120,7 +120,7 @@
   </div>
 
   <TextButton
-    on:click={() => {
+    onclick={() => {
       inputText = DateTime.now().toISO();
       resetInterval();
     }}>Set to current time</TextButton
