@@ -7,14 +7,14 @@
   import Input from '$lib/components/Input.svelte';
   import Text from '$lib/components/Text.svelte';
   import { subtractIPRanges } from './calculator';
-  import { lastAvailableResult } from './utils.svelte';
+  // import { lastAvailableResult } from './utils.svelte';
 
   let allowedIpString = $state('');
   let disallowedIpString = $state('');
 
   let calculationResult = $derived(subtractIPRanges(allowedIpString, disallowedIpString));
 
-  let result = lastAvailableResult(() => calculationResult);
+  // let result = lastAvailableResult(() => calculationResult);
 </script>
 
 <div class="flex flex-col p-4 gap-4">
