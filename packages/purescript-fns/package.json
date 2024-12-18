@@ -5,10 +5,13 @@
     "main": "index.js",
     "version": "0.0.0",
     "scripts": {
-        "prepare": "spago build"
+        "prepare": "spago build",
+        "lint": "purs-tidy check 'src/**/*.purs' 'test/**/*.purs'",
+        "format": "purs-tidy format-in-place 'src/**/*.purs' 'test/**/*.purs'"
     },
     "devDependencies": {
         "purescript": "^0.15.15",
+        "purs-tidy": "^0.11.0",
         "spago": "^0.93.41"
     }
 }

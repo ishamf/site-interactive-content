@@ -29,6 +29,9 @@ importers:
       purescript:
         specifier: ^0.15.15
         version: 0.15.15
+      purs-tidy:
+        specifier: ^0.11.0
+        version: 0.11.0
       spago:
         specifier: ^0.93.41
         version: 0.93.41
@@ -249,7 +252,7 @@ importers:
         version: 5.14.3
       svelte-check:
         specifier: ^4.0.0
-        version: 4.1.1(picomatch@2.3.1)(svelte@5.14.3)(typescript@5.5.4)
+        version: 4.1.1(picomatch@4.0.2)(svelte@5.14.3)(typescript@5.5.4)
       svelte-eslint-parser:
         specifier: ^0.43.0
         version: 0.43.0(svelte@5.14.3)
@@ -2744,6 +2747,10 @@ packages:
     resolution: {integrity: sha512-4gwLNJa4KRiV+Wl+lyMY4MUFM6cSnIqvz7MvSTdLdvXJN2P9CrABnNbSspaokkNRFd9soWHBFDlYsAtRchqHtg==}
     hasBin: true
 
+  purs-tidy@0.11.0:
+    resolution: {integrity: sha512-HZ8AS6J7Ka2YVl6Gr/H5NV17TU10yGYUTxVwRd5tKuwsVdFZewXSzZ/HTpWrkhdR2gxSVk0BdnpJhyu//oRc+w==}
+    hasBin: true
+
   qrcode@1.5.3:
     resolution: {integrity: sha512-puyri6ApkEHYiVl4CFzo1tDkAZ+ATcnbJrJ6RiBM1Fhctdn/ix9MTE3hRph33omisEbC/2fcfemsseiKgBPKZg==}
     engines: {node: '>=10.13.0'}
@@ -4862,9 +4869,9 @@ snapshots:
     dependencies:
       reusify: 1.0.4
 
-  fdir@6.4.2(picomatch@2.3.1):
+  fdir@6.4.2(picomatch@4.0.2):
     optionalDependencies:
-      picomatch: 2.3.1
+      picomatch: 4.0.2
 
   figgy-pudding@3.5.2: {}
 
@@ -5819,6 +5826,8 @@ snapshots:
       - bluebird
       - supports-color
 
+  purs-tidy@0.11.0: {}
+
   qrcode@1.5.3:
     dependencies:
       dijkstrajs: 1.0.3
@@ -6220,11 +6229,11 @@ snapshots:
       - stylus
       - sugarss
 
-  svelte-check@4.1.1(picomatch@2.3.1)(svelte@5.14.3)(typescript@5.5.4):
+  svelte-check@4.1.1(picomatch@4.0.2)(svelte@5.14.3)(typescript@5.5.4):
     dependencies:
       '@jridgewell/trace-mapping': 0.3.25
       chokidar: 4.0.2
-      fdir: 6.4.2(picomatch@2.3.1)
+      fdir: 6.4.2(picomatch@4.0.2)
       picocolors: 1.0.0
       sade: 1.8.1
       svelte: 5.14.3
