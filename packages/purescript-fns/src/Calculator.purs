@@ -1,7 +1,6 @@
 module Calculator
   ( IPRange
   , calcAsRecord
-  , fromRightWithError
   , ipRangeRegex
   , mergeIpRanges
   , parseIPRange
@@ -9,6 +8,7 @@ module Calculator
   , renderIpRanges
   , sortIpRanges
   , subtractIpRanges
+  , validateIPRanges
   )
   where
 
@@ -22,7 +22,7 @@ import Data.List (List(..), concat, range, sortBy, (:))
 import Data.Maybe (Maybe(..))
 import Data.String (Pattern(..), joinWith, split, trim)
 import Data.String.Regex (Regex, match, parseFlags, regex)
-import JS.BigInt (BigInt, and, fromInt, not, or, shl, shr)
+import JS.BigInt (BigInt, and, fromInt, or, shl, shr)
 import JS.BigInt as BigInt
 import Partial.Unsafe (unsafeCrashWith)
 
@@ -63,7 +63,7 @@ parseIPRange str = do
                 in (foldl f (Right b0) matches.address)
     length <- note "Cannot parse int" (BigInt.fromString matches.length)
     Right (let mask = (shl b1 (b32 - length)) - b1 
-            in {start: and address (not mask), end: or address mask})
+            in {start: and address (BigInt.not mask), end: or address mask})
 
 parseIPRanges :: String -> Either String (List IPRange)
 parseIPRanges = 
@@ -132,6 +132,10 @@ calcAsRecord a b = case (calc a b) of
     Right result -> { result, error: "" }
     Left error -> {result: "", error }
 
+validateIPRanges :: String -> String
+validateIPRanges s = case parseIPRanges s of
+    Right _ -> ""
+    Left message -> message
 
 b0 :: BigInt
 b0 = fromInt 0

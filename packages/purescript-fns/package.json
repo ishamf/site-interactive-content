@@ -4,6 +4,9 @@
     "type": "module",
     "main": "index.js",
     "version": "0.0.0",
+    "scripts": {
+        "prepare": "spago build"
+    },
     "devDependencies": {
         "purescript": "^0.15.15",
         "spago": "^0.93.41"
