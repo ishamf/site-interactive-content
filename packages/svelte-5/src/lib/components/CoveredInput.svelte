@@ -19,8 +19,8 @@
     children,
   }: Props = $props();
 
-  let textarea: HTMLTextAreaElement = $state();
-  let cover: HTMLDivElement = $state();
+  let textarea: HTMLTextAreaElement | undefined = $state();
+  let cover: HTMLDivElement | undefined = $state();
 
   let paddingClass = $derived(padding === 'small' ? 'p-1' : 'p-2');
 </script>

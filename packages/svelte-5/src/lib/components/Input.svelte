@@ -1,21 +1,22 @@
 <script lang="ts">
-  import { createBubbler } from 'svelte/legacy';
+  import type { HTMLInputAttributes } from 'svelte/elements';
 
-  const bubble = createBubbler();
   interface Props {
     value: string;
     placeholder: string;
     disabled?: boolean;
+    onfocus?: HTMLInputAttributes['onfocus'];
+    onblur?: HTMLInputAttributes['onblur'];
   }
 
-  let { value = $bindable(), placeholder, disabled = false }: Props = $props();
+  let { value = $bindable(), placeholder, disabled = false, onfocus, onblur }: Props = $props();
 </script>
 
 <input
   type="text"
   bind:value
-  onfocus={bubble('focus')}
-  onblur={bubble('blur')}
+  {onfocus}
+  {onblur}
   {disabled}
   {placeholder}
   class="flex-1 px-4 py-2 block min-w-0 min-h-12

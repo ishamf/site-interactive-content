@@ -1,17 +1,17 @@
 <script lang="ts">
-  import { createBubbler } from 'svelte/legacy';
+  import type { HTMLButtonAttributes } from 'svelte/elements';
 
-  const bubble = createBubbler();
   interface Props {
     danger?: boolean;
+    onclick?: HTMLButtonAttributes['onclick'];
     children?: import('svelte').Snippet;
   }
 
-  let { danger = false, children }: Props = $props();
+  let { danger = false, children, onclick }: Props = $props();
 </script>
 
 <button
-  onclick={bubble('click')}
+  {onclick}
   class="px-4 py-2
         bg-neutral-100 hover:bg-neutral-200
         dark:bg-neutral-700 dark:hover:bg-neutral-600
