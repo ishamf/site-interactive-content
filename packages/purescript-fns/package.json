@@ -8,7 +8,8 @@
         "prepare": "pnpm build",
         "build": "spago build",
         "lint": "purs-tidy check 'src/**/*.purs' 'test/**/*.purs'",
-        "format": "purs-tidy format-in-place 'src/**/*.purs' 'test/**/*.purs'"
+        "format": "purs-tidy format-in-place 'src/**/*.purs' 'test/**/*.purs'",
+        "test": "spago test"
     },
     "devDependencies": {
         "purescript": "^0.15.15",

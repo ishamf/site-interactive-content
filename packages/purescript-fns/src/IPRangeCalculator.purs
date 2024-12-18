@@ -18,7 +18,7 @@ import Data.Array (foldl, foldr, fromFoldable)
 import Data.Array.NonEmpty (toArray)
 import Data.Either (Either(..), note)
 import Data.Int as Int
-import Data.List (List(..), concat, range, sortBy, (:))
+import Data.List (List(..), range, sortBy, (:))
 import Data.Maybe (Maybe(..))
 import Data.String (Pattern(..), joinWith, split, trim)
 import Data.String.Regex (Regex, match, parseFlags, regex)
@@ -116,7 +116,7 @@ renderIpRanges = renderIpRanges' >>> fromFoldable >>> joinWith ", "
   where
   renderIpRanges' :: List IPRange -> List String
   renderIpRanges' Nil = Nil
-  renderIpRanges' (x : xs) = concat ((renderRange x) : (renderIpRanges' xs) : Nil)
+  renderIpRanges' (x : xs) = (renderRange x) <> (renderIpRanges' xs)
 
   renderRange :: IPRange -> List String
   renderRange x =
@@ -128,6 +128,7 @@ renderIpRanges = renderIpRanges' >>> fromFoldable >>> joinWith ", "
         ( if block_end == x.end then Nil
           else (renderRange { start: block_end + b1, end: x.end })
         )
+
   renderPrefix start = joinWith "." $ fromFoldable (map (componentAt >>> show) (map fromInt $ range 1 4))
     where
     componentAt i =
