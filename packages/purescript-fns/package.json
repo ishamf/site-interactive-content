@@ -1,0 +1,11 @@
+{
+    "name": "purescript-fns",
+    "private": true,
+    "type": "module",
+    "main": "index.js",
+    "version": "0.0.0",
+    "devDependencies": {
+        "purescript": "^0.15.15",
+        "spago": "^0.21.0"
+    }
+}
