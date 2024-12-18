@@ -18,6 +18,7 @@ import Control.Apply (lift2)
 import Data.Array (foldl, foldr, fromFoldable)
 import Data.Array.NonEmpty (toArray)
 import Data.Either (Either(..), note)
+import Data.Int as Int
 import Data.List (List(..), concat, range, sortBy, (:))
 import Data.Maybe (Maybe(..))
 import Data.String (Pattern(..), joinWith, split, trim)
@@ -58,8 +59,10 @@ parseIPRange str = do
       _ -> Left "Cannot match regex"
     address <- let f acc s = do 
                                 a <- acc
-                                i <- note "Cannot parse int" (BigInt.fromString s)
-                                Right (shl a b8 + i)
+                                i <- note "Cannot parse int" (Int.fromString s)
+                                if i < 0 || i > 255
+                                then Left "Invalid IP address component"
+                                else Right (shl a b8 + fromInt i)
                 in (foldl f (Right b0) matches.address)
     length <- note "Cannot parse int" (BigInt.fromString matches.length)
     Right (let mask = (shl b1 (b32 - length)) - b1 
