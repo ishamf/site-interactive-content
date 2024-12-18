@@ -1,4 +1,4 @@
-export function calculateIPRanges(
+export function subtractIPRanges(
   allowedIps: string,
   disallowedIPs: string
 ): { error: string; result: string };

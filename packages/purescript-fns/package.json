@@ -5,7 +5,8 @@
     "main": "index.js",
     "version": "0.0.0",
     "scripts": {
-        "prepare": "spago build",
+        "prepare": "pnpm build",
+        "build": "spago build",
         "lint": "purs-tidy check 'src/**/*.purs' 'test/**/*.purs'",
         "format": "purs-tidy format-in-place 'src/**/*.purs' 'test/**/*.purs'"
     },

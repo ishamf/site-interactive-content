@@ -1,9 +1,9 @@
 
 
-import { calcAsRecord, validateIPRanges } from './output/Calculator'
+import { subtractIPRangesAsRecord, validateIPRanges } from './output/Calculator'
 
-export function calculateIPRanges(allowedIps, disallowedIPs) {
-    return calcAsRecord(allowedIps)(disallowedIPs)
+export function subtractIPRanges(allowedIps, disallowedIPs) {
+    return subtractIPRangesAsRecord(allowedIps)(disallowedIPs)
 }
 
 export { validateIPRanges }

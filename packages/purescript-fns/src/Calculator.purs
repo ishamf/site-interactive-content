@@ -1,6 +1,6 @@
 module Calculator
   ( IPRange
-  , calcAsRecord
+  , subtractIPRangesAsRecord
   , ipRangeRegex
   , mergeIpRanges
   , parseIPRange
@@ -41,8 +41,8 @@ ipRangeRegex =
     ( regex "([b0-b9]+)\\.([b0-b9]+)\\.([b0-b9]+)\\.([b0-b9]+)/([b0-b9]+)" (parseFlags "")
     )
 
-calc :: String -> String -> Either String String
-calc allowedStr disallowedStr = do
+subtractIpRangesFromString :: String -> String -> Either String String
+subtractIpRangesFromString allowedStr disallowedStr = do
   allowed <- parseIPRanges allowedStr
   disallowed <- parseIPRanges disallowedStr
   Right
@@ -101,19 +101,24 @@ subtractIpRanges a Nil = a
 subtractIpRanges (a : as) (b : bs) =
   if a.end < b.start then a : subtractIpRanges as (b : bs)
   else if b.end < a.start then subtractIpRanges (a : as) bs
-  else -- a and b definitely intersects
-    if b.start <= a.start && a.end <= b.end then subtractIpRanges as (b : bs)
-  else if a.start < b.start && b.end < a.end then { start: a.start, end: b.start - b1 } : { start: b.end + b1, end: a.end } : subtractIpRanges as bs
-  else if b.start <= a.start then { start: b.end + b1, end: a.end } : subtractIpRanges as bs
-  else --  b.end >= a.end
-
-    { start: a.start, end: b.start - b1 } : subtractIpRanges as (b : bs)
+  -- a and b definitely intersects
+  else if b.start <= a.start && a.end <= b.end -- b fully covers a
+  then subtractIpRanges as (b : bs)
+  else if a.start < b.start && b.end < a.end -- a fully covers b
+  then { start: a.start, end: b.start - b1 } : { start: b.end + b1, end: a.end } : subtractIpRanges as bs
+  else if b.start <= a.start -- b is behind a
+  then { start: b.end + b1, end: a.end } : subtractIpRanges as bs
+  --  b.end >= a.end, a is behind b
+  else { start: a.start, end: b.start - b1 } : subtractIpRanges as (b : bs)
 
 renderIpRanges :: List IPRange -> String
 renderIpRanges = renderIpRanges' >>> fromFoldable >>> joinWith ", "
   where
+  renderIpRanges' :: List IPRange -> List String
   renderIpRanges' Nil = Nil
   renderIpRanges' (x : xs) = concat ((renderRange x) : (renderIpRanges' xs) : Nil)
+
+  renderRange :: IPRange -> List String
   renderRange x =
     let
       block_length = maxBlockLength x.start x.end
@@ -123,13 +128,13 @@ renderIpRanges = renderIpRanges' >>> fromFoldable >>> joinWith ", "
         ( if block_end == x.end then Nil
           else (renderRange { start: block_end + b1, end: x.end })
         )
-  renderPrefix n = joinWith "." $ fromFoldable (map (sc >>> show) (map fromInt $ range 1 4))
+  renderPrefix start = joinWith "." $ fromFoldable (map (componentAt >>> show) (map fromInt $ range 1 4))
     where
-    sc i =
+    componentAt i =
       let
         shn = (b4 - i) * b8
       in
-        shr (and n (shl b255 shn)) shn
+        shr (and start (shl b255 shn)) shn
 
 maxBlockLength ∷ BigInt → BigInt → BigInt
 maxBlockLength start end = mbl start end b1
@@ -141,8 +146,8 @@ maxBlockLength start end = mbl start end b1
       if and s mask == b0 && s + mask <= e then mbl s e (i + b1)
       else i - b1
 
-calcAsRecord :: String -> String -> { error :: String, result :: String }
-calcAsRecord a b = case (calc a b) of
+subtractIPRangesAsRecord :: String -> String -> { error :: String, result :: String }
+subtractIPRangesAsRecord a b = case (subtractIpRangesFromString a b) of
   Right result -> { result, error: "" }
   Left error -> { result: "", error }
 
