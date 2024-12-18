@@ -108,31 +108,24 @@ renderIpRanges = renderIpRanges' >>> fromFoldable >>> joinWith ", "
     where 
         renderIpRanges' Nil = Nil
         renderIpRanges' (x:xs) = concat ((renderRange x) : (renderIpRanges' xs) : Nil)
-        renderRange x
-          | x.start >= x.end = Nil
-          | otherwise =
-                        let start_length = zeroBitCount x.start
-                            end_length = zeroBitCount (x.end + b1)
-                            min_length = if start_length < end_length then start_length else (end_length - b1)
+        renderRange x = let block_length = maxBlockLength x.start x.end
+                            block_end = x.start + shl b1 block_length - b1
                         in 
-                            (renderPrefix x.start <> "/" <> show (b32 - min_length)) :
-                            (if start_length == (end_length - b1)
+                            (renderPrefix x.start <> "/" <> show (b32 - block_length)) :
+                            (if block_end == x.end
                              then Nil
-                             else (renderRange {start: x.start + (shl b1 min_length), end: x.end}))
+                             else (renderRange {start: block_end + b1, end: x.end}))
         renderPrefix n = joinWith "." $ fromFoldable (map (sc >>> show) (map fromInt $ range 1 4))
             where sc i = let shn = (b4 - i) * b8
                          in shr (and n (shl b255 shn)) shn
 
-zeroBitCount :: BigInt -> BigInt
-zeroBitCount x' = zbc x' 1
+maxBlockLength ∷ BigInt → BigInt → BigInt
+maxBlockLength start end = mbl start end b1
     where
-        zbc :: BigInt -> Int -> BigInt
-        zbc x p 
-            | p >= 32 = fromInt 32
-            | otherwise = let mask = shl b1 (fromInt p) - b1 in
-                            if and x mask == b0
-                            then zbc x (p + 1)
-                            else ((fromInt p) - b1)
+        mbl s e i = let mask = shl b1 i - b1 in
+                    if and s mask == b0 && s + mask <= e
+                    then mbl s e (i + b1)
+                    else i - b1
 
 calcAsRecord :: String -> String -> { error :: String, result :: String }
 calcAsRecord a b = case (calc a b) of 
@@ -148,8 +141,6 @@ b4 :: BigInt
 b4 = fromInt 4
 b8 :: BigInt
 b8 = fromInt 8
-b9 :: BigInt
-b9 = fromInt 9
 b32 :: BigInt
 b32 = fromInt 32
 b255 :: BigInt

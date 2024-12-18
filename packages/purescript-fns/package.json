@@ -6,6 +6,6 @@
     "version": "0.0.0",
     "devDependencies": {
         "purescript": "^0.15.15",
-        "spago": "^0.21.0"
+        "spago": "^0.93.41"
     }
 }

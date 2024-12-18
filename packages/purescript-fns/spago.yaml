@@ -1,0 +1,20 @@
+package:
+  dependencies:
+  - aff
+  - arrays
+  - console
+  - effect
+  - either
+  - integers
+  - js-bigints
+  - lists
+  - maybe
+  - partial
+  - prelude
+  - strings
+  - test-unit
+  name: my-project
+workspace:
+  extra_packages: {}
+  package_set:
+    url: https://raw.githubusercontent.com/purescript/package-sets/psc-0.15.15-20241215/packages.json
