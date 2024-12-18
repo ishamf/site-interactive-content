@@ -2,7 +2,7 @@ module Test.Main where
 
 import Prelude
 
-import Calculator (mergeIpRanges, parseIPRange, parseIPRanges, renderIpRanges, sortIpRanges, subtractIpRanges)
+import IPRangeCalculator (mergeIpRanges, parseIPRange, parseIPRanges, renderIpRanges, sortIpRanges, subtractIpRanges)
 import Control.Apply (lift2)
 import Data.Either (Either(..), isRight)
 import Data.List as List

@@ -1,4 +1,4 @@
-module Calculator
+module IPRangeCalculator
   ( IPRange
   , subtractIPRangesAsRecord
   , ipRangeRegex
