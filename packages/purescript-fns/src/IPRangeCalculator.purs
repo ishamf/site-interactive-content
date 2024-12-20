@@ -1,15 +1,18 @@
 module IPRangeCalculator
   ( IPRange
-  , subtractIPRangesAsRecord
+  , cleanupIpRanges
   , ipRangeRegex
   , mergeIpRanges
   , parseIPRange
   , parseIPRanges
   , renderIpRanges
   , sortIpRanges
+  , subtractIPRangesAsRecord
   , subtractIpRanges
+  , subtractIpRangesFromString
   , validateIPRanges
-  ) where
+  )
+  where
 
 import Prelude
 
@@ -99,16 +102,21 @@ subtractIpRanges :: List IPRange -> List IPRange -> List IPRange
 subtractIpRanges Nil _ = Nil
 subtractIpRanges a Nil = a
 subtractIpRanges (a : as) (b : bs) =
+  -- check for non-intersecting a and b
   if a.end < b.start then a : subtractIpRanges as (b : bs)
   else if b.end < a.start then subtractIpRanges (a : as) bs
   -- a and b definitely intersects
-  else if b.start <= a.start && a.end <= b.end -- b fully covers a
+  else if b.start <= a.start && a.end <= b.end 
+  -- b fully covers a, delete a but preserve b since it can delete others
   then subtractIpRanges as (b : bs)
-  else if a.start < b.start && b.end < a.end -- a fully covers b
-  then { start: a.start, end: b.start - b1 } : { start: b.end + b1, end: a.end } : subtractIpRanges as bs
-  else if b.start <= a.start -- b is behind a
-  then { start: b.end + b1, end: a.end } : subtractIpRanges as bs
-  --  b.end >= a.end, a is behind b
+  else if a.start < b.start && b.end < a.end 
+  -- a fully covers b, need to split into two. The first part of a is clear, but the next part might be matched with other b
+  then { start: a.start, end: b.start - b1 } : subtractIpRanges ({ start: b.end + b1, end: a.end } : as) bs
+  else if b.start <= a.start 
+  -- b is behind a, a "shrinks" but it can still be matched with other b
+  then subtractIpRanges ({ start: b.end + b1, end: a.end } : as) bs
+  -- b.end >= a.end
+  -- a is behind b, current a is clear but b can match other a
   else { start: a.start, end: b.start - b1 } : subtractIpRanges as (b : bs)
 
 renderIpRanges :: List IPRange -> String
