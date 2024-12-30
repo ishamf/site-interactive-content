@@ -1,1 +1,1 @@
-export { subtractIPRanges } from 'purescript-fns';
+export { subtractIPRanges, validateIPRanges } from 'purescript-fns';
