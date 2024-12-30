@@ -100,23 +100,20 @@ cleanupIpRanges = sortIpRanges >>> mergeIpRanges
 subtractIpRanges :: List IPRange -> List IPRange -> List IPRange
 subtractIpRanges Nil _ = Nil
 subtractIpRanges a Nil = a
-subtractIpRanges (a : as) (b : bs) =
+subtractIpRanges (a : as) (b : bs)
   -- check for non-intersecting a and b
-  if a.end < b.start then a : subtractIpRanges as (b : bs)
-  else if b.end < a.start then subtractIpRanges (a : as) bs
+  | a.end < b.start = a : subtractIpRanges as (b : bs)
+  | b.end < a.start = subtractIpRanges (a : as) bs
   -- a and b definitely intersects
-  else if b.start <= a.start && a.end <= b.end
   -- b fully covers a, delete a but preserve b since it can delete others
-  then subtractIpRanges as (b : bs)
-  else if a.start < b.start && b.end < a.end
+  | b.start <= a.start && a.end <= b.end = subtractIpRanges as (b : bs)
   -- a fully covers b, need to split into two. The first part of a is clear, but the next part might be matched with other b
-  then { start: a.start, end: b.start - b1 } : subtractIpRanges ({ start: b.end + b1, end: a.end } : as) bs
-  else if b.start <= a.start
+  | a.start < b.start && b.end < a.end = { start: a.start, end: b.start - b1 } : subtractIpRanges ({ start: b.end + b1, end: a.end } : as) bs
   -- b is behind a, a "shrinks" but it can still be matched with other b
-  then subtractIpRanges ({ start: b.end + b1, end: a.end } : as) bs
+  | b.start <= a.start = subtractIpRanges ({ start: b.end + b1, end: a.end } : as) bs
   -- b.end >= a.end
   -- a is behind b, current a is clear but b can match other a
-  else { start: a.start, end: b.start - b1 } : subtractIpRanges as (b : bs)
+  | otherwise = { start: a.start, end: b.start - b1 } : subtractIpRanges as (b : bs)
 
 renderIpRanges :: List IPRange -> String
 renderIpRanges = renderIpRanges' >>> fromFoldable >>> joinWith ", "
