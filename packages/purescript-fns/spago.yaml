@@ -1,0 +1,20 @@
+package:
+  dependencies:
+    - aff
+    - arrays
+    - console
+    - effect
+    - either
+    - integers
+    - js-bigints
+    - lists
+    - maybe
+    - partial
+    - prelude
+    - strings
+    - test-unit
+  name: site-interactive-content-fns
+workspace:
+  extraPackages: {}
+  packageSet:
+    url: https://raw.githubusercontent.com/purescript/package-sets/psc-0.15.15-20241215/packages.json
