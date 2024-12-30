@@ -40,7 +40,7 @@ fromRightWithError _ (Right r) = r
 ipRangeRegex :: Regex
 ipRangeRegex =
   fromRightWithError "Cannot parse regex"
-    ( regex "^([b0-b9]+)\\.([b0-b9]+)\\.([b0-b9]+)\\.([b0-b9]+)/([b0-b9]+)$" (parseFlags "")
+    ( regex "^([0-9]+)\\.([0-9]+)\\.([0-9]+)\\.([0-9]+)/([0-9]+)$" (parseFlags "")
     )
 
 subtractIpRangesFromString :: String -> String -> Either String String
