@@ -11,8 +11,7 @@ module IPRangeCalculator
   , subtractIpRanges
   , subtractIpRangesFromString
   , validateIPRanges
-  )
-  where
+  ) where
 
 import Prelude
 
@@ -106,13 +105,13 @@ subtractIpRanges (a : as) (b : bs) =
   if a.end < b.start then a : subtractIpRanges as (b : bs)
   else if b.end < a.start then subtractIpRanges (a : as) bs
   -- a and b definitely intersects
-  else if b.start <= a.start && a.end <= b.end 
+  else if b.start <= a.start && a.end <= b.end
   -- b fully covers a, delete a but preserve b since it can delete others
   then subtractIpRanges as (b : bs)
-  else if a.start < b.start && b.end < a.end 
+  else if a.start < b.start && b.end < a.end
   -- a fully covers b, need to split into two. The first part of a is clear, but the next part might be matched with other b
   then { start: a.start, end: b.start - b1 } : subtractIpRanges ({ start: b.end + b1, end: a.end } : as) bs
-  else if b.start <= a.start 
+  else if b.start <= a.start
   -- b is behind a, a "shrinks" but it can still be matched with other b
   then subtractIpRanges ({ start: b.end + b1, end: a.end } : as) bs
   -- b.end >= a.end
