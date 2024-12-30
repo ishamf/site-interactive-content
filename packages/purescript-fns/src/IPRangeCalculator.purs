@@ -119,16 +119,15 @@ renderIpRanges :: List IPRange -> String
 renderIpRanges = renderIpRanges' >>> fromFoldable >>> joinWith ", "
   where
   renderIpRanges' :: List IPRange -> List String
-  renderIpRanges' Nil = Nil
-  renderIpRanges' (x : xs) = (renderRange x) <> (renderIpRanges' xs)
+  renderIpRanges' = (_ >>= renderRange)
 
   renderRange :: IPRange -> List String
   renderRange x =
     let
-      block_length = maxBlockLength x.start x.end
-      block_end = x.start + shl b1 block_length - b1
+      block_size = maxBlockSize x.start x.end
+      block_end = x.start + shl b1 block_size - b1
     in
-      (renderPrefix x.start <> "/" <> show (b32 - block_length)) :
+      (renderPrefix x.start <> "/" <> show (b32 - block_size)) :
         ( if block_end == x.end then Nil
           else (renderRange { start: block_end + b1, end: x.end })
         )
@@ -141,14 +140,14 @@ renderIpRanges = renderIpRanges' >>> fromFoldable >>> joinWith ", "
       in
         shr (and start (shl b255 shn)) shn
 
-maxBlockLength ∷ BigInt → BigInt → BigInt
-maxBlockLength start end = mbl start end b1
+maxBlockSize ∷ BigInt → BigInt → BigInt
+maxBlockSize start end = mbs start end b1
   where
-  mbl s e i =
+  mbs s e i =
     let
       mask = shl b1 i - b1
     in
-      if and s mask == b0 && s + mask <= e then mbl s e (i + b1)
+      if and s mask == b0 && s + mask <= e then mbs s e (i + b1)
       else i - b1
 
 subtractIPRangesAsRecord :: String -> String -> { error :: String, result :: String }
