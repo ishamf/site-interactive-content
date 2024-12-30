@@ -24,6 +24,9 @@ main = do
       test "10.0.0.0/8" do
         Assert.equal (Right { start: (shl (fromInt 10) (fromInt 24)), end: (shl (fromInt 11) (fromInt 24) - (fromInt 1)) }) $ parseIPRange "10.0.0.0/8"
 
+      test "overly specific" do
+        Assert.equal (Left "192.168.0.0/1 is overly specific, did you mean 128.0.0.0/1 or 192.168.0.0/13?") (parseIPRange "192.168.0.0/1")
+
     suite "parseIPRanges" do
       test "works" do
         ( rightAndEqual
@@ -106,6 +109,6 @@ main = do
 
 rightAndEqual ∷ forall a b. Eq a => Eq b => Show a => Show b => Either a b -> Either a b -> Aff Unit
 rightAndEqual a b = do
-  Assert.equal (isRight a) true
-  Assert.equal (isRight b) true
+  Assert.equal true (isRight a)
+  Assert.equal true (isRight b)
   Assert.equal a b

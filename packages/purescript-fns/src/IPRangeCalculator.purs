@@ -64,17 +64,26 @@ parseIPRange str = do
       f acc s = do
         a <- acc
         i <- note "Cannot parse int" (Int.fromString s)
-        if i < 0 || i > 255 then Left "Invalid IP address component"
+        if i < 0 || i > 255 then Left (str <> " has invalid IP address component")
         else Right (shl a b8 + fromInt i)
     in
       (foldl f (Right b0) matches.address)
   length <- note "Cannot parse int" (BigInt.fromString matches.length)
-  Right
-    ( let
+  ( if length < b0 || length > b32 then Left (str <> " has invalid mask length")
+    else
+      let
         mask = (shl b1 (b32 - length)) - b1
       in
-        { start: and address (BigInt.not mask), end: or address mask }
-    )
+        if and address mask == b0 then Right { start: and address (BigInt.not mask), end: or address mask }
+        else
+          let
+            actualLength = b32 - maxBlockSize address maxAddress
+            fixedMask = (shl b1 (b32 - actualLength)) - b1
+            fixedAddress1 = renderIpRanges ({ start: and address (BigInt.not mask), end: or address mask } : Nil)
+            fixedAddress2 = renderIpRanges ({ start: and address (BigInt.not fixedMask), end: or address fixedMask } : Nil)
+          in
+            Left (str <> " is overly specific, did you mean " <> fixedAddress1 <> " or " <> fixedAddress2 <> "?")
+  )
 
 parseIPRanges :: String -> Either String (List IPRange)
 parseIPRanges =
@@ -177,3 +186,6 @@ b32 = fromInt 32
 
 b255 :: BigInt
 b255 = fromInt 255
+
+maxAddress :: BigInt
+maxAddress = shl b1 b32 - b1
