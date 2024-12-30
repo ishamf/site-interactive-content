@@ -8,6 +8,7 @@
         "lint": "pnpm run -r lint",
         "format": "pnpm run -r format",
         "check": "pnpm run -r check",
+        "test": "pnpm run -r test",
         "build": "pnpm run -r build && pnpm run unify-dist",
         "unify-dist": "tsx scripts/unifyDist.ts"
     },
