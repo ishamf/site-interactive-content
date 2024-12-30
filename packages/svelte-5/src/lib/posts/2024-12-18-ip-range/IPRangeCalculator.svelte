@@ -64,7 +64,7 @@
   <div class="label">
     <Text>Disallowed IPs</Text>
   </div>
-  <Input bind:value={disallowedIpString} placeholder="10.0.0.0/8"></Input>
+  <Input bind:value={disallowedIpString} placeholder="10.0.0.0/8, 192.168.0.0/16"></Input>
   {#if disallowedIpState.state === 'invalid'}
     <div class="error" transition:slide={animationConfig}>
       <Text type="error">{disallowedIpState.error}</Text>
