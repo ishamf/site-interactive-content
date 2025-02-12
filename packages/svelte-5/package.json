@@ -11,7 +11,7 @@
     "check": "svelte-check --tsconfig ./tsconfig.json",
     "lint": "prettier --check . && eslint .",
     "install-playwright-browsers": "playwright install",
-    "test": "playwright test",
+    "e2e-test": "playwright test",
     "format": "prettier --write ."
   },
   "devDependencies": {

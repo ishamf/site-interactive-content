@@ -14,7 +14,7 @@
     "download-test-cache": "tsx scripts/downloadTestCache.ts",
     "check": "svelte-check --tsconfig ./tsconfig.json",
     "lint": "prettier --check . && eslint .",
-    "test": "playwright test",
+    "e2e-test": "playwright test",
     "format": "prettier --write ."
   },
   "devDependencies": {
