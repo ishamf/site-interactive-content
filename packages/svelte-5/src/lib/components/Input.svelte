@@ -2,6 +2,7 @@
   import type { HTMLInputAttributes } from 'svelte/elements';
 
   interface Props {
+    id?: string;
     value: string;
     placeholder: string;
     disabled?: boolean;
@@ -9,12 +10,13 @@
     onblur?: HTMLInputAttributes['onblur'];
   }
 
-  let { value = $bindable(), placeholder, disabled = false, onfocus, onblur }: Props = $props();
+  let { id, value = $bindable(), placeholder, disabled = false, onfocus, onblur }: Props = $props();
 </script>
 
 <input
   type="text"
   bind:value
+  {id}
   {onfocus}
   {onblur}
   {disabled}
