@@ -60,6 +60,18 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - run: pnpm run e2e-test
+      - name: Upload test results for svelte-4
+        if: success() || failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-test-results-svelte-4
+          path: packages/svelte-4/test-results
+      - name: Upload test results for svelte-5
+        if: success() || failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-test-results-svelte-5
+          path: packages/svelte-5/test-results
 
   publish:
     runs-on: ubuntu-latest
