@@ -9,6 +9,7 @@
     "minify-output": "find dist -name '*.js' -exec esbuild --minify --allow-overwrite '{}' '--outfile={}' ';'",
     "preview": "vite preview",
     "prepare": "npm run build-grammar-bundles && npm run download-test-cache",
+    "install-playwright-browsers": "playwright install",
     "build-grammar-bundles": "find src -name '*.ohm' | xargs ohm generateBundles --esm --withTypes",
     "download-test-cache": "tsx scripts/downloadTestCache.ts",
     "check": "svelte-check --tsconfig ./tsconfig.json",
