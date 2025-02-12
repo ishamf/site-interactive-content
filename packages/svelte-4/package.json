@@ -8,13 +8,17 @@
     "build": "vite build && pnpm minify-output",
     "minify-output": "find dist -name '*.js' -exec esbuild --minify --allow-overwrite '{}' '--outfile={}' ';'",
     "preview": "vite preview",
-    "prepare": "npm run build-grammar-bundles",
+    "prepare": "npm run build-grammar-bundles && npm run download-test-cache",
+    "install-playwright-browsers": "playwright install",
     "build-grammar-bundles": "find src -name '*.ohm' | xargs ohm generateBundles --esm --withTypes",
+    "download-test-cache": "tsx scripts/downloadTestCache.ts",
     "check": "svelte-check --tsconfig ./tsconfig.json",
     "lint": "prettier --check . && eslint .",
+    "e2e-test": "playwright test",
     "format": "prettier --write ."
   },
   "devDependencies": {
+    "@playwright/test": "^1.50.1",
     "@sveltejs/vite-plugin-svelte": "^3.0.2",
     "@tsconfig/svelte": "^5.0.2",
     "@types/luxon": "^3.4.2",

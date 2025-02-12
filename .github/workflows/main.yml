@@ -13,7 +13,9 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20.x
+      # Workaround for https://github.com/nodejs/corepack/issues/612 and https://github.com/actions/setup-node/issues/1222
       - run: |
+          npm i -g --force corepack
           corepack enable
           corepack prepare pnpm@9.0.6
 
@@ -33,6 +35,43 @@ jobs:
         with:
           name: site
           path: dist
+
+  e2e-test:
+    runs-on: ubuntu-latest
+    container:
+      image: mcr.microsoft.com/playwright:v1.50.1-noble
+      options: --user 1001
+    steps:
+      - uses: actions/checkout@v4
+      - name: Use Node.js 20.x
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20.x
+      # Workaround for https://github.com/nodejs/corepack/issues/612 and https://github.com/actions/setup-node/issues/1222
+      - run: |
+          npm i -g --force corepack
+          corepack enable
+          corepack prepare pnpm@9.0.6
+
+      - name: Use cached Node.js 20.x
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20.x
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm run e2e-test
+      - name: Upload test results for svelte-4
+        if: success() || failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-test-results-svelte-4
+          path: packages/svelte-4/test-results
+      - name: Upload test results for svelte-5
+        if: success() || failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-test-results-svelte-5
+          path: packages/svelte-5/test-results
 
   publish:
     runs-on: ubuntu-latest

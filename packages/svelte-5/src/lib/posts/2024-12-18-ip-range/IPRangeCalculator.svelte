@@ -51,20 +51,24 @@
 </script>
 
 <div class="area">
-  <div class="label">
+  <label class="label" for="allowed-ips-input">
     <Text>Allowed IPs</Text>
-  </div>
-  <Input bind:value={allowedIpString} placeholder="0.0.0.0/0"></Input>
+  </label>
+  <Input id="allowed-ips-input" bind:value={allowedIpString} placeholder="0.0.0.0/0"></Input>
   {#if allowedIpState.state === 'invalid'}
     <div class="error" transition:slide={animationConfig}>
       <Text type="error">{allowedIpState.error}</Text>
     </div>
   {/if}
 
-  <div class="label">
+  <label class="label" for="disallowed-ips-input">
     <Text>Disallowed IPs</Text>
-  </div>
-  <Input bind:value={disallowedIpString} placeholder="10.0.0.0/8, 192.168.0.0/16"></Input>
+  </label>
+  <Input
+    id="disallowed-ips-input"
+    bind:value={disallowedIpString}
+    placeholder="10.0.0.0/8, 192.168.0.0/16"
+  ></Input>
   {#if disallowedIpState.state === 'invalid'}
     <div class="error" transition:slide={animationConfig}>
       <Text type="error">{disallowedIpState.error}</Text>
