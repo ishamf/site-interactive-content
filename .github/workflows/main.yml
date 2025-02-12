@@ -12,7 +12,7 @@ jobs:
       - name: Use Node.js 22.x
         uses: actions/setup-node@v4
         with:
-          node-version: 22.x
+          node-version: 22.14.0
       - run: |
           corepack enable
           corepack prepare pnpm@10.3.0
@@ -20,7 +20,7 @@ jobs:
       - name: Use cached Node.js 22.x
         uses: actions/setup-node@v4
         with:
-          node-version: 22.x
+          node-version: 22.14.0
           cache: pnpm
       - name: Cache purescript files
         uses: actions/cache@v4
@@ -52,7 +52,7 @@ jobs:
       - name: Use Node.js 22.x
         uses: actions/setup-node@v4
         with:
-          node-version: 22.x
+          node-version: 22.14.0
       - run: |
           corepack enable
           corepack prepare pnpm@10.3.0
@@ -60,7 +60,7 @@ jobs:
       - name: Use cached Node.js 22.x
         uses: actions/setup-node@v4
         with:
-          node-version: 22.x
+          node-version: 22.14.0
           cache: pnpm
       - name: Cache purescript files
         uses: actions/cache@v4
