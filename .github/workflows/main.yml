@@ -66,12 +66,14 @@ jobs:
         with:
           name: e2e-test-results-svelte-4
           path: packages/svelte-4/test-results
+          if-no-files-found: ignore
       - name: Upload test results for svelte-5
         if: success() || failure()
         uses: actions/upload-artifact@v4
         with:
           name: e2e-test-results-svelte-5
           path: packages/svelte-5/test-results
+          if-no-files-found: ignore
 
   publish:
     runs-on: ubuntu-latest
