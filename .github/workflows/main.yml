@@ -89,6 +89,21 @@ jobs:
           name: e2e-test-results-svelte-5
           path: packages/svelte-5/test-results
           if-no-files-found: ignore
+      - name: Collect changed files
+        if: success() || failure()
+        run: |
+          git add .
+          diff_names="$(git diff --binary --staged --name-only)"
+          if [ -n "$diff_names" ]; then
+            git diff --staged --binary | gzip > /tmp/snapshot_diff.patch.gz
+          fi
+      - name: Upload changed files
+        if: success() || failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-test-changed-files.patch.gz
+          path: /tmp/snapshot_diff.patch.gz
+          if-no-files-found: ignore
 
   publish:
     runs-on: ubuntu-latest
