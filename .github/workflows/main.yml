@@ -24,6 +24,14 @@ jobs:
         with:
           node-version: 20.x
           cache: pnpm
+      - name: Cache purescript files
+        uses: actions/cache@v4
+        with:
+          key: spago-${{ hashFiles('packages/purescript-fns/spago.*') }}
+          path: |
+            packages/purescript-fns/.spago
+            packages/purescript-fns/output
+
       - run: pnpm install --frozen-lockfile
       - run: pnpm run lint
       - run: pnpm run check
@@ -58,6 +66,13 @@ jobs:
         with:
           node-version: 20.x
           cache: pnpm
+      - name: Cache purescript files
+        uses: actions/cache@v4
+        with:
+          key: spago-${{ hashFiles('packages/purescript-fns/spago.*') }}
+          path: |
+            packages/purescript-fns/.spago
+            packages/purescript-fns/output
       - run: pnpm install --frozen-lockfile
       - run: pnpm run e2e-test
       - name: Upload test results for svelte-4
