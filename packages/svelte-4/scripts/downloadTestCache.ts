@@ -1,4 +1,6 @@
 import { createWriteStream, createReadStream, existsSync } from 'fs';
+import { mkdir } from 'fs/promises';
+import { dirname } from 'path';
 import { createHash } from 'crypto';
 import { Readable } from 'stream';
 import { finished } from 'stream/promises';
@@ -42,6 +44,10 @@ for (const file of files) {
       continue;
     }
   }
+
+  const targetDir = dirname(file.target);
+
+  await mkdir(targetDir, { recursive: true });
 
   await downloadFile(file.url, file.target);
 
