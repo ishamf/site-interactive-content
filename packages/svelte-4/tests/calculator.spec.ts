@@ -10,4 +10,6 @@ test('test', async ({ page }) => {
   await page.getByRole('textbox', { name: 'Type stuff here!' }).nth(2).click();
   await page.getByRole('textbox', { name: 'Type stuff here!' }).nth(2).fill('2');
   await expect(page.locator('xif-calculator')).toContainText('224');
+
+  await expect(page.locator('xif-calculator').first()).toHaveScreenshot();
 });

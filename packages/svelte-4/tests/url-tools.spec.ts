@@ -20,6 +20,8 @@ test('Parsing complex url', async ({ page }) => {
   await expect(page.getByRole('paragraph')).toContainText(
     'https://archive.org/wayback/available?url=https%3A%2F%2Fen.wikipedia.org%2Fw%2Findex.php%3Ftitle%3DWayback_Machine%26action%3Dhistory'
   );
+
+  await expect(page.locator('xif-url-tools').first()).toHaveScreenshot();
 });
 
 test('Getting url from hash', async ({ page }) => {
@@ -87,4 +89,6 @@ test('Constructing url from UI', async ({ page }) => {
   await expect(page.getByRole('paragraph')).toContainText(
     'https://archive.org/wayback/available?url=https%3A%2F%2Farchive.org%2Fwayback%2Favailable%3Furl%3Dhttps%253A%252F%252Farchive.org%252Fwayback%252Favailable%253Furl%253Dhttps%25253A%25252F%25252Farchive.org%25252Fwayback%25252Favailable&other=test&another=value'
   );
+
+  await expect(page.locator('xif-url-tools').first()).toHaveScreenshot();
 });
