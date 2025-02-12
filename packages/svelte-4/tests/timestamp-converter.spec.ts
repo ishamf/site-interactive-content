@@ -13,4 +13,8 @@ test('Basic timestamp', async ({ page }) => {
   await expect(page.locator('td').nth(4)).toContainText('1739347000000');
   await expect(page.locator('td').nth(6)).toContainText('ISO 8601');
   await expect(page.locator('td').nth(7)).toContainText('2025-02-12T07:56:40.000Z');
+
+  await expect(page.locator('xif-timestamp-converter').first()).toHaveScreenshot({
+    mask: [page.getByRole('cell', { name: 'ago' })],
+  });
 });
