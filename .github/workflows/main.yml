@@ -95,14 +95,14 @@ jobs:
           git add .
           diff_names="$(git diff --binary --staged --name-only)"
           if [ -n "$diff_names" ]; then
-            git diff --staged --binary | gzip > /tmp/snapshot_diff.patch.gz
+            git diff --staged --binary > /tmp/snapshot_diff.patch
           fi
       - name: Upload changed files
         if: success() || failure()
         uses: actions/upload-artifact@v4
         with:
-          name: e2e-test-changed-files.patch.gz
-          path: /tmp/snapshot_diff.patch.gz
+          name: e2e-test-changed-files.patch
+          path: /tmp/snapshot_diff.patch
           if-no-files-found: ignore
 
   publish:
