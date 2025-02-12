@@ -8,39 +8,93 @@
   import './lib/entries/2024-image-key';
   import './lib/entries/2024-window-position';
   import './lib/entries/2024-parameterized-calculator';
+
+  import TextButton from '$lib/components/TextButton.svelte';
+
+  const appComponents = [
+    'url-tools',
+    'timestamp-converter',
+    'input-styling',
+    'glowing-text',
+    'embeddings',
+    'embedding-figure',
+    'image-key',
+    'window-display',
+    'calculator',
+  ] as const;
+
+  type AppComponent = (typeof appComponents)[number];
+
+  const appComponentLabels: Record<AppComponent, string> = {
+    'url-tools': 'Url Tools',
+    'timestamp-converter': 'Timestamp Converter',
+    'input-styling': 'Input Styling',
+    'glowing-text': 'Glowing Text',
+    embeddings: 'Embeddings',
+    'embedding-figure': 'Embedding Figure',
+    'image-key': 'Image Key',
+    'window-display': 'Window Display',
+    calculator: 'Calculator',
+  };
+
+  let currentComponent: AppComponent = 'url-tools';
 </script>
 
 <main class="max-w-3xl">
-  <!-- Only used for testing -->
-  <xif-url-tools></xif-url-tools>
+  <div class="p-4 flex flex-row gap-4">
+    {#each appComponents as appComponent}
+      <TextButton
+        on:click={() => {
+          currentComponent = appComponent;
+        }}
+        selected={appComponent === currentComponent}
+      >
+        {appComponentLabels[appComponent]}
+      </TextButton>
+    {/each}
+  </div>
 
-  <xif-timestamp-converter></xif-timestamp-converter>
+  {#if currentComponent === 'url-tools'}
+    <xif-url-tools></xif-url-tools>
+  {/if}
 
-  <p class="time-display">
-    Current times, in ISO-8601: <xif-current-time type="iso-8601">Not loaded</xif-current-time>
-    Timestamp: <xif-current-time type="timestamp">Not loaded</xif-current-time>
-    Timestamp-ms: <xif-current-time type="timestamp-ms">Not loaded</xif-current-time>
-  </p>
+  {#if currentComponent === 'timestamp-converter'}
+    <xif-timestamp-converter></xif-timestamp-converter>
+  {/if}
 
-  <xif-input-styling-1></xif-input-styling-1>
+  {#if currentComponent === 'input-styling'}
+    <p class="time-display">
+      Current times, in ISO-8601: <xif-current-time type="iso-8601">Not loaded</xif-current-time>
+      Timestamp: <xif-current-time type="timestamp">Not loaded</xif-current-time>
+      Timestamp-ms: <xif-current-time type="timestamp-ms">Not loaded</xif-current-time>
+    </p>
+    <xif-input-styling-1></xif-input-styling-1>
+    <xif-input-styling-2></xif-input-styling-2>
+    <xif-input-styling-3></xif-input-styling-3>
+  {/if}
 
-  <xif-input-styling-2></xif-input-styling-2>
+  {#if currentComponent === 'glowing-text'}
+    <xif-glowing-text></xif-glowing-text>
+  {/if}
 
-  <xif-input-styling-3></xif-input-styling-3>
+  {#if currentComponent === 'embeddings'}
+    <xif-embeddings></xif-embeddings>
+    <xif-embedding-figure
+      sentences="good app,bad app,hard to use,easy to use,responsive,unresponsive,quick load times,slow load times"
+    ></xif-embedding-figure>
+  {/if}
 
-  <xif-glowing-text></xif-glowing-text>
+  {#if currentComponent === 'image-key'}
+    <xif-image-key></xif-image-key>
+  {/if}
 
-  <xif-embeddings></xif-embeddings>
+  {#if currentComponent === 'window-display'}
+    <xif-window-display></xif-window-display>
+  {/if}
 
-  <xif-embedding-figure
-    sentences="good app,bad app,hard to use,easy to use,responsive,unresponsive,quick load times,slow load times"
-  ></xif-embedding-figure>
-
-  <xif-image-key></xif-image-key>
-
-  <xif-window-display></xif-window-display>
-
-  <xif-calculator></xif-calculator>
+  {#if currentComponent === 'calculator'}
+    <xif-calculator></xif-calculator>
+  {/if}
 </main>
 
 <style lang="postcss">
