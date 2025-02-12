@@ -9,20 +9,18 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-      - name: Use Node.js 20.x
+      - name: Use Node.js 22.x
         uses: actions/setup-node@v4
         with:
-          node-version: 20.x
-      # Workaround for https://github.com/nodejs/corepack/issues/612 and https://github.com/actions/setup-node/issues/1222
+          node-version: 22.14.0
       - run: |
-          npm i -g --force corepack
           corepack enable
-          corepack prepare pnpm@9.0.6
+          corepack prepare pnpm@10.3.0
 
-      - name: Use cached Node.js 20.x
+      - name: Use cached Node.js 22.x
         uses: actions/setup-node@v4
         with:
-          node-version: 20.x
+          node-version: 22.14.0
           cache: pnpm
       - name: Cache purescript files
         uses: actions/cache@v4
@@ -51,20 +49,18 @@ jobs:
       options: --user 1001
     steps:
       - uses: actions/checkout@v4
-      - name: Use Node.js 20.x
+      - name: Use Node.js 22.x
         uses: actions/setup-node@v4
         with:
-          node-version: 20.x
-      # Workaround for https://github.com/nodejs/corepack/issues/612 and https://github.com/actions/setup-node/issues/1222
+          node-version: 22.14.0
       - run: |
-          npm i -g --force corepack
           corepack enable
-          corepack prepare pnpm@9.0.6
+          corepack prepare pnpm@10.3.0
 
-      - name: Use cached Node.js 20.x
+      - name: Use cached Node.js 22.x
         uses: actions/setup-node@v4
         with:
-          node-version: 20.x
+          node-version: 22.14.0
           cache: pnpm
       - name: Cache purescript files
         uses: actions/cache@v4

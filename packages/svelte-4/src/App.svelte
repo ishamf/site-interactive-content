@@ -10,6 +10,7 @@
   import './lib/entries/2024-parameterized-calculator';
 
   import TextButton from '$lib/components/TextButton.svelte';
+  import Container from '$lib/components/Container.svelte';
 
   const appComponents = [
     'url-tools',
@@ -39,18 +40,20 @@
 </script>
 
 <main class="max-w-3xl">
-  <div class="p-4 flex flex-row gap-4">
-    {#each appComponents as appComponent}
-      <TextButton
-        on:click={() => {
-          currentComponent = appComponent;
-        }}
-        selected={appComponent === currentComponent}
-      >
-        {appComponentLabels[appComponent]}
-      </TextButton>
-    {/each}
-  </div>
+  <Container>
+    <div class="p-4 flex flex-row gap-4">
+      {#each appComponents as appComponent}
+        <TextButton
+          on:click={() => {
+            currentComponent = appComponent;
+          }}
+          selected={appComponent === currentComponent}
+        >
+          {appComponentLabels[appComponent]}
+        </TextButton>
+      {/each}
+    </div>
+  </Container>
 
   {#if currentComponent === 'url-tools'}
     <xif-url-tools></xif-url-tools>

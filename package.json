@@ -1,7 +1,7 @@
 {
     "name": "site-interactive-content-svelte-4",
     "private": true,
-    "packageManager": "pnpm@9.0.6",
+    "packageManager": "pnpm@10.3.0",
     "type": "module",
     "scripts": {
         "prepare": "husky",
@@ -20,5 +20,19 @@
         "husky": "^9.0.11",
         "lint-staged": "^15.2.7",
         "tsx": "^4.19.2"
+    },
+    "pnpm": {
+        "ignoredBuiltDependencies": [
+            "cpu-features",
+            "esbuild",
+            "protobufjs",
+            "sharp",
+            "ssh2",
+            "svelte-preprocess"
+        ],
+        "onlyBuiltDependencies": [
+            "better-sqlite3",
+            "purescript"
+        ]
     }
 }
