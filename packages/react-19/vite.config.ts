@@ -12,6 +12,7 @@ export default defineConfig({
   },
   plugins: [react(), tailwindcss()],
   build: {
+    outDir: 'dist',
     lib: {
       entry: readdirSync(resolve(__dirname, 'src/entries')).map((x) => 'src/entries/' + x),
       formats: ['es'],
@@ -19,6 +20,7 @@ export default defineConfig({
         return 'entry-' + entryName + '.js';
       },
     },
+    sourcemap: true,
     rollupOptions: {
       output: {
         manualChunks: {
