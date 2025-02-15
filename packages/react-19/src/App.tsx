@@ -1,4 +1,4 @@
-// import './App.css';
+import './demo.css';
 import './entries/2025-test-react';
 
 function App() {
