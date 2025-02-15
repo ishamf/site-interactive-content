@@ -1,4 +1,4 @@
-import appCss from './app.css?inline';
+import appCss from './App.css?inline';
 
 const appStyles = new CSSStyleSheet();
 
