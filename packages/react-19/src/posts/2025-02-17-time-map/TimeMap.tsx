@@ -1,27 +1,26 @@
 import { useRef, useState } from 'react';
-import { DatePicker } from 'antd';
+import { DateTime } from 'luxon';
+import { DateTimePicker } from '@mui/x-date-pickers';
 import { MapDisplay } from './components/MapDisplay';
-import dayjs from 'dayjs';
 
 export function TimeMap() {
-  const [time, setTime] = useState(1739782800000);
-
-  const timeInst = dayjs(time);
+  const [time, setTime] = useState<DateTime>(() => DateTime.now());
 
   const containerRef = useRef<HTMLDivElement>(null);
 
   return (
     <div ref={containerRef}>
-      <MapDisplay time={time} />
+      <MapDisplay time={time.valueOf()} />
 
-      <DatePicker
-        showTime
-        value={timeInst}
-        getPopupContainer={() => containerRef.current!}
+      <DateTimePicker
+        value={time}
+        timezone="UTC"
         onChange={(value) => {
-          setTime(value.valueOf());
+          if (value) {
+            setTime(value);
+          }
         }}
-      ></DatePicker>
+      />
     </div>
   );
 }

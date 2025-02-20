@@ -1,4 +1,4 @@
-import { toAntdWebComponent } from '../../antdComponentWrapper';
+import { toMuiWebComponent } from '../../muiComponentWrapper';
 import { TimeMap } from './TimeMap';
 
-customElements.define('xif-time-map', toAntdWebComponent(TimeMap));
+customElements.define('xif-time-map', toMuiWebComponent(TimeMap));

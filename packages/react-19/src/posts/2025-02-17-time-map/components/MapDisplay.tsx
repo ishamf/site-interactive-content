@@ -131,7 +131,7 @@ function createAlphaCalculator(time: number) {
       )
     );
 
-    const shadeAngle = 10;
+    const shadeAngle = 5;
 
     return altitude > shadeAngle
       ? 1
