@@ -34,3 +34,5 @@ export async function loadImageData() {
 
   return { dayImage, nightImage, dayImageData, nightImageData };
 }
+
+export type MapImageData = Awaited<ReturnType<typeof loadImageData>>;
