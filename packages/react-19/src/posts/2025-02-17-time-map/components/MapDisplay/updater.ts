@@ -1,6 +1,4 @@
 import { RefObject, useEffect, useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
-import type { MapImageData } from '../../images';
 import { drawMapAtTimeWithWorker } from './manager';
 
 async function drawMapAtTime({
@@ -8,7 +6,6 @@ async function drawMapAtTime({
   time,
   alphaSize = 1,
 }: {
-  mapImageData: MapImageData;
   ctx: CanvasRenderingContext2D;
   time: number;
   alphaSize: number;
@@ -25,15 +22,6 @@ export function useMapUpdater(
   time: number,
   needQuickUpdate: boolean
 ) {
-  const { data: imageData } = useQuery({
-    queryKey: ['mapImageData'],
-    queryFn: async () => {
-      const { loadImageData } = await import('../../images');
-
-      return loadImageData();
-    },
-  });
-
   const [pendingRequest, setPendingRequest] = useState<{
     time: number;
     needQuickUpdate: boolean;
@@ -49,8 +37,6 @@ export function useMapUpdater(
   useEffect(() => {
     if (isLowresProcessing || isHighresProcessing || pendingRequest === null) return;
 
-    if (!imageData) return;
-
     const canvas = canvasRef.current;
     if (!canvas) return;
 
@@ -64,7 +50,6 @@ export function useMapUpdater(
     }
 
     drawMapAtTime({
-      mapImageData: imageData,
       ctx,
       time: pendingRequest.time,
       alphaSize: pendingRequest.needQuickUpdate ? 20 : 1,
@@ -74,13 +59,11 @@ export function useMapUpdater(
         setPendingHighresTime(pendingRequest.time);
       }
     });
-  }, [time, imageData, canvasRef, isLowresProcessing, pendingRequest, isHighresProcessing]);
+  }, [time, canvasRef, isLowresProcessing, pendingRequest, isHighresProcessing]);
 
   useEffect(() => {
     const timeout = setTimeout(() => {
       if (isLowresProcessing || isHighresProcessing || pendingHighresTime === null) return;
-
-      if (!imageData) return;
 
       const canvas = canvasRef.current;
       if (!canvas) return;
@@ -91,15 +74,13 @@ export function useMapUpdater(
       setIsHighresProcessing(true);
       setPendingHighresTime(null);
 
-      drawMapAtTime({ mapImageData: imageData, ctx, time: pendingHighresTime, alphaSize: 1 }).then(
-        () => {
-          setIsHighresProcessing(false);
-        }
-      );
+      drawMapAtTime({ ctx, time: pendingHighresTime, alphaSize: 1 }).then(() => {
+        setIsHighresProcessing(false);
+      });
     }, 500);
 
     return () => {
       clearTimeout(timeout);
     };
-  }, [canvasRef, imageData, isHighresProcessing, isLowresProcessing, pendingHighresTime]);
+  }, [canvasRef, isHighresProcessing, isLowresProcessing, pendingHighresTime]);
 }
