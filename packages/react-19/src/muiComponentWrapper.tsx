@@ -8,8 +8,11 @@ import { useRef } from 'react';
 
 import { AdapterLuxon } from '@mui/x-date-pickers/AdapterLuxon';
 import { LocalizationProvider } from '@mui/x-date-pickers';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 let createdCaches = 0;
+
+const queryClient = new QueryClient();
 
 const numToCharMap: Record<string, string> = {
   '0': 'a',
@@ -64,7 +67,9 @@ export function toMuiWebComponent(Component: any) {
       <CacheProvider value={cacheRef.current}>
         <ThemeProvider theme={themeRef.current}>
           <LocalizationProvider dateAdapter={AdapterLuxon}>
-            <Component {...rest}></Component>
+            <QueryClientProvider client={queryClient}>
+              <Component {...rest}></Component>
+            </QueryClientProvider>
           </LocalizationProvider>
         </ThemeProvider>
       </CacheProvider>
