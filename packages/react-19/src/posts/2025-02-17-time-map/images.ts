@@ -2,26 +2,19 @@ import dayImageSrc from './assets/day.jpg?url';
 import nightImageSrc from './assets/night.jpg?url';
 import { canvasWidth } from './constants';
 
+async function loadImage(url: string) {
+  const res = await fetch(url);
+  const blob = await res.blob();
+  return createImageBitmap(blob);
+}
+
 export async function loadImageData() {
-  const dayImageElement = new Image();
-  dayImageElement.src = dayImageSrc;
-
-  const nightImageElement = new Image();
-  nightImageElement.src = nightImageSrc;
-
-  await Promise.all(
-    [dayImageElement, nightImageElement].map(
-      (image) => new Promise((resolve) => image.addEventListener('load', resolve))
-    )
-  );
-
-  const dayImage = dayImageElement;
-  const nightImage = nightImageElement;
+  const [dayImage, nightImage] = await Promise.all([dayImageSrc, nightImageSrc].map(loadImage));
 
   const dayImageCanvas = new OffscreenCanvas(canvasWidth, canvasWidth);
   const nightImageCanvas = new OffscreenCanvas(canvasWidth, canvasWidth);
 
-  function createImageData(image: HTMLImageElement, canvas: OffscreenCanvas) {
+  function createImageData(image: ImageBitmap, canvas: OffscreenCanvas) {
     const ctx = canvas.getContext('2d');
     if (!ctx) throw new Error('Could not get 2d context');
     ctx.drawImage(image, 0, 0);
@@ -29,10 +22,10 @@ export async function loadImageData() {
     return ctx.getImageData(0, 0, canvas.width, canvas.height);
   }
 
-  const dayImageData = createImageData(dayImageElement, dayImageCanvas);
-  const nightImageData = createImageData(nightImageElement, nightImageCanvas);
+  const dayImageData = createImageData(dayImage, dayImageCanvas);
+  const nightImageData = createImageData(nightImage, nightImageCanvas);
 
-  return { dayImage, nightImage, dayImageData, nightImageData };
+  return { dayImageData, nightImageData };
 }
 
 export type MapImageData = Awaited<ReturnType<typeof loadImageData>>;

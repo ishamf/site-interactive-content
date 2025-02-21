@@ -5,6 +5,7 @@ import { MapDisplay } from './components/MapDisplay';
 import { Slider } from '@mui/material';
 
 export function TimeMap() {
+  const [needQuickUpdate, setNeedQuickUpdate] = useState<boolean>(false);
   const [time, setTime] = useState<DateTime>(() => DateTime.now());
   const [sliderValue, setSliderValue] = useState<number>(0);
 
@@ -12,7 +13,10 @@ export function TimeMap() {
 
   return (
     <div ref={containerRef}>
-      <MapDisplay time={time.valueOf() + (sliderValue * 24 * 3600 * 1000) / 100} />
+      <MapDisplay
+        time={time.valueOf() + (sliderValue * 24 * 3600 * 1000) / 100}
+        needQuickUpdate={needQuickUpdate}
+      />
 
       <DateTimePicker
         value={time}
@@ -20,6 +24,7 @@ export function TimeMap() {
         onChange={(value) => {
           if (value) {
             setTime(value);
+            setNeedQuickUpdate(false);
           }
         }}
       />
@@ -29,6 +34,7 @@ export function TimeMap() {
         onChange={(_e, v) => {
           if (typeof v === 'number') {
             setSliderValue(v);
+            setNeedQuickUpdate(true);
           }
         }}
       ></Slider>

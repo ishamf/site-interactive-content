@@ -11,22 +11,15 @@ export function renderMapAtTime({
   parts,
 }: {
   mapImageData: MapImageData;
-  ctx: CanvasRenderingContext2D;
+  ctx: CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D;
   time: number;
   alphaSize: number;
   partIndex: number;
   parts: number;
 }) {
-  let start = performance.now();
-
   const partHeight = canvasHeight / parts;
 
   const imageData = ctx.createImageData(canvasWidth, partHeight);
-
-  let now = performance.now();
-
-  console.log('createImageData', now - start);
-  start = now;
 
   const getAlpha = createAlphaCalculator(time);
 
@@ -50,8 +43,11 @@ export function renderMapAtTime({
         const cacheIdx = Math.floor(x / alphaSize);
 
         if (alphaCache.length < cacheIdx + 1) {
-          const latitude = -((y / canvasHeight) * 180 - 90);
-          const longitude = (x / canvasWidth) * 360 - 180;
+          const cacheSourceY = Math.min(y + alphaSize / 2, canvasHeight - 1);
+          const cacheSourceX = Math.min(x + alphaSize / 2, canvasWidth - 1);
+
+          const latitude = -((cacheSourceY / canvasHeight) * 180 - 90);
+          const longitude = (cacheSourceX / canvasWidth) * 360 - 180;
 
           alpha = getAlpha(latitude, longitude);
           alphaCache[cacheIdx] = alpha;
@@ -71,10 +67,6 @@ export function renderMapAtTime({
       imageData.data[(ry * canvasWidth + x) * 4 + 3] = 255;
     }
   }
-
-  now = performance.now();
-  console.log('renderMap', now - start);
-  start = now;
 
   return imageData;
 }
