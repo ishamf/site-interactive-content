@@ -7,5 +7,5 @@ export function MapDisplay({ time, needQuickUpdate }: { time: number; needQuickU
 
   useMapUpdater(canvasRef, time, needQuickUpdate);
 
-  return <canvas ref={canvasRef} width={canvasWidth} height={canvasHeight} className="max-w-4xl" />;
+  return <canvas ref={canvasRef} width={canvasWidth} height={canvasHeight} />;
 }

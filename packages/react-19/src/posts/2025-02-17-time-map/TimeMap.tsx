@@ -12,7 +12,7 @@ export function TimeMap() {
   const containerRef = useRef<HTMLDivElement>(null);
 
   return (
-    <div ref={containerRef}>
+    <div ref={containerRef} className="max-w-[135vh] flex items-stretch flex-col gap-4 p-4">
       <MapDisplay
         time={time.valueOf() + (sliderValue * 24 * 3600 * 1000) / 100}
         needQuickUpdate={needQuickUpdate}
