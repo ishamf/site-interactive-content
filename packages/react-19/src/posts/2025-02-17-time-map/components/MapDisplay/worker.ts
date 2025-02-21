@@ -1,4 +1,4 @@
-import type { MapImageData } from '../../images';
+import { loadImageData, MapImageData } from '../../assets';
 import { WorkerMessage, WorkerResponse } from './types';
 
 const canvas = new OffscreenCanvas(256, 256);
@@ -25,8 +25,6 @@ let mapImageDataPromise: Promise<MapImageData> | null = null;
 
 async function getMapImageData() {
   if (mapImageDataPromise) return mapImageDataPromise;
-
-  const { loadImageData } = await import('../../images');
 
   mapImageDataPromise = loadImageData();
 

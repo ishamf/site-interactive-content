@@ -1,6 +1,6 @@
-import dayImageSrc from './assets/day.jpg?url';
-import nightImageSrc from './assets/night.jpg?url';
-import { canvasWidth } from './constants';
+import dayImageSrc from './data/day.jpg?url';
+import nightImageSrc from './data/night.jpg?url';
+import { canvasWidth } from '../constants';
 
 async function loadImage(url: string) {
   const res = await fetch(url);

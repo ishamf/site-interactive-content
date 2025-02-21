@@ -1,5 +1,5 @@
 import { canvasHeight, canvasWidth } from '../../constants';
-import type { MapImageData } from '../../images';
+import type { MapImageData } from '../../assets';
 import { createAlphaCalculator } from './math';
 
 export function renderMapAtTime({

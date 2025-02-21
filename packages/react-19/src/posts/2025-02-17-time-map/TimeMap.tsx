@@ -1,43 +1,44 @@
-import { useRef, useState } from 'react';
+import { useState } from 'react';
 import { DateTime } from 'luxon';
 import { DateTimePicker } from '@mui/x-date-pickers';
 import { MapDisplay } from './components/MapDisplay';
-import { Slider } from '@mui/material';
+import { Slider, TextField } from '@mui/material';
 
 export function TimeMap() {
   const [needQuickUpdate, setNeedQuickUpdate] = useState<boolean>(false);
   const [time, setTime] = useState<DateTime>(() => DateTime.now());
-  const [sliderValue, setSliderValue] = useState<number>(0);
 
-  const containerRef = useRef<HTMLDivElement>(null);
+  const utcTime = time.setZone('utc');
 
   return (
-    <div ref={containerRef} className="max-w-[135vh] flex items-stretch flex-col gap-4 p-4">
-      <MapDisplay
-        time={time.valueOf() + (sliderValue * 24 * 3600 * 1000) / 100}
-        needQuickUpdate={needQuickUpdate}
-      />
-
-      <DateTimePicker
-        value={time}
-        timezone="UTC"
-        onChange={(value) => {
-          if (value) {
-            setTime(value);
-            setNeedQuickUpdate(false);
-          }
-        }}
-      />
-
-      <Slider
-        value={sliderValue}
-        onChange={(_e, v) => {
-          if (typeof v === 'number') {
-            setSliderValue(v);
-            setNeedQuickUpdate(true);
-          }
-        }}
-      ></Slider>
+    <div className="flex max-w-full flex-row flex-wrap p-4 gap-4 items-start">
+      <div className="flex-[999] max-w-[120vh] flex items-stretch flex-col gap-4 ">
+        <MapDisplay time={time.valueOf()} needQuickUpdate={needQuickUpdate} />
+        <Slider
+          min={1}
+          value={100 - utcTime.diff(utcTime.startOf('day')).as('days') * 100}
+          onChange={(_e, v) => {
+            if (typeof v === 'number') {
+              setTime(utcTime.startOf('day').plus({ days: 1 - v / 100 }));
+              setNeedQuickUpdate(true);
+            }
+          }}
+        ></Slider>
+      </div>
+      <div className="flex-1 gap-4 grid grid-cols-2 min-h-0">
+        <TextField disabled label="Time Zone" value={'UTC'}></TextField>
+        <DateTimePicker
+          value={time}
+          timezone="UTC"
+          ampm={false}
+          onChange={(value) => {
+            if (value) {
+              setTime(value);
+              setNeedQuickUpdate(false);
+            }
+          }}
+        />
+      </div>
     </div>
   );
 }
