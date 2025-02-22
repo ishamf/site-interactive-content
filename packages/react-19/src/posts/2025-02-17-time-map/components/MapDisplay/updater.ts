@@ -1,22 +1,6 @@
 import { RefObject, useEffect, useState } from 'react';
 import { drawMapAtTimeWithWorker } from './manager';
 
-async function drawMapAtTime({
-  ctx,
-  time,
-  alphaSize = 1,
-}: {
-  ctx: CanvasRenderingContext2D;
-  time: number;
-  alphaSize: number;
-}) {
-  await drawMapAtTimeWithWorker({
-    ctx,
-    time,
-    alphaSize,
-  });
-}
-
 export function useMapUpdater(
   canvasRef: RefObject<HTMLCanvasElement | null>,
   time: number,
@@ -49,7 +33,7 @@ export function useMapUpdater(
       setPendingHighresTime(null);
     }
 
-    drawMapAtTime({
+    drawMapAtTimeWithWorker({
       ctx,
       time: pendingRequest.time,
       alphaSize: pendingRequest.needQuickUpdate ? 20 : 1,
@@ -74,7 +58,7 @@ export function useMapUpdater(
       setIsHighresProcessing(true);
       setPendingHighresTime(null);
 
-      drawMapAtTime({ ctx, time: pendingHighresTime, alphaSize: 1 }).then(() => {
+      drawMapAtTimeWithWorker({ ctx, time: pendingHighresTime, alphaSize: 1 }).then(() => {
         setIsHighresProcessing(false);
       });
     }, 500);
