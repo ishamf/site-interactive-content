@@ -5,3 +5,9 @@ export async function loadImageData() {
 
   return load();
 }
+
+export async function loadSelectionData() {
+  const { selectionData } = await import('./selectionData');
+
+  return selectionData;
+}
