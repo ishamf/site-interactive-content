@@ -13,13 +13,16 @@ export function useMapUpdater(
   const [isLowresProcessing, setIsLowresProcessing] = useState(false);
   const [pendingHighresTime, setPendingHighresTime] = useState<number | null>(null);
   const [isHighresProcessing, setIsHighresProcessing] = useState(false);
+  const [highresAbortController, setHighresAbortController] = useState<AbortController | null>(
+    null
+  );
 
   useEffect(() => {
     setPendingRequest({ time, needQuickUpdate });
   }, [needQuickUpdate, time]);
 
   useEffect(() => {
-    if (isLowresProcessing || isHighresProcessing || pendingRequest === null) return;
+    if (isLowresProcessing || pendingRequest === null) return;
 
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -27,6 +30,9 @@ export function useMapUpdater(
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
+    if (highresAbortController) {
+      highresAbortController.abort();
+    }
     setIsLowresProcessing(true);
     setPendingRequest(null);
     if (!pendingRequest.needQuickUpdate) {
@@ -44,7 +50,14 @@ export function useMapUpdater(
         setPendingHighresTime(pendingRequest.time);
       }
     });
-  }, [time, canvasRef, isLowresProcessing, pendingRequest, isHighresProcessing]);
+  }, [
+    time,
+    canvasRef,
+    isLowresProcessing,
+    pendingRequest,
+    isHighresProcessing,
+    highresAbortController,
+  ]);
 
   useEffect(() => {
     const timeout = setTimeout(() => {
@@ -56,11 +69,21 @@ export function useMapUpdater(
       const ctx = canvas.getContext('2d');
       if (!ctx) return;
 
+      const abortController = new AbortController();
+
       setIsHighresProcessing(true);
       setPendingHighresTime(null);
+      setHighresAbortController(abortController);
 
-      drawMapAtTime({ ctx, time: pendingHighresTime, alphaSize: 1, useWorker: true }).then(() => {
+      drawMapAtTime({
+        ctx,
+        time: pendingHighresTime,
+        alphaSize: 1,
+        useWorker: true,
+        abortSignal: abortController.signal,
+      }).then(() => {
         setIsHighresProcessing(false);
+        setHighresAbortController(null);
       });
     }, 500);
 

@@ -63,11 +63,13 @@ export async function drawMapAtTime({
   time,
   alphaSize = 1,
   useWorker,
+  abortSignal,
 }: {
   ctx: CanvasRenderingContext2D;
   time: number;
   alphaSize: number;
   useWorker: boolean;
+  abortSignal?: AbortSignal;
 }) {
   const mapImageData = await getMapImageData();
 
@@ -88,6 +90,8 @@ export async function drawMapAtTime({
       });
 
   const alphaBitmap = await createImageBitmap(alphaMapData);
+
+  if (abortSignal?.aborted) return;
 
   ctx.reset();
 
