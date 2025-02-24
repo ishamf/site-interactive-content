@@ -25,7 +25,11 @@ export async function loadImageData() {
   const dayImageData = createImageData(dayImage, dayImageCanvas);
   const nightImageData = createImageData(nightImage, nightImageCanvas);
 
-  return { dayImageData, nightImageData };
+  const [dayImageBitmap, nightImageBitmap] = await Promise.all(
+    [dayImageData, nightImageData].map((data) => createImageBitmap(data))
+  );
+
+  return { dayImageData, nightImageData, dayImageBitmap, nightImageBitmap };
 }
 
 export type MapImageData = Awaited<ReturnType<typeof loadImageData>>;

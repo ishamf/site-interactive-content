@@ -1,14 +1,9 @@
-export interface RenderArgs {
-  time: number;
-  partIndex: number;
-  parts: number;
-  alphaSize: number;
-}
-
 export interface WorkerMessage {
-  type: 'render';
+  type: 'renderAlpha';
   id: number;
-  renderArgs: RenderArgs;
+  width: number;
+  height: number;
+  time: number;
 }
 
 export interface WorkerResponse {
