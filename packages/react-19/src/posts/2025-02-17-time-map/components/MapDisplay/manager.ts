@@ -73,6 +73,8 @@ export async function drawMapAtTime({
 }) {
   const mapImageData = await getMapImageData();
 
+  // const start  = performance.now();
+
   const alphaMapWidth = canvasWidth / alphaSize;
   const alphaMapHeight = canvasHeight / alphaSize;
 
@@ -91,18 +93,22 @@ export async function drawMapAtTime({
 
   const alphaBitmap = await createImageBitmap(alphaMapData);
 
-  if (abortSignal?.aborted) return;
+  if (abortSignal?.aborted) {
+    return;
+  }
 
-  ctx.reset();
+  ctx.globalCompositeOperation = 'source-over';
+  ctx.clearRect(0, 0, canvasWidth, canvasHeight);
 
-  ctx.scale(alphaSize, alphaSize);
-  ctx.drawImage(alphaBitmap, 0, 0);
-
-  ctx.resetTransform();
+  ctx.drawImage(alphaBitmap, 0, 0, canvasWidth, canvasHeight);
 
   ctx.globalCompositeOperation = 'source-in';
   ctx.drawImage(mapImageData.dayImageBitmap, 0, 0);
 
   ctx.globalCompositeOperation = 'destination-over';
   ctx.drawImage(mapImageData.nightImageBitmap, 0, 0);
+
+  // const end = performance.now();
+
+  // console.log('Rendered map with alphaSize', alphaSize, 'in', end - start);
 }
