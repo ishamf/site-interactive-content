@@ -1,14 +1,9 @@
 import { RefObject, useEffect, useState } from 'react';
 import { drawMapAtTime } from './manager';
 
-export function useMapUpdater(
-  canvasRef: RefObject<HTMLCanvasElement | null>,
-  time: number,
-  needQuickUpdate: boolean
-) {
+export function useMapUpdater(canvasRef: RefObject<HTMLCanvasElement | null>, time: number) {
   const [pendingRequest, setPendingRequest] = useState<{
     time: number;
-    needQuickUpdate: boolean;
   } | null>(null);
   const [isLowresProcessing, setIsLowresProcessing] = useState(false);
   const [pendingHighresTime, setPendingHighresTime] = useState<number | null>(null);
@@ -18,8 +13,8 @@ export function useMapUpdater(
   );
 
   useEffect(() => {
-    setPendingRequest({ time, needQuickUpdate });
-  }, [needQuickUpdate, time]);
+    setPendingRequest({ time });
+  }, [time]);
 
   useEffect(() => {
     if (isLowresProcessing || pendingRequest === null) return;
@@ -35,20 +30,16 @@ export function useMapUpdater(
     }
     setIsLowresProcessing(true);
     setPendingRequest(null);
-    if (!pendingRequest.needQuickUpdate) {
-      setPendingHighresTime(null);
-    }
 
     drawMapAtTime({
       ctx,
       time: pendingRequest.time,
-      alphaSize: pendingRequest.needQuickUpdate ? 20 : 1,
-      useWorker: !pendingRequest.needQuickUpdate,
+      alphaSize: 20,
+      useWorker: false,
     }).then(() => {
       setIsLowresProcessing(false);
-      if (pendingRequest.needQuickUpdate) {
-        setPendingHighresTime(pendingRequest.time);
-      }
+
+      setPendingHighresTime(pendingRequest.time);
     });
   }, [
     time,

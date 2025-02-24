@@ -5,7 +5,6 @@ import { MapDisplay } from './components/MapDisplay';
 import { Slider, TextField } from '@mui/material';
 
 export function TimeMap() {
-  const [needQuickUpdate, setNeedQuickUpdate] = useState<boolean>(false);
   const [time, setTime] = useState<DateTime>(() => DateTime.now());
 
   const utcTime = time.setZone('utc');
@@ -13,7 +12,7 @@ export function TimeMap() {
   return (
     <div className="flex max-w-full flex-row flex-wrap p-4 gap-4 items-start">
       <div className="flex-[999] max-w-[120vh] flex items-stretch flex-col gap-4 ">
-        <MapDisplay time={time.valueOf()} needQuickUpdate={needQuickUpdate} />
+        <MapDisplay time={time.valueOf()} />
         <Slider
           min={1}
           max={287}
@@ -21,7 +20,6 @@ export function TimeMap() {
           onChange={(_e, v) => {
             if (typeof v === 'number') {
               setTime(utcTime.startOf('day').plus({ days: 1 - v / 288 }));
-              setNeedQuickUpdate(true);
             }
           }}
         ></Slider>
@@ -35,7 +33,6 @@ export function TimeMap() {
           onChange={(value) => {
             if (value) {
               setTime(value);
-              setNeedQuickUpdate(false);
             }
           }}
         />
