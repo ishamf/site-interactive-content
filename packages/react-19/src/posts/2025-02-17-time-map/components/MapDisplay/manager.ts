@@ -2,9 +2,8 @@ import { loadImageData, MapImageData } from '../../assets';
 import { canvasHeight, canvasWidth } from '../../constants';
 import { renderAlphaMapAtTime } from './render';
 import { WorkerMessage, WorkerResponse } from './types';
-import ImageWorker from './worker?worker';
 
-const imageWorker = new ImageWorker();
+const imageWorker = new Worker(new URL('./worker.js', import.meta.url), { type: 'module' });
 
 let taskIdCounter = 0;
 
