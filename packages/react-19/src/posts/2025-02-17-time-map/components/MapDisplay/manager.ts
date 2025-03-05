@@ -23,6 +23,7 @@ async function renderAlphaMapWithWorker({
   const { promise, resolve } = Promise.withResolvers<ImageData>();
 
   function listener(event: MessageEvent) {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const { id, imageData }: WorkerResponse = event.data;
 
     if (id !== taskId) return;
