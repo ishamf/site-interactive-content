@@ -19,6 +19,7 @@ interface CountryCapitalSelectionData extends BaseSelectionData {
   longitude: number;
   latitude: number;
   country: string;
+  cityName: string;
 }
 
 interface TimezoneSelectionData extends BaseSelectionData {
@@ -61,6 +62,7 @@ const countryCapitalSelectionData: CountryCapitalSelectionData[] = citiesData
     longitude: city.longitude,
     latitude: city.latitude,
     country: city.country_name,
+    cityName: city.name,
   }));
 
 const timezoneSelectionData: TimezoneSelectionData[] = timezoneData
@@ -85,3 +87,11 @@ export const selectionData = [
   ...countryCapitalSelectionData,
   ...timezoneSelectionData,
 ];
+
+export const selectionDataById = selectionData.reduce(
+  (acc, selection) => {
+    acc[selection.id] = selection;
+    return acc;
+  },
+  {} as Record<string, SelectionData>
+);

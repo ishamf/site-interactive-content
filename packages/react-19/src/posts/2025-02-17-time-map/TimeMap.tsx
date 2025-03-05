@@ -3,9 +3,21 @@ import { DateTime } from 'luxon';
 import { DateTimePicker } from '@mui/x-date-pickers';
 import { MapDisplay } from './components/MapDisplay';
 import { Slider, TextField } from '@mui/material';
+import { TimezoneSelection } from './components/TimezoneSelection';
+import { useQuery } from '@tanstack/react-query';
+import { loadSelectionData } from './assets';
 
 export function TimeMap() {
   const [time, setTime] = useState<DateTime>(() => DateTime.now());
+
+  const [selectedItems, setSelectedItems] = useState<string[]>([]);
+
+  const selectionDataQuery = useQuery({
+    queryKey: ['selectionData'],
+    queryFn: async () => {
+      return loadSelectionData();
+    },
+  });
 
   const utcTime = time.setZone('utc');
 
@@ -36,6 +48,48 @@ export function TimeMap() {
             }
           }}
         />
+        {selectionDataQuery.isSuccess ? (
+          <>
+            {selectedItems.map((id, idx) => {
+              return (
+                <TimezoneSelection
+                  key={idx}
+                  selectionData={selectionDataQuery.data.selectionData}
+                  currentSelection={selectionDataQuery.data.selectionDataById[id]}
+                  time={time}
+                  onChangeId={(newId) => {
+                    setSelectedItems((p) => {
+                      const newItems = [...p];
+
+                      if (newId) {
+                        newItems.splice(idx, 1, newId);
+                      } else {
+                        newItems.splice(idx, 1);
+                      }
+
+                      return newItems;
+                    });
+                  }}
+                  onChangeTime={(time) => {
+                    setTime(time);
+                  }}
+                ></TimezoneSelection>
+              );
+            })}
+            <TimezoneSelection
+              key={selectedItems.length}
+              selectionData={selectionDataQuery.data.selectionData}
+              currentSelection={null}
+              time={time}
+              onChangeId={(newId) => {
+                setSelectedItems((p) => (newId ? [...p, newId] : p));
+              }}
+              onChangeTime={(time) => {
+                setTime(time);
+              }}
+            ></TimezoneSelection>
+          </>
+        ) : null}
       </div>
     </div>
   );

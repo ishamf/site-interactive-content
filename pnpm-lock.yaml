@@ -71,6 +71,9 @@ importers:
       antd:
         specifier: ^5.24.0
         version: 5.24.0(date-fns@4.1.0)(luxon@3.4.4)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
+      classnames:
+        specifier: ^2.5.1
+        version: 2.5.1
       dayjs:
         specifier: ^1.11.13
         version: 1.11.13

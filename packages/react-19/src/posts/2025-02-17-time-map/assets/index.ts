@@ -1,4 +1,5 @@
 export type { MapImageData } from './images';
+export type { SelectionData } from './selectionData';
 
 export async function loadImageData() {
   const { loadImageData: load } = await import('./images');
@@ -7,7 +8,7 @@ export async function loadImageData() {
 }
 
 export async function loadSelectionData() {
-  const { selectionData } = await import('./selectionData');
+  const { selectionData, selectionDataById } = await import('./selectionData');
 
-  return selectionData;
+  return { selectionData, selectionDataById };
 }
