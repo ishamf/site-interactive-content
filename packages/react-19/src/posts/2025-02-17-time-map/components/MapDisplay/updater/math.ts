@@ -17,7 +17,15 @@ function toDeg(rad: number) {
   return (rad * 180) / Math.PI;
 }
 
-export function createAlphaCalculator(time: number) {
+export function createAlphaCalculator({
+  width,
+  height,
+  time,
+}: {
+  time: number;
+  width: number;
+  height: number;
+}) {
   // https://aa.usno.navy.mil/faq/sun_approx
   const julianDate = time / 86400000 + 2440587.5;
   const daysSinceEpoch = julianDate - 2451545.0;
@@ -56,15 +64,34 @@ export function createAlphaCalculator(time: number) {
   // > The maximum value of the equation of the equinoxes is about 1.1 seconds,
   // > so if an error of ~1 second is unimportant, the transformation from GMST to GAST can be skipped.
 
-  function getAlpha(latitude: number, longitude: number) {
-    // https://aa.usno.navy.mil/faq/alt_az
+  // Precalculate the longitude and latitude-based components so we only need to calculate these
+  // once per row/column. From testing, it seems to be 50% faster
+  const localHourAngleByX: number[] = [];
+
+  // Altitude = lha * a + b
+  const altitudeAByY: number[] = [];
+  const altitudeBByY: number[] = [];
+
+  for (let x = 0; x < width; x++) {
+    const longitude = ((x + 0.5) / width) * 360 - 180;
+
     const localHourAngle = flMod(gmstHours * 15 - rightAscension + flMod(longitude, 360), 360);
 
+    localHourAngleByX.push(localHourAngle);
+  }
+
+  for (let y = 0; y < height; y++) {
+    const latitude = -(((y + 0.5) / height) * 180 - 90);
+    altitudeAByY.push(Math.cos(toRad(declination)) * Math.cos(toRad(latitude)));
+    altitudeBByY.push(Math.sin(toRad(declination)) * Math.sin(toRad(latitude)));
+  }
+
+  function getAlpha(x: number, y: number) {
+    // https://aa.usno.navy.mil/faq/alt_az
+    const localHourAngle = localHourAngleByX[x];
+
     const altitude = toDeg(
-      Math.asin(
-        Math.cos(toRad(localHourAngle)) * Math.cos(toRad(declination)) * Math.cos(toRad(latitude)) +
-          Math.sin(toRad(declination)) * Math.sin(toRad(latitude))
-      )
+      Math.asin(Math.cos(toRad(localHourAngle)) * altitudeAByY[y] + altitudeBByY[y])
     );
 
     const shadeAngle = 5;
