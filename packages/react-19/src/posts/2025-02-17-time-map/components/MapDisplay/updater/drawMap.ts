@@ -1,6 +1,6 @@
-import { loadImageData, MapImageData } from '../../assets';
-import { canvasHeight, canvasWidth } from '../../constants';
-import { renderAlphaMapAtTime } from './render';
+import { loadImageData, MapImageData } from '../../../assets';
+import { canvasHeight, canvasWidth } from '../../../constants';
+import { renderAlphaMap } from './renderAlphaMap';
 import { WorkerMessage, WorkerResponse } from './types';
 
 const imageWorker = new Worker(new URL('./worker.js', import.meta.url), { type: 'module' });
@@ -85,7 +85,7 @@ export async function drawMapAtTime({
         width: alphaMapWidth,
         height: alphaMapHeight,
       })
-    : renderAlphaMapAtTime({
+    : renderAlphaMap({
         time,
         width: alphaMapWidth,
         height: alphaMapHeight,

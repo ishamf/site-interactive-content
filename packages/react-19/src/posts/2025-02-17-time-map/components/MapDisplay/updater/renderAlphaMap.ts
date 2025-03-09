@@ -1,6 +1,6 @@
 import { createAlphaCalculator } from './math';
 
-export function renderAlphaMapAtTime({
+export function renderAlphaMap({
   width,
   height,
   time,

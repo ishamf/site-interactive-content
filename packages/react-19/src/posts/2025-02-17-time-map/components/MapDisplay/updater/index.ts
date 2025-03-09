@@ -1,5 +1,5 @@
 import { RefObject, useEffect, useReducer } from 'react';
-import { drawMapAtTime } from './manager';
+import { drawMapAtTime } from './drawMap';
 
 type State =
   | {
