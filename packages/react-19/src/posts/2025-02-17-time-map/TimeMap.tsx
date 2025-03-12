@@ -22,8 +22,8 @@ export function TimeMap() {
   const utcTime = time.setZone('utc');
 
   return (
-    <div className="flex max-w-full flex-row flex-wrap p-4 gap-4 items-start">
-      <div className="flex-[999] max-w-[120vh] flex items-stretch flex-col gap-4 ">
+    <div className="flex max-w-full flex-col md:flex-row p-4 gap-4 items-start justify-center">
+      <div className="max-w-[120vh] flex flex-1 items-stretch flex-col gap-4 ">
         <MapDisplay time={time.valueOf()} />
         <Slider
           min={1}
@@ -36,7 +36,7 @@ export function TimeMap() {
           }}
         ></Slider>
       </div>
-      <div className="flex-1 gap-4 grid grid-cols-2 min-h-0">
+      <div className="flex-1 min-h-0 md:max-w-[24rem] gap-4 grid grid-cols-2  ">
         <TextField disabled label="Time Zone" value={'UTC'}></TextField>
         <DateTimePicker
           value={time}
