@@ -2,9 +2,9 @@ import r2wc from '@r2wc/react-to-web-component';
 
 import { addAppStylesheet } from './utils';
 import { CacheProvider } from '@emotion/react';
-import createCache, { EmotionCache } from '@emotion/cache';
-import { createTheme, Theme, ThemeProvider } from '@mui/material/styles';
-import { useRef } from 'react';
+import createCache from '@emotion/cache';
+import { createTheme, ThemeProvider } from '@mui/material/styles';
+import { useMemo } from 'react';
 
 import { AdapterLuxon } from '@mui/x-date-pickers/AdapterLuxon';
 import { LocalizationProvider } from '@mui/x-date-pickers';
@@ -37,35 +37,42 @@ function toAlphabet(num: number) {
   return res.join('');
 }
 
-export function toMuiWebComponent(Component: any) {
+export function toMuiWebComponent(Component: any): any {
   const MuiWrapperComponent = ({ container, ...rest }: { container: any }) => {
-    const cacheRef = useRef<EmotionCache>(null);
-    const themeRef = useRef<Theme>(null);
-
-    if (!cacheRef.current) {
+    const emotionCache = useMemo(() => {
       const cacheKey = `emotion-mui-${toAlphabet(createdCaches++)}`;
 
-      cacheRef.current = createCache({ key: cacheKey, prepend: true, container });
-    }
+      return createCache({ key: cacheKey, prepend: true, container });
+    }, [container]);
 
-    if (!themeRef.current) {
-      themeRef.current = createTheme({
+    const muiTheme = useMemo(() => {
+      return createTheme({
         colorSchemes: {
           dark: true,
         },
         components: {
+          MuiPopover: {
+            defaultProps: {
+              container,
+            },
+          },
           MuiPopper: {
+            defaultProps: {
+              container,
+            },
+          },
+          MuiModal: {
             defaultProps: {
               container,
             },
           },
         },
       });
-    }
+    }, [container]);
 
     return (
-      <CacheProvider value={cacheRef.current}>
-        <ThemeProvider theme={themeRef.current}>
+      <CacheProvider value={emotionCache}>
+        <ThemeProvider theme={muiTheme}>
           <LocalizationProvider dateAdapter={AdapterLuxon}>
             <QueryClientProvider client={queryClient}>
               <Component {...rest}></Component>

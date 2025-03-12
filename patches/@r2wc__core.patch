@@ -1,0 +1,25 @@
+diff --git a/dist/core.js b/dist/core.js
+index 4a00e9d60a68c4393605fb066ef278dfa88190af..b4bed4caab1d341c421dc5986ddb6be82a016460 100644
+--- a/dist/core.js
++++ b/dist/core.js
+@@ -56,9 +56,17 @@ function _(t, e, n) {
+       y(this, O);
+       y(this, C, {});
+       y(this, "container");
+-      e.shadow ? this.container = this.attachShadow({
+-        mode: e.shadow
+-      }) : this.container = this, this[c].container = this.container;
++      if (e.shadow) {
++        const shadowRoot = this.attachShadow({
++          mode: e.shadow
++        })
++        this.container = document.createElement("div");
++        shadowRoot.appendChild(this.container);
++        this[c].shadowRoot = shadowRoot;
++      } else {
++        this.container = this;
++      }
++      this[c].container = this.container;
+       for (const r of a) {
+         const p = m[r], o = this.getAttribute(p), i = h[r], f = i ? A[i] : null;
+         f != null && f.parse && o && (this[c][r] = f.parse(o, p, this));

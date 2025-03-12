@@ -34,6 +34,9 @@
             "@swc/core",
             "better-sqlite3",
             "purescript"
-        ]
+        ],
+        "patchedDependencies": {
+            "@r2wc/core": "patches/@r2wc__core.patch"
+        }
     }
 }

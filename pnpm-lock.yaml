@@ -4,6 +4,11 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+patchedDependencies:
+  '@r2wc/core':
+    hash: 3a518cb827eca818b1174ef9346d69dd15480134e36c315c0e68d08ae9983707
+    path: patches/@r2wc__core.patch
+
 importers:
 
   .:
@@ -5858,11 +5863,11 @@ snapshots:
 
   '@protobufjs/utf8@1.1.0': {}
 
-  '@r2wc/core@1.2.0': {}
+  '@r2wc/core@1.2.0(patch_hash=3a518cb827eca818b1174ef9346d69dd15480134e36c315c0e68d08ae9983707)': {}
 
   '@r2wc/react-to-web-component@2.0.4(react-dom@19.0.0(react@19.0.0))(react@19.0.0)':
     dependencies:
-      '@r2wc/core': 1.2.0
+      '@r2wc/core': 1.2.0(patch_hash=3a518cb827eca818b1174ef9346d69dd15480134e36c315c0e68d08ae9983707)
       react: 19.0.0
       react-dom: 19.0.0(react@19.0.0)
 
