@@ -12,14 +12,8 @@ interface CitySelectionData extends BaseSelectionData {
   longitude: number;
   latitude: number;
   country: string;
-}
-
-interface CountryCapitalSelectionData extends BaseSelectionData {
-  type: 'countryCapital';
-  longitude: number;
-  latitude: number;
-  country: string;
-  cityName: string;
+  population: number;
+  isCapital: boolean;
 }
 
 interface TimezoneSelectionData extends BaseSelectionData {
@@ -27,7 +21,7 @@ interface TimezoneSelectionData extends BaseSelectionData {
   representativeCity: CitySelectionData | null;
 }
 
-export type SelectionData = CitySelectionData | CountryCapitalSelectionData | TimezoneSelectionData;
+export type SelectionData = CitySelectionData | TimezoneSelectionData;
 
 const supportedTimezones = new Set(Intl.supportedValuesOf('timeZone'));
 
@@ -41,6 +35,8 @@ const citiesSelectionData: CitySelectionData[] = citiesData
     longitude: city.longitude,
     latitude: city.latitude,
     country: city.country_name,
+    population: city.population,
+    isCapital: city.is_capital,
   }));
 
 const citiesSelectionDataById = citiesSelectionData.reduce(
@@ -50,20 +46,6 @@ const citiesSelectionDataById = citiesSelectionData.reduce(
   },
   {} as Record<string, CitySelectionData>
 );
-
-const countryCapitalSelectionData: CountryCapitalSelectionData[] = citiesData
-  .filter((city) => city.is_capital)
-  .filter((city) => supportedTimezones.has(city.timezone))
-  .map((city) => ({
-    type: 'countryCapital',
-    id: `capital-${city.country_name.toString()}`,
-    label: city.country_name,
-    timezone: city.timezone,
-    longitude: city.longitude,
-    latitude: city.latitude,
-    country: city.country_name,
-    cityName: city.name,
-  }));
 
 const timezoneSelectionData: TimezoneSelectionData[] = timezoneData
   .filter((timezone) => supportedTimezones.has(timezone.TimeZoneId))
@@ -82,11 +64,31 @@ const timezoneSelectionData: TimezoneSelectionData[] = timezoneData
     };
   });
 
-export const selectionData = [
-  ...citiesSelectionData,
-  ...countryCapitalSelectionData,
-  ...timezoneSelectionData,
-];
+export const selectionData = [...citiesSelectionData, ...timezoneSelectionData];
+
+selectionData.sort((a, b) => {
+  if (a.type === 'city' && b.type === 'timezone') {
+    return -1;
+  } else if (a.type === 'timezone' && b.type === 'city') {
+    return 1;
+  } else if (a.type === 'city' && b.type === 'city') {
+    if (a.isCapital && !b.isCapital) {
+      return -1;
+    } else if (!a.isCapital && b.isCapital) {
+      return 1;
+    }
+
+    return b.population - a.population;
+  }
+
+  if (a.label < b.label) {
+    return -1;
+  }
+  if (a.label > b.label) {
+    return 1;
+  }
+  return 0;
+});
 
 export const selectionDataById = selectionData.reduce(
   (acc, selection) => {

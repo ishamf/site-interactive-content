@@ -1,8 +1,7 @@
-import { Autocomplete, TextField } from '@mui/material';
+import { Autocomplete, createFilterOptions, TextField } from '@mui/material';
 import { SelectionData } from '../../assets';
 import { DateTimePicker } from '@mui/x-date-pickers';
 import { DateTime } from 'luxon';
-import classNames from 'classnames';
 
 export function TimezoneSelection({
   time,
@@ -21,11 +20,21 @@ export function TimezoneSelection({
     <>
       <Autocomplete
         getOptionKey={(option) => option.id}
-        renderOption={(props, option, { selected }) => (
+        filterOptions={createFilterOptions({
+          limit: 20,
+          stringify: (option) => {
+            if (option.type === 'city' && option.isCapital) {
+              return `${option.label} ${option.country}`;
+            }
+
+            return option.label;
+          },
+        })}
+        renderOption={({ key, ...props }, option) => (
           <TimezoneOption
+            key={key}
             {...props}
             option={option}
-            selected={selected}
             onClick={() => {
               onChangeId(option.id);
             }}
@@ -56,29 +65,29 @@ export function TimezoneSelection({
 
 function TimezoneOption({
   option,
-  selected,
+
   onClick,
+  ...rest
 }: {
   option: SelectionData;
-  selected: boolean;
   onClick: () => void;
 }) {
   return (
-    <li>
+    <li {...rest}>
       <button
-        className={classNames('hover:bg-neutral-100 cursor-pointer p-4 w-full', {
-          'bg-neutral-50': selected,
-        })}
+        className="cursor-pointer p-4 w-full text-left"
         onClick={() => {
           onClick();
         }}
       >
-        <p>{option.label}</p>
-        <p>
+        <p className="text-neutral-900 dark:text-neutral-100">{option.label}</p>
+        <p className="text-sm text-neutral-700 dark:text-neutral-300">
           {option.type === 'city' ? (
-            <>City in {option.country}</>
-          ) : option.type === 'countryCapital' ? (
-            <>Country (Time at capital)</>
+            option.isCapital ? (
+              <>Capital of {option.country}</>
+            ) : (
+              <>City in {option.country}</>
+            )
           ) : (
             <>Timezone</>
           )}
