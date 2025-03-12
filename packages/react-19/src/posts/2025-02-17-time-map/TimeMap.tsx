@@ -7,10 +7,17 @@ import { TimezoneSelection } from './components/TimezoneSelection';
 import { useQuery } from '@tanstack/react-query';
 import { loadSelectionData } from './assets';
 
+interface Selection {
+  itemId: string | null;
+  rowId: number;
+}
+
+let rowIds = 0;
+
 export function TimeMap() {
   const [time, setTime] = useState<DateTime>(() => DateTime.now());
 
-  const [selectedItems, setSelectedItems] = useState<string[]>([]);
+  const [selectedItems, setSelectedItems] = useState<Selection[]>([]);
 
   const selectionDataQuery = useQuery({
     queryKey: ['selectionData'],
@@ -36,10 +43,11 @@ export function TimeMap() {
           }}
         ></Slider>
       </div>
-      <div className="flex-1 min-h-0 md:max-w-[24rem] gap-4 grid grid-cols-2  ">
+      <div className="flex-1 min-h-0 md:max-w-[28rem] gap-4 grid items-center grid-cols-[40%_1fr_auto]">
         <TextField disabled label="Time Zone" value={'UTC'}></TextField>
         <DateTimePicker
           value={time}
+          className="col-span-2"
           timezone="UTC"
           ampm={false}
           onChange={(value) => {
@@ -50,19 +58,22 @@ export function TimeMap() {
         />
         {selectionDataQuery.isSuccess ? (
           <>
-            {selectedItems.map((id, idx) => {
+            {selectedItems.map(({ itemId, rowId }, idx) => {
               return (
                 <TimezoneSelection
-                  key={idx}
+                  key={rowId}
                   selectionData={selectionDataQuery.data.selectionData}
-                  currentSelection={selectionDataQuery.data.selectionDataById[id]}
+                  currentSelection={
+                    itemId ? selectionDataQuery.data.selectionDataById[itemId] : null
+                  }
                   time={time}
-                  onChangeId={(newId) => {
+                  onChangeId={(newId, isDeleting) => {
                     setSelectedItems((p) => {
                       const newItems = [...p];
 
-                      if (newId) {
-                        newItems.splice(idx, 1, newId);
+                      if (!isDeleting) {
+                        const current = newItems[idx];
+                        newItems.splice(idx, 1, { ...current, itemId: newId });
                       } else {
                         newItems.splice(idx, 1);
                       }
@@ -82,11 +93,12 @@ export function TimeMap() {
               currentSelection={null}
               time={time}
               onChangeId={(newId) => {
-                setSelectedItems((p) => (newId ? [...p, newId] : p));
+                setSelectedItems((p) => (newId ? [...p, { itemId: newId, rowId: rowIds++ }] : p));
               }}
               onChangeTime={(time) => {
                 setTime(time);
               }}
+              isNew
             ></TimezoneSelection>
           </>
         ) : null}
