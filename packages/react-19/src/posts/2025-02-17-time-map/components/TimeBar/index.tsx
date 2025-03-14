@@ -2,7 +2,7 @@
 
 import { css } from '@emotion/react';
 import { flMod } from '../../../../utils/math';
-import { useRef } from 'react';
+import { useRef, useCallback } from 'react';
 
 const DAY_LENGTH = 24 * 3600 * 1000;
 const ACCURACY_LIMIT = 5 * 60 * 1000; // 5 minutes
@@ -23,53 +23,59 @@ export function TimeBar({ time, setTime }: { time: number; setTime: (time: numbe
 
   const stateRef = useRef(null as DragState | null);
 
-  function onPointerDown(event: React.PointerEvent) {
-    if (!containerRef.current) return;
+  const onPointerDown = useCallback(
+    (event: React.PointerEvent) => {
+      if (!containerRef.current) return;
 
-    const containerWidth = containerRef.current.clientWidth;
-    const offsetAccuracyLimit = (ACCURACY_LIMIT / DAY_LENGTH) * containerWidth;
+      const containerWidth = containerRef.current.clientWidth;
+      const offsetAccuracyLimit = (ACCURACY_LIMIT / DAY_LENGTH) * containerWidth;
 
-    const offsetX = event.nativeEvent.offsetX;
+      const offsetX = event.nativeEvent.offsetX;
 
-    const roundedInitialTime = Math.round(time / ACCURACY_LIMIT) * ACCURACY_LIMIT;
+      const roundedInitialTime = Math.round(time / ACCURACY_LIMIT) * ACCURACY_LIMIT;
 
-    containerRef.current.setPointerCapture(event.pointerId);
+      containerRef.current.setPointerCapture(event.pointerId);
 
-    stateRef.current = {
-      initialTime: time,
-      initialX: offsetX,
-      roundedInitialTime,
-      roundedInitialX: Math.round(offsetX / offsetAccuracyLimit) * offsetAccuracyLimit,
-    };
-  }
+      stateRef.current = {
+        initialTime: time,
+        initialX: offsetX,
+        roundedInitialTime,
+        roundedInitialX: Math.round(offsetX / offsetAccuracyLimit) * offsetAccuracyLimit,
+      };
+    },
+    [time]
+  );
 
-  function onPointerMove(event: React.PointerEvent) {
-    if (!stateRef.current || !containerRef.current) return;
+  const onPointerMove = useCallback(
+    (event: React.PointerEvent) => {
+      if (!stateRef.current || !containerRef.current) return;
 
-    const containerWidth = containerRef.current.clientWidth;
+      const containerWidth = containerRef.current.clientWidth;
 
-    const offsetX = event.nativeEvent.offsetX;
+      const offsetX = event.nativeEvent.offsetX;
 
-    const deltaX = offsetX - stateRef.current.initialX;
+      const deltaX = offsetX - stateRef.current.initialX;
 
-    const deltaT = (deltaX / containerWidth) * DAY_LENGTH;
+      const deltaT = (deltaX / containerWidth) * DAY_LENGTH;
 
-    const roundedDeltaT = Math.round(deltaT / ACCURACY_LIMIT) * ACCURACY_LIMIT;
+      const roundedDeltaT = Math.round(deltaT / ACCURACY_LIMIT) * ACCURACY_LIMIT;
 
-    const newTime = stateRef.current.roundedInitialTime - roundedDeltaT;
+      const newTime = stateRef.current.roundedInitialTime - roundedDeltaT;
 
-    setTime(newTime);
-  }
+      setTime(newTime);
+    },
+    [setTime]
+  );
 
-  function onPointerUp() {
+  const onPointerUp = useCallback(() => {
     stateRef.current = null;
-  }
+  }, []);
 
-  function onPointerCancel() {
+  const onPointerCancel = useCallback(() => {
     if (!stateRef.current) return;
     setTime(stateRef.current.initialTime);
     stateRef.current = null;
-  }
+  }, [setTime]);
 
   return (
     <div
