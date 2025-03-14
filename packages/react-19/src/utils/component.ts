@@ -1,4 +1,4 @@
-import appStyles from './app-css';
+import appStyles from '../app-css';
 
 export function addAppStylesheet(Element: any): any {
   class WrappedElement extends Element {

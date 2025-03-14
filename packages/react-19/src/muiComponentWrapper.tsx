@@ -1,6 +1,6 @@
 import r2wc from '@r2wc/react-to-web-component';
 
-import { addAppStylesheet } from './utils';
+import { addAppStylesheet } from './utils/component';
 import { CacheProvider } from '@emotion/react';
 import createCache from '@emotion/cache';
 import { createTheme, ThemeProvider } from '@mui/material/styles';

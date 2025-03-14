@@ -4,7 +4,7 @@ import '@ant-design/v5-patch-for-react-19';
 import { StyleProvider } from '@ant-design/cssinjs';
 import { ConfigProvider, theme } from 'antd';
 import { useMediaQuery } from 'usehooks-ts';
-import { addAppStylesheet } from './utils';
+import { addAppStylesheet } from './utils/component';
 
 export function toAntdWebComponent(Component: any) {
   const AntdWrapperComponent = ({ container, ...rest }: { container: any }) => {
