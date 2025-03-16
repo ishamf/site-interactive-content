@@ -55,6 +55,9 @@ export function createAlphaCalculator({
   // > The maximum value of the equation of the equinoxes is about 1.1 seconds,
   // > so if an error of ~1 second is unimportant, the transformation from GMST to GAST can be skipped.
 
+  // Calculate sun altitude
+  // https://aa.usno.navy.mil/faq/alt_az
+
   // Precalculate the longitude and latitude-based components so we only need to calculate these
   // once per row/column. From testing, it seems to be 50% faster
   const localHourAngleByX: number[] = [];
@@ -66,7 +69,9 @@ export function createAlphaCalculator({
   for (let x = 0; x < width; x++) {
     const longitude = ((x + 0.5) / width) * 360 - 180;
 
-    const localHourAngle = flMod(gmstHours * 15 - rightAscension + flMod(longitude, 360), 360);
+    const localHourAngle = toRad(
+      flMod(gmstHours * 15 - rightAscension + flMod(longitude, 360), 360)
+    );
 
     localHourAngleByX.push(localHourAngle);
   }
@@ -78,12 +83,9 @@ export function createAlphaCalculator({
   }
 
   function getAlpha(x: number, y: number) {
-    // https://aa.usno.navy.mil/faq/alt_az
     const localHourAngle = localHourAngleByX[x];
 
-    const altitude = toDeg(
-      Math.asin(Math.cos(toRad(localHourAngle)) * altitudeAByY[y] + altitudeBByY[y])
-    );
+    const altitude = toDeg(Math.asin(Math.cos(localHourAngle) * altitudeAByY[y] + altitudeBByY[y]));
 
     const shadeAngle = 5;
 

@@ -28,8 +28,8 @@ export function TimeMap() {
   });
 
   return (
-    <div className="flex max-w-full flex-col md:flex-row p-4 gap-4 items-start justify-center">
-      <div className="max-w-[120vh] flex flex-1 items-stretch flex-col gap-4 ">
+    <div className="flex max-w-full flex-col p-4 gap-4 items-stretch justify-center md:flex-row md:items-start">
+      <div className="max-w-[120vh] flex flex-1 self-center items-stretch flex-col gap-4">
         <MapDisplay time={time.valueOf()} />
         <TimeBar
           time={time.valueOf()}
@@ -38,7 +38,7 @@ export function TimeMap() {
           }}
         ></TimeBar>
       </div>
-      <div className="flex-1 min-h-0 md:max-w-[28rem] gap-4 grid items-center grid-cols-[40%_1fr_auto]">
+      <div className="flex-1 min-h-0 md:max-w-[28rem] gap-4 grid items-center grid-cols-[45%_1fr_auto]">
         <TextField disabled label="Time Zone" value={'UTC'}></TextField>
         <DateTimePicker
           value={time}

@@ -4,12 +4,14 @@ import { css } from '@emotion/react';
 import { flMod } from '../../../../utils/math';
 import { useRef, useCallback } from 'react';
 
+const HOUR_LENGTH = 3600 * 1000;
 const DAY_LENGTH = 24 * 3600 * 1000;
 const ACCURACY_LIMIT = 5 * 60 * 1000; // 5 minutes
 
 interface DragState {
   initialTime: number;
   initialX: number;
+  pointerId: number;
 
   roundedInitialTime: number;
   roundedInitialX: number;
@@ -17,7 +19,9 @@ interface DragState {
 
 export function TimeBar({ time, setTime }: { time: number; setTime: (time: number) => void }) {
   const dayPercentage = (flMod(time, DAY_LENGTH) / DAY_LENGTH) * 100;
-  const offset = dayPercentage > 50 ? dayPercentage - 50 : dayPercentage + 50;
+  const hourPercentage = (flMod(time, HOUR_LENGTH) / HOUR_LENGTH) * 100;
+  const offset2X = dayPercentage > 50 ? dayPercentage - 50 : dayPercentage + 50;
+  const offset25 = ((hourPercentage > 50 ? hourPercentage - 50 : hourPercentage + 50) * 1) / 25;
 
   const containerRef = useRef<HTMLDivElement | null>(null);
 
@@ -39,6 +43,7 @@ export function TimeBar({ time, setTime }: { time: number; setTime: (time: numbe
       stateRef.current = {
         initialTime: time,
         initialX: offsetX,
+        pointerId: event.pointerId,
         roundedInitialTime,
         roundedInitialX: Math.round(offsetX / offsetAccuracyLimit) * offsetAccuracyLimit,
       };
@@ -48,7 +53,12 @@ export function TimeBar({ time, setTime }: { time: number; setTime: (time: numbe
 
   const onPointerMove = useCallback(
     (event: React.PointerEvent) => {
-      if (!stateRef.current || !containerRef.current) return;
+      if (
+        !stateRef.current ||
+        !containerRef.current ||
+        event.pointerId !== stateRef.current.pointerId
+      )
+        return;
 
       const containerWidth = containerRef.current.clientWidth;
 
@@ -67,49 +77,79 @@ export function TimeBar({ time, setTime }: { time: number; setTime: (time: numbe
     [setTime]
   );
 
-  const onPointerUp = useCallback(() => {
+  // In mac chrome 134, sometimes pointerup is not fired, use pointerleave instead
+  const onPointerUpOrLeave = useCallback((event: React.PointerEvent) => {
+    if (!stateRef.current || event.pointerId !== stateRef.current.pointerId) return;
+
     stateRef.current = null;
   }, []);
 
-  const onPointerCancel = useCallback(() => {
-    if (!stateRef.current) return;
-    setTime(stateRef.current.initialTime);
-    stateRef.current = null;
-  }, [setTime]);
+  const onPointerCancel = useCallback(
+    (event: React.PointerEvent) => {
+      if (!stateRef.current || event.pointerId !== stateRef.current.pointerId) return;
+      setTime(stateRef.current.initialTime);
+      stateRef.current = null;
+    },
+    [setTime]
+  );
 
   return (
     <div
-      className="w-full h-8 overflow-hidden cursor-grab select-none"
+      className="w-full h-8 overflow-hidden cursor-grab select-none touch-pan-y"
       ref={containerRef}
       onPointerDown={onPointerDown}
       onPointerMove={onPointerMove}
-      onPointerUp={onPointerUp}
+      onPointerUp={onPointerUpOrLeave}
+      onPointerLeave={onPointerUpOrLeave}
       onPointerCancel={onPointerCancel}
     >
-      <div
-        css={css`
-          --day-color: #f0fffe;
-          --night-color: #000b5b;
-          pointer-events: none;
-          width: 200%;
-          height: 100%;
-          background: repeating-linear-gradient(
-            to right,
-            var(--night-color) 0%,
-            var(--night-color) 10%,
+      <div className="pointer-events-none w-full h-full relative">
+        <div
+          css={css`
+            --day-color: #f0fffe;
+            --night-color: #000b5b;
+            width: 200%;
+            height: 50%;
+            background: repeating-linear-gradient(
+              to right,
+              var(--night-color) 0%,
+              var(--night-color) 10%,
 
-            var(--day-color) 15%,
-            var(--day-color) 25%,
-            var(--day-color) 35%,
+              var(--day-color) 15%,
+              var(--day-color) 25%,
+              var(--day-color) 35%,
 
-            var(--night-color) 40%,
-            var(--night-color) 50%
-          );
-        `}
-        style={{
-          transform: `translateX(-${offset / 2}%)`,
-        }}
-      ></div>
+              var(--night-color) 40%,
+              var(--night-color) 50%
+            );
+          `}
+          style={{
+            transform: `translateX(-${offset2X / 2}%)`,
+          }}
+        ></div>
+        <div
+          className="relative"
+          css={css`
+            width: ${(100 * 25) / 24}%;
+          `}
+          style={{
+            transform: `translateX(-${offset25}%)`,
+          }}
+        >
+          {Array(25)
+            .fill(0)
+            .map((_, i) => (
+              <div
+                key={i}
+                className="w-0.5 h-2 absolute bg-gray-300 "
+                style={{
+                  transform: `translateX(-50%)`,
+                  left: `${(i * 100) / 24}%`,
+                }}
+              />
+            ))}
+        </div>
+      </div>
     </div>
   );
 }
