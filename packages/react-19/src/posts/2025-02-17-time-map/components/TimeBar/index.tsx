@@ -2,7 +2,8 @@
 
 import { css } from '@emotion/react';
 import { flMod } from '../../../../utils/math';
-import { useRef, useCallback } from 'react';
+import { useRef, useCallback, useState } from 'react';
+import classNames from 'classnames';
 
 const HOUR_LENGTH = 3600 * 1000;
 const DAY_LENGTH = 24 * 3600 * 1000;
@@ -25,6 +26,7 @@ export function TimeBar({ time, setTime }: { time: number; setTime: (time: numbe
 
   const containerRef = useRef<HTMLDivElement | null>(null);
 
+  const [isGrabbing, setIsGrabbing] = useState(false);
   const stateRef = useRef(null as DragState | null);
 
   const onPointerDown = useCallback(
@@ -39,6 +41,8 @@ export function TimeBar({ time, setTime }: { time: number; setTime: (time: numbe
       const roundedInitialTime = Math.round(time / ACCURACY_LIMIT) * ACCURACY_LIMIT;
 
       containerRef.current.setPointerCapture(event.pointerId);
+
+      setIsGrabbing(true);
 
       stateRef.current = {
         initialTime: time,
@@ -81,6 +85,7 @@ export function TimeBar({ time, setTime }: { time: number; setTime: (time: numbe
   const onPointerUpOrLeave = useCallback((event: React.PointerEvent) => {
     if (!stateRef.current || event.pointerId !== stateRef.current.pointerId) return;
 
+    setIsGrabbing(false);
     stateRef.current = null;
   }, []);
 
@@ -88,6 +93,7 @@ export function TimeBar({ time, setTime }: { time: number; setTime: (time: numbe
     (event: React.PointerEvent) => {
       if (!stateRef.current || event.pointerId !== stateRef.current.pointerId) return;
       setTime(stateRef.current.initialTime);
+      setIsGrabbing(false);
       stateRef.current = null;
     },
     [setTime]
@@ -95,7 +101,10 @@ export function TimeBar({ time, setTime }: { time: number; setTime: (time: numbe
 
   return (
     <div
-      className="w-full h-8 overflow-hidden cursor-grab select-none touch-pan-y"
+      className={classNames('w-full h-8 overflow-hidden select-none touch-pan-y', {
+        'cursor-grab': !isGrabbing,
+        'cursor-grabbing': isGrabbing,
+      })}
       ref={containerRef}
       onPointerDown={onPointerDown}
       onPointerMove={onPointerMove}

@@ -3,7 +3,6 @@ import { DeleteOutline as DeleteIcon } from '@mui/icons-material';
 import { SelectionData } from '../../assets';
 import { DateTimePicker } from '@mui/x-date-pickers';
 import { DateTime } from 'luxon';
-import classNames from 'classnames';
 
 export function TimezoneSelection({
   time,
@@ -24,9 +23,9 @@ export function TimezoneSelection({
   const isShowingEditArea = shouldShowDeleteButton;
 
   return (
-    <>
+    <div className="flex flex-row gap-4 items-center">
       <Autocomplete
-        className="col-start-1"
+        className="flex-1"
         getOptionKey={(option) => option.id}
         filterOptions={createFilterOptions({
           limit: 20,
@@ -48,29 +47,38 @@ export function TimezoneSelection({
         onChange={(_e, value) => {
           onChangeId(value?.id ?? null, false);
         }}
-      ></Autocomplete>
-      <DateTimePicker
-        className={classNames('col-start-2', { 'col-span-2': !isShowingEditArea })}
-        value={currentSelection ? time : null}
-        disabled={!currentSelection}
-        timezone={currentSelection?.timezone}
-        ampm={false}
-        onChange={(value) => {
-          if (value && value.isValid) {
-            onChangeTime(value);
-          }
+        slotProps={{
+          clearIndicator: {
+            onClick: () => {
+              onChangeId(null, true);
+            },
+          },
         }}
-      />
-      {isShowingEditArea ? (
-        <div className="ml-[-0.75rem]">
-          {shouldShowDeleteButton ? (
+      ></Autocomplete>
+
+      <div className="flex-1 flex items-center gap-1">
+        <DateTimePicker
+          className="flex-1"
+          value={currentSelection ? time : null}
+          disabled={!currentSelection}
+          timezone={currentSelection?.timezone}
+          ampm={false}
+          onChange={(value) => {
+            if (value && value.isValid) {
+              onChangeTime(value);
+            }
+          }}
+        />
+
+        {isShowingEditArea ? (
+          <div>
             <IconButton onClick={() => onChangeId(null, true)}>
               <DeleteIcon />
             </IconButton>
-          ) : null}
-        </div>
-      ) : null}
-    </>
+          </div>
+        ) : null}
+      </div>
+    </div>
   );
 }
 
