@@ -8,6 +8,8 @@ export function MapDisplay({ time }: { time: number }) {
   useMapUpdater(canvasRef, time);
 
   return (
-    <canvas className="max-w-full" ref={canvasRef} width={canvasWidth} height={canvasHeight} />
+    <div className="max-w-full relative">
+      <canvas className="max-w-full" ref={canvasRef} width={canvasWidth} height={canvasHeight} />
+    </div>
   );
 }

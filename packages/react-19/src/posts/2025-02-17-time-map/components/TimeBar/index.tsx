@@ -2,12 +2,14 @@
 
 import { css } from '@emotion/react';
 import { flMod } from '../../../../utils/math';
-import { useRef, useCallback, useState } from 'react';
+import { useRef, useCallback, useState, useMemo } from 'react';
 import classNames from 'classnames';
+import { dayColors, dayDarkTextColors, dayLightTextColors } from '../../constants';
+import { DateTime } from 'luxon';
 
-const HOUR_LENGTH = 3600 * 1000;
 const DAY_LENGTH = 24 * 3600 * 1000;
 const ACCURACY_LIMIT = 5 * 60 * 1000; // 5 minutes
+const EPOCH_START_DAY = 4; // Thursday
 
 interface DragState {
   initialTime: number;
@@ -19,28 +21,134 @@ interface DragState {
 }
 
 export function TimeBar({ time, setTime }: { time: number; setTime: (time: number) => void }) {
+  const currentDaysSinceEpoch = Math.floor(time / DAY_LENGTH);
   const dayPercentage = (flMod(time, DAY_LENGTH) / DAY_LENGTH) * 100;
-  const hourPercentage = (flMod(time, HOUR_LENGTH) / HOUR_LENGTH) * 100;
-  const offset2X = dayPercentage > 50 ? dayPercentage - 50 : dayPercentage + 50;
-  const offset25 = ((hourPercentage > 50 ? hourPercentage - 50 : hourPercentage + 50) * 1) / 25;
+
+  const offset2X = dayPercentage / 2;
+
+  const currentWeekDay = flMod(currentDaysSinceEpoch + EPOCH_START_DAY, 7);
+
+  const currentDayColorIndex = currentWeekDay;
+  const prevDayColorIndex = flMod(currentDayColorIndex - 1, 7);
+  const nextDayColorIndex = flMod(currentDayColorIndex + 1, 7);
+
+  const prevDayColor = dayColors[prevDayColorIndex];
+  const currentDayColor = dayColors[currentDayColorIndex];
+  const nextDayColor = dayColors[nextDayColorIndex];
 
   const containerRef = useRef<HTMLDivElement | null>(null);
 
+  const isTextShowingNextDay = dayPercentage >= 50;
+
+  const { listeners, isGrabbing } = useGrabTime({ container: containerRef.current, time, setTime });
+
+  const leftTextColorIndex = isTextShowingNextDay ? currentDayColorIndex : prevDayColorIndex;
+  const rightTextColorIndex =
+    dayPercentage == 50
+      ? leftTextColorIndex
+      : isTextShowingNextDay
+        ? nextDayColorIndex
+        : currentDayColorIndex;
+  const { leftText, rightText } = useMemo(() => {
+    const currentDateTime = DateTime.fromMillis(currentDaysSinceEpoch * DAY_LENGTH).setZone('utc');
+
+    if (isTextShowingNextDay) {
+      const leftText = currentDateTime.toLocaleString(DateTime.DATE_MED_WITH_WEEKDAY);
+      const rightText = currentDateTime
+        .plus({ days: 1 })
+        .toLocaleString(DateTime.DATE_MED_WITH_WEEKDAY);
+
+      if (dayPercentage == 50) {
+        return { leftText, rightText: leftText };
+      }
+
+      return { leftText, rightText };
+    } else {
+      const leftText = currentDateTime
+        .minus({ days: 1 })
+        .toLocaleString(DateTime.DATE_MED_WITH_WEEKDAY);
+      const rightText = currentDateTime.toLocaleString(DateTime.DATE_MED_WITH_WEEKDAY);
+
+      return { leftText, rightText };
+    }
+  }, [currentDaysSinceEpoch, isTextShowingNextDay, dayPercentage]);
+
+  return (
+    <div
+      className={classNames('w-full overflow-hidden select-none touch-pan-y', {
+        'cursor-grab': !isGrabbing,
+        'cursor-grabbing': isGrabbing,
+      })}
+      ref={containerRef}
+      {...listeners}
+    >
+      <div className="pointer-events-none w-full relative">
+        <div
+          className="relative flex"
+          css={css`
+            width: 200%;
+          `}
+          style={{
+            transform: `translateX(-${offset2X}%)`,
+          }}
+        >
+          <div className="flex-1 h-2" style={{ backgroundColor: prevDayColor }}></div>
+          <div className="flex-2 h-2" style={{ backgroundColor: currentDayColor }}></div>
+          <div className="flex-1 h-2" style={{ backgroundColor: nextDayColor }}></div>
+        </div>
+        <div className="flex justify-between">
+          <div
+            css={css`
+              color: ${dayLightTextColors[leftTextColorIndex]};
+
+              @media (prefers-color-scheme: dark) {
+                color: ${dayDarkTextColors[leftTextColorIndex]};
+              }
+            `}
+          >
+            {leftText}
+          </div>
+          <div
+            css={css`
+              color: ${dayLightTextColors[rightTextColorIndex]};
+
+              @media (prefers-color-scheme: dark) {
+                color: ${dayDarkTextColors[rightTextColorIndex]};
+              }
+            `}
+          >
+            {rightText}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function useGrabTime({
+  container,
+  time,
+  setTime,
+}: {
+  container: HTMLElement | null;
+  time: number;
+  setTime: (time: number) => void;
+}) {
   const [isGrabbing, setIsGrabbing] = useState(false);
   const stateRef = useRef(null as DragState | null);
 
   const onPointerDown = useCallback(
     (event: React.PointerEvent) => {
-      if (!containerRef.current) return;
+      if (!container) return;
 
-      const containerWidth = containerRef.current.clientWidth;
+      const containerWidth = container.clientWidth;
       const offsetAccuracyLimit = (ACCURACY_LIMIT / DAY_LENGTH) * containerWidth;
 
       const offsetX = event.nativeEvent.offsetX;
 
       const roundedInitialTime = Math.round(time / ACCURACY_LIMIT) * ACCURACY_LIMIT;
 
-      containerRef.current.setPointerCapture(event.pointerId);
+      container.setPointerCapture(event.pointerId);
 
       setIsGrabbing(true);
 
@@ -52,19 +160,14 @@ export function TimeBar({ time, setTime }: { time: number; setTime: (time: numbe
         roundedInitialX: Math.round(offsetX / offsetAccuracyLimit) * offsetAccuracyLimit,
       };
     },
-    [time]
+    [container, time]
   );
 
   const onPointerMove = useCallback(
     (event: React.PointerEvent) => {
-      if (
-        !stateRef.current ||
-        !containerRef.current ||
-        event.pointerId !== stateRef.current.pointerId
-      )
-        return;
+      if (!stateRef.current || !container || event.pointerId !== stateRef.current.pointerId) return;
 
-      const containerWidth = containerRef.current.clientWidth;
+      const containerWidth = container.clientWidth;
 
       const offsetX = event.nativeEvent.offsetX;
 
@@ -78,7 +181,7 @@ export function TimeBar({ time, setTime }: { time: number; setTime: (time: numbe
 
       setTime(newTime);
     },
-    [setTime]
+    [container, setTime]
   );
 
   // In mac chrome 134, sometimes pointerup is not fired, use pointerleave instead
@@ -99,66 +202,14 @@ export function TimeBar({ time, setTime }: { time: number; setTime: (time: numbe
     [setTime]
   );
 
-  return (
-    <div
-      className={classNames('w-full h-8 overflow-hidden select-none touch-pan-y', {
-        'cursor-grab': !isGrabbing,
-        'cursor-grabbing': isGrabbing,
-      })}
-      ref={containerRef}
-      onPointerDown={onPointerDown}
-      onPointerMove={onPointerMove}
-      onPointerUp={onPointerUpOrLeave}
-      onPointerLeave={onPointerUpOrLeave}
-      onPointerCancel={onPointerCancel}
-    >
-      <div className="pointer-events-none w-full h-full relative">
-        <div
-          css={css`
-            --day-color: #f0fffe;
-            --night-color: #000b5b;
-            width: 200%;
-            height: 50%;
-            background: repeating-linear-gradient(
-              to right,
-              var(--night-color) 0%,
-              var(--night-color) 10%,
-
-              var(--day-color) 15%,
-              var(--day-color) 25%,
-              var(--day-color) 35%,
-
-              var(--night-color) 40%,
-              var(--night-color) 50%
-            );
-          `}
-          style={{
-            transform: `translateX(-${offset2X / 2}%)`,
-          }}
-        ></div>
-        <div
-          className="relative"
-          css={css`
-            width: ${(100 * 25) / 24}%;
-          `}
-          style={{
-            transform: `translateX(-${offset25}%)`,
-          }}
-        >
-          {Array(25)
-            .fill(0)
-            .map((_, i) => (
-              <div
-                key={i}
-                className="w-0.5 h-2 absolute bg-gray-300 "
-                style={{
-                  transform: `translateX(-50%)`,
-                  left: `${(i * 100) / 24}%`,
-                }}
-              />
-            ))}
-        </div>
-      </div>
-    </div>
-  );
+  return {
+    isGrabbing,
+    listeners: {
+      onPointerDown,
+      onPointerMove,
+      onPointerUp: onPointerUpOrLeave,
+      onPointerLeave: onPointerUpOrLeave,
+      onPointerCancel,
+    },
+  };
 }
