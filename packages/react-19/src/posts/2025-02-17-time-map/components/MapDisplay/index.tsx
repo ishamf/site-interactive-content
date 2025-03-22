@@ -3,11 +3,17 @@ import { canvasWidth, canvasHeight } from '../../constants';
 import { useMapUpdater } from './updater';
 import { useSelectionStore } from '../../store';
 import { CityDisplay } from './CityDisplay';
-import { selectionDataById } from '../../assets/selectionData';
 import { useCityDisplayStore } from './cityLayout';
 import { useElementSize } from '../../../../utils/hooks';
+import { SelectionData } from '../../assets';
 
-export function MapDisplay({ time }: { time: number }) {
+export function MapDisplay({
+  time,
+  selectionDataById,
+}: {
+  time: number;
+  selectionDataById: Record<string, SelectionData | undefined>;
+}) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   const selectedItems = useSelectionStore((state) => state.selectedItems);
@@ -35,6 +41,10 @@ export function MapDisplay({ time }: { time: number }) {
             }
 
             const item = selectionDataById[selectionItem.itemId];
+
+            if (!item) {
+              return null;
+            }
 
             const city = item.type === 'city' ? item : item.representativeCity;
 

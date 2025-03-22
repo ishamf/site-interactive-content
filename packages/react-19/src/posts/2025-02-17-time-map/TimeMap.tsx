@@ -25,7 +25,10 @@ export function TimeMap() {
   return (
     <div className="flex max-w-full flex-col p-4 gap-4 items-stretch justify-center md:flex-row md:items-start bg-neutral-50 dark:bg-neutral-950">
       <div className="max-w-[170vh] flex-1 z-10 self-center md:self-start sticky top-0 py-4 flex items-stretch flex-col bg-neutral-50 dark:bg-neutral-950">
-        <MapDisplay time={time.valueOf()} />
+        <MapDisplay
+          time={time.valueOf()}
+          selectionDataById={selectionDataQuery.data?.selectionDataById ?? {}}
+        />
         <TimeBar
           time={time.valueOf()}
           setTime={(ms) => {
