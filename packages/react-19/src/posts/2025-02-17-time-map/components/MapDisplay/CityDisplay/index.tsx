@@ -24,7 +24,7 @@ export function CityDisplay({
 }: {
   time: number;
   city: CitySelectionData;
-  labelPosition: LabelPosition;
+  labelPosition: LabelPosition | null;
   onLabelSizeChange: (size: { width: number; height: number } | null) => void;
 }) {
   const labelRef = useRef<HTMLDivElement>(null);
@@ -52,6 +52,7 @@ export function CityDisplay({
           transform: translate(-50%, -50%);
           left: ${(longitude * 100) / 360 + 50}%;
           top: ${(latitude * -100) / 180 + 50}%;
+          ${!labelPosition ? 'visibility: hidden;' : ''}
         `}
       >
         <svg
@@ -60,7 +61,7 @@ export function CityDisplay({
             height: 5px;
             transform-origin: 2.5px 2.5px;
             transform: translate(-2.5px, -2.5px)
-              rotate(${indicatorRotationBasedOnLabelPosition[labelPosition]}deg);
+              rotate(${indicatorRotationBasedOnLabelPosition[labelPosition ?? 'bottomright']}deg);
             filter: ${Array(1).fill('drop-shadow(0 0 2px rgba(0, 0, 0, 1))').join(' ')};
           `}
           viewBox="0 0 50 20"

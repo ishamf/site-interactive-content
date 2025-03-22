@@ -47,9 +47,7 @@ export function MapDisplay({ time }: { time: number }) {
                 key={selectionItem.rowId}
                 city={city}
                 time={time}
-                labelPosition={
-                  store.displayItemById[selectionItem.rowId]?.labelPosition ?? 'bottomright'
-                }
+                labelPosition={store.displayItemById[selectionItem.rowId]?.labelPosition ?? null}
                 onLabelSizeChange={(size) => {
                   if (size) {
                     store.registerDisplayItem(selectionItem.rowId, { city, size });

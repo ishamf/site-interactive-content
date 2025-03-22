@@ -12,7 +12,7 @@ type BoxRect = BoxSize & { left: number; top: number };
 type DisplayItem = {
   rowId: string;
   city: CitySelectionData;
-  labelPosition: LabelPosition;
+  labelPosition: LabelPosition | null;
   size: BoxSize;
 };
 
@@ -21,6 +21,7 @@ interface CityDisplayStore {
   displayItemById: Record<string, DisplayItem>;
   registerContainerSize(size: BoxSize): void;
   registerDisplayItem(rowId: string, item: { size: BoxSize; city: CitySelectionData } | null): void;
+  queueRecalculatePositions(): void;
   recalculatePositions(): void;
 }
 
@@ -33,7 +34,7 @@ function createStore() {
     registerContainerSize(size) {
       set({ containerSize: size });
 
-      get().recalculatePositions();
+      get().queueRecalculatePositions();
     },
 
     registerDisplayItem(rowId, item) {
@@ -42,7 +43,7 @@ function createStore() {
           return {
             displayItemById: {
               ...state.displayItemById,
-              [rowId]: { rowId, city: item.city, size: item.size, labelPosition: 'bottomright' },
+              [rowId]: { rowId, city: item.city, size: item.size, labelPosition: null },
             },
           };
         }
@@ -51,8 +52,23 @@ function createStore() {
         return { displayItemById: rest };
       });
 
-      get().recalculatePositions();
+      get().queueRecalculatePositions();
     },
+
+    queueRecalculatePositions: (() => {
+      let isExecuting = false;
+      return () => {
+        if (isExecuting) {
+          return;
+        }
+
+        isExecuting = true;
+        setTimeout(() => {
+          get().recalculatePositions();
+          isExecuting = false;
+        }, 0);
+      };
+    })(),
 
     recalculatePositions() {
       if (!this.containerSize) {
@@ -140,7 +156,8 @@ function calculateItemCost(
   currentItem: BoxRect,
   currentItemIndex: number,
   currentItemPosition: LabelPosition,
-  allItems: BoxRect[]
+  allItems: Record<LabelPosition, BoxRect[]>,
+  allItemPositions: LabelPosition[]
 ) {
   let cost = 0;
 
@@ -151,19 +168,26 @@ function calculateItemCost(
     cost += 1;
   }
 
-  // Cost for intersection with other items
-  for (let i = 0; i < allItems.length; i++) {
-    if (i === currentItemIndex) {
-      continue;
+  // Cost for intersection with other items. This has the biggest effect for
+  // items that are actually intersecting with each other, but it
+  // also has a lesser effect with the "potential position" of the other items,
+  // to open up more positions for items that are actually intersecting
+  for (const position of labelPositions) {
+    for (let i = 0; i < allItemPositions.length; i++) {
+      if (i === currentItemIndex) {
+        continue;
+      }
+      cost +=
+        getBoxIntersection(currentItem, allItems[position][i]) *
+        (allItemPositions[i] === position ? 10 : 1);
     }
-    cost += getBoxIntersection(currentItem, allItems[i]) * 2;
   }
 
   // Cost for going out of bounds
   cost +=
     (currentItem.width * currentItem.height -
       getBoxIntersection(currentItem, { left: 0, top: 0, ...containerSize })) *
-    100;
+    1000;
 
   return cost;
 }
@@ -178,8 +202,16 @@ type CandidateAction = {
  * Greedy algorithm to optimize label displays
  */
 function optimizeLabelDisplays(containerSize: BoxSize, items: DisplayItem[]): DisplayItem[] {
-  const boxRects = items.map((item) => getLabelRect(containerSize, item, item.labelPosition));
-  const itemLabelPositions = items.map((item) => item.labelPosition);
+  // const start = performance.now();
+
+  const boxRectsByPosition = labelPositions.reduce(
+    (acc, position) => {
+      acc[position] = items.map((item) => getLabelRect(containerSize, item, position));
+      return acc;
+    },
+    {} as Record<LabelPosition, BoxRect[]>
+  );
+  const itemLabelPositions: LabelPosition[] = Array(items.length).fill('bottomright');
 
   const n = items.length;
   const maxIters = Math.max(n * 3, 20);
@@ -192,10 +224,11 @@ function optimizeLabelDisplays(containerSize: BoxSize, items: DisplayItem[]): Di
       const currentPosition = itemLabelPositions[i];
       const currentCost = calculateItemCost(
         containerSize,
-        boxRects[i],
+        boxRectsByPosition[currentPosition][i],
         i,
         currentPosition,
-        boxRects
+        boxRectsByPosition,
+        itemLabelPositions
       );
 
       if (currentCost === 0) continue;
@@ -207,10 +240,11 @@ function optimizeLabelDisplays(containerSize: BoxSize, items: DisplayItem[]): Di
 
         const candidateCost = calculateItemCost(
           containerSize,
-          getLabelRect(containerSize, items[i], candidatePosition),
+          boxRectsByPosition[candidatePosition][i],
           i,
           candidatePosition,
-          boxRects
+          boxRectsByPosition,
+          itemLabelPositions
         );
 
         const costDelta = candidateCost - currentCost;
@@ -226,12 +260,9 @@ function optimizeLabelDisplays(containerSize: BoxSize, items: DisplayItem[]): Di
     }
 
     itemLabelPositions[bestCandidateAction.index] = bestCandidateAction.position;
-    boxRects[bestCandidateAction.index] = getLabelRect(
-      containerSize,
-      items[bestCandidateAction.index],
-      bestCandidateAction.position
-    );
   }
+
+  // console.log('Optimization iterations:', iter, 'Time:', performance.now() - start);
 
   return items.map((item, i) => ({
     ...item,
