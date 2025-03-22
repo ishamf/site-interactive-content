@@ -24,7 +24,7 @@ export function TimeMap() {
 
   return (
     <div className="flex max-w-full flex-col p-4 gap-4 items-stretch justify-center md:flex-row md:items-start">
-      <div className="max-w-[170vh] flex-1 z-10 bg-white self-center md:self-start sticky top-0 py-4 flex items-stretch flex-col">
+      <div className="max-w-[170vh] flex-1 z-10 self-center md:self-start md:sticky md:top-0 py-4 flex items-stretch flex-col">
         <MapDisplay time={time.valueOf()} />
         <TimeBar
           time={time.valueOf()}
@@ -52,8 +52,8 @@ export function TimeMap() {
                       selectionStore.updateSelection(rowId, newId);
                     }
                   }}
-                  onChangeTime={(time) => {
-                    setTime(time);
+                  onChangeTime={(t) => {
+                    setTime(t);
                   }}
                 ></TimezoneSelection>
               );
@@ -68,8 +68,8 @@ export function TimeMap() {
                   selectionStore.addNewSelection(newId);
                 }
               }}
-              onChangeTime={(time) => {
-                setTime(time);
+              onChangeTime={(t) => {
+                setTime(t);
               }}
               isNew
             ></TimezoneSelection>
