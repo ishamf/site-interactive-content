@@ -23,7 +23,6 @@ export default tseslint.config(
     },
     rules: {
       ...reactHooks.configs.recommended.rules,
-      'no-shadow': 'error',
       'react-refresh/only-export-components': ['warn', { allowConstantExport: true }],
       '@typescript-eslint/no-unused-vars': ['error', { varsIgnorePattern: '^_' }],
       '@typescript-eslint/no-explicit-any': 0,
