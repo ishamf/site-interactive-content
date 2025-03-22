@@ -1,4 +1,4 @@
-import { flMod } from '../../../../../utils/math';
+import { flMod } from '../../utils/math';
 
 function toRad(deg: number) {
   return (deg * Math.PI) / 180;
@@ -9,13 +9,11 @@ function toDeg(rad: number) {
 }
 
 export function createAlphaCalculator({
-  width,
-  height,
+  precalculate: { width, height },
   time,
 }: {
   time: number;
-  width: number;
-  height: number;
+  precalculate: { width: number; height: number };
 }) {
   // https://aa.usno.navy.mil/faq/sun_approx
   const julianDate = time / 86400000 + 2440587.5;
@@ -82,11 +80,7 @@ export function createAlphaCalculator({
     altitudeBByY.push(Math.sin(toRad(declination)) * Math.sin(toRad(latitude)));
   }
 
-  function getAlpha(x: number, y: number) {
-    const localHourAngle = localHourAngleByX[x];
-
-    const altitude = toDeg(Math.asin(Math.cos(localHourAngle) * altitudeAByY[y] + altitudeBByY[y]));
-
+  function getAlphaFromAltitude(altitude: number) {
     const shadeAngle = 5;
 
     return altitude > shadeAngle
@@ -96,5 +90,30 @@ export function createAlphaCalculator({
         : (altitude + shadeAngle) / (2 * shadeAngle);
   }
 
-  return getAlpha;
+  function getAlphaWithPrecalculatedComponents(x: number, y: number) {
+    const localHourAngle = localHourAngleByX[x];
+
+    const altitude = toDeg(Math.asin(Math.cos(localHourAngle) * altitudeAByY[y] + altitudeBByY[y]));
+
+    return getAlphaFromAltitude(altitude);
+  }
+
+  /**
+   * Function to get the alpha value directly (without precalculation)
+   */
+  function getAlphaWithLatLong(latitude: number, longitude: number) {
+    // https://aa.usno.navy.mil/faq/alt_az
+    const localHourAngle = flMod(gmstHours * 15 - rightAscension + flMod(longitude, 360), 360);
+
+    const altitude = toDeg(
+      Math.asin(
+        Math.cos(toRad(localHourAngle)) * Math.cos(toRad(declination)) * Math.cos(toRad(latitude)) +
+          Math.sin(toRad(declination)) * Math.sin(toRad(latitude))
+      )
+    );
+
+    return getAlphaFromAltitude(altitude);
+  }
+
+  return { getAlphaWithLatLong, getAlphaWithPrecalculatedComponents };
 }

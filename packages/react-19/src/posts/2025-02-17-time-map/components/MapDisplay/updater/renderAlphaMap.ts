@@ -1,4 +1,4 @@
-import { createAlphaCalculator } from './math';
+import { createAlphaCalculator } from '../../../math';
 
 export function renderAlphaMap({
   width,
@@ -11,7 +11,10 @@ export function renderAlphaMap({
 }) {
   const imageData = new ImageData(width, height);
 
-  const getAlpha = createAlphaCalculator({ time, width, height });
+  const { getAlphaWithPrecalculatedComponents: getAlpha } = createAlphaCalculator({
+    time,
+    precalculate: { width, height },
+  });
 
   for (let y = 0; y < height; y++) {
     for (let x = 0; x < width; x++) {

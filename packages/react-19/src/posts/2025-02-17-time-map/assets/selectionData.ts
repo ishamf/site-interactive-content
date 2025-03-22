@@ -7,7 +7,7 @@ interface BaseSelectionData {
   id: string;
 }
 
-interface CitySelectionData extends BaseSelectionData {
+export interface CitySelectionData extends BaseSelectionData {
   type: 'city';
   longitude: number;
   latitude: number;
