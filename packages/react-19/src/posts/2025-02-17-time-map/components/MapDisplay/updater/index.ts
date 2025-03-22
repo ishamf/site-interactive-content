@@ -1,13 +1,17 @@
 import { RefObject, useEffect, useReducer } from 'react';
 import { drawMapAtTime } from './drawMap';
 
-type State =
+type RenderingState =
   | {
-      state: 'idle';
+      renderingState: 'idle';
       time: number;
     }
-  | { state: 'renderingLowRes'; time: number }
-  | { state: 'renderingHighRes'; time: number };
+  | { renderingState: 'renderingLowRes'; time: number }
+  | { renderingState: 'renderingHighRes'; time: number };
+
+type State = RenderingState & {
+  hasRenderedOnce: boolean;
+};
 
 type Action =
   | { type: 'newTime'; time: number }
@@ -17,16 +21,16 @@ type Action =
 function reducer(state: State, action: Action): State {
   switch (action.type) {
     case 'newTime':
-      return { state: 'renderingLowRes', time: action.time };
+      return { ...state, renderingState: 'renderingLowRes', time: action.time };
     case 'doneRenderingLowRes':
-      if (state.state === 'renderingLowRes' && state.time === action.time) {
-        return { state: 'renderingHighRes', time: state.time };
+      if (state.renderingState === 'renderingLowRes' && state.time === action.time) {
+        return { renderingState: 'renderingHighRes', time: state.time, hasRenderedOnce: true };
       } else {
         return state;
       }
     case 'doneRenderingHighRes':
-      if (state.state === 'renderingHighRes' && state.time === action.time) {
-        return { state: 'idle', time: state.time };
+      if (state.renderingState === 'renderingHighRes' && state.time === action.time) {
+        return { renderingState: 'idle', time: state.time, hasRenderedOnce: true };
       } else {
         return state;
       }
@@ -34,14 +38,18 @@ function reducer(state: State, action: Action): State {
 }
 
 export function useMapUpdater(canvasRef: RefObject<HTMLCanvasElement | null>, time: number) {
-  const [state, dispatch] = useReducer<State, [Action]>(reducer, { state: 'idle', time });
+  const [state, dispatch] = useReducer<State, [Action]>(reducer, {
+    renderingState: 'idle',
+    time,
+    hasRenderedOnce: false,
+  });
 
   useEffect(() => {
     dispatch({ type: 'newTime', time });
   }, [time]);
 
   useEffect(() => {
-    if (state.state !== 'renderingLowRes') return;
+    if (state.renderingState !== 'renderingLowRes') return;
 
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -64,7 +72,7 @@ export function useMapUpdater(canvasRef: RefObject<HTMLCanvasElement | null>, ti
   }, [canvasRef, state]);
 
   useEffect(() => {
-    if (state.state !== 'renderingHighRes') return;
+    if (state.renderingState !== 'renderingHighRes') return;
 
     let abortController: AbortController | undefined;
 
@@ -97,4 +105,6 @@ export function useMapUpdater(canvasRef: RefObject<HTMLCanvasElement | null>, ti
       abortController?.abort();
     };
   }, [canvasRef, state]);
+
+  return { hasRenderedOnce: state.hasRenderedOnce };
 }

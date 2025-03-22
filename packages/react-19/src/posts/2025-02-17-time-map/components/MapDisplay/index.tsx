@@ -10,26 +10,28 @@ export function MapDisplay({ time }: { time: number }) {
 
   const selectedItems = useSelectionStore((state) => state.selectedItems);
 
-  useMapUpdater(canvasRef, time);
+  const { hasRenderedOnce } = useMapUpdater(canvasRef, time);
 
   return (
     <div className="max-w-full relative">
       <canvas className="max-w-full" ref={canvasRef} width={canvasWidth} height={canvasHeight} />
-      {selectedItems.map((selectionItem) => {
-        if (!selectionItem.itemId) {
-          return null;
-        }
+      {hasRenderedOnce
+        ? selectedItems.map((selectionItem) => {
+            if (!selectionItem.itemId) {
+              return null;
+            }
 
-        const item = selectionDataById[selectionItem.itemId];
+            const item = selectionDataById[selectionItem.itemId];
 
-        const city = item.type === 'city' ? item : item.representativeCity;
+            const city = item.type === 'city' ? item : item.representativeCity;
 
-        if (!city) {
-          return null;
-        }
+            if (!city) {
+              return null;
+            }
 
-        return <CityDisplay key={selectionItem.rowId} city={city} time={time}></CityDisplay>;
-      })}
+            return <CityDisplay key={selectionItem.rowId} city={city} time={time}></CityDisplay>;
+          })
+        : null}
     </div>
   );
 }
