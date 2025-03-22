@@ -16,7 +16,7 @@ export function TimezoneSelection({
   currentSelection: SelectionData | null;
   selectionData: SelectionData[];
   onChangeId: (selectionId: string | null, isDeleting: boolean) => void;
-  onChangeTime: (time: DateTime) => void;
+  onChangeTime: (t: DateTime) => void;
   isNew?: boolean;
 }) {
   const shouldShowDeleteButton = !currentSelection && !isNew;
