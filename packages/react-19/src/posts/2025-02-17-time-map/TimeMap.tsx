@@ -4,7 +4,7 @@ import { MapDisplay } from './components/MapDisplay';
 import { TimezoneSelection } from './components/TimezoneSelection';
 import { useQuery } from '@tanstack/react-query';
 import { loadSelectionData } from './assets';
-import { TimeBar } from './components/TimeBar';
+import { DayDisplayBar } from './components/DayDisplayBar';
 import { useSelectionStore } from './store';
 
 export function TimeMap() {
@@ -28,13 +28,16 @@ export function TimeMap() {
         <MapDisplay
           time={time.valueOf()}
           selectionDataById={selectionDataQuery.data?.selectionDataById ?? {}}
+          setTime={(ms) => {
+            setTime(DateTime.fromMillis(ms));
+          }}
         />
-        <TimeBar
+        <DayDisplayBar
           time={time.valueOf()}
           setTime={(ms) => {
             setTime(DateTime.fromMillis(ms));
           }}
-        ></TimeBar>
+        ></DayDisplayBar>
       </div>
       <div className="flex-1 min-h-0 md:max-w-[28rem] flex flex-col gap-4">
         {selectionDataQuery.isSuccess ? (

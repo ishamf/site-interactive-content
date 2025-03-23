@@ -10,7 +10,13 @@ import { useGrabTime } from '../../utils';
 
 const DAY_LENGTH = 24 * 3600 * 1000;
 
-export function TimeBar({ time, setTime }: { time: number; setTime: (time: number) => void }) {
+export function DayDisplayBar({
+  time,
+  setTime,
+}: {
+  time: number;
+  setTime: (time: number) => void;
+}) {
   const currentDaysSinceEpoch = Math.floor(time / DAY_LENGTH);
   const dayPercentage = (flMod(time, DAY_LENGTH) / DAY_LENGTH) * 100;
 
