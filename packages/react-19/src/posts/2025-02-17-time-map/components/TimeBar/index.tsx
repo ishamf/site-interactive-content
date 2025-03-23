@@ -9,10 +9,10 @@ export function TimeBar({ time, setTime }: { time: DateTime; setTime: (time: Dat
   const utcTime = time.toUTC();
 
   return (
-    <div className="flex mt-4 flex-col md:flex-row justify-between gap-4 w-full items-center contain-inline-size">
-      <p className="text-neutral-700 dark:text-neutral-300 min-w-0 text-center">
-        <span className="whitespace-nowrap">{utcTime.toLocaleString(DateTime.DATETIME_FULL)}</span>{' '}
-        <span className="whitespace-nowrap">
+    <div className="flex flex-col md:flex-row justify-between gap-4 w-full items-center contain-inline-size">
+      <p className="text-neutral-700 dark:text-neutral-300 min-w-40 text-center">
+        <span className="inline-block">{utcTime.toLocaleString(DateTime.DATETIME_FULL)}</span>
+        <span className="inline-block">
           (<RelativeTime time={utcTime} />)
         </span>
       </p>

@@ -9,6 +9,7 @@ import { loadSelectionData } from './assets';
 import { DayDisplayBar } from './components/DayDisplayBar';
 import { useSelectionStore } from './store';
 import { TimeBar } from './components/TimeBar';
+import { useMediaQuery } from 'usehooks-ts';
 
 export function TimeMap() {
   const [time, setTime] = useState<DateTime>(() => DateTime.now());
@@ -34,11 +35,22 @@ export function TimeMap() {
 
   const refsByRowId: RefObject<Record<string, ComponentRef<typeof TimezoneSelection>>> = useRef({});
 
+  const isWidescreen = useMediaQuery('(width >= 48rem)');
+
+  const timeBarNode = (
+    <TimeBar
+      time={time}
+      setTime={(time) => {
+        setTime(time);
+      }}
+    ></TimeBar>
+  );
+
   return (
-    <div className="flex max-w-full flex-col px-4 pb-4 gap-x-4 items-stretch justify-center md:flex-row md:items-start bg-neutral-50 dark:bg-neutral-900">
+    <div className="flex max-w-full flex-col px-4 gap-x-4 items-stretch justify-center md:flex-row md:items-start bg-neutral-50 dark:bg-neutral-900">
       <div
         style={{ maxWidth: 'calc(200vh - 16rem)' }}
-        className="flex-1 z-10 self-center md:self-start sticky top-0 pt-4 pb-2 flex items-stretch flex-col bg-neutral-50 dark:bg-neutral-900"
+        className="flex-1 z-10 self-center md:self-start sticky top-0 pt-4 pb-2 md:pb-4 flex items-stretch flex-col bg-neutral-50 dark:bg-neutral-900"
       >
         <MapDisplay
           time={time.valueOf()}
@@ -60,14 +72,10 @@ export function TimeMap() {
             setTime(DateTime.fromMillis(ms));
           }}
         ></DayDisplayBar>
-        <TimeBar
-          time={time}
-          setTime={(time) => {
-            setTime(time);
-          }}
-        ></TimeBar>
+        {isWidescreen ? <div className="mt-4">{timeBarNode}</div> : null}
       </div>
-      <div className="flex-1 pt-4 min-h-0 md:max-w-[28rem] flex flex-col gap-4">
+      <div className="flex-1 md:pt-4 pb-4 min-h-0 md:max-w-[28rem] flex flex-col gap-4">
+        {!isWidescreen ? timeBarNode : null}
         {selectionDataQuery.isSuccess ? (
           <>
             <DndContext
