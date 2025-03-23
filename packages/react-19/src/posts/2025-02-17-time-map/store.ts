@@ -3,15 +3,52 @@ import { create } from 'zustand';
 import { persist, combine } from 'zustand/middleware';
 import { nanoid } from 'nanoid';
 import { arrayMove } from '@dnd-kit/sortable';
+import { LoadableSelectionData } from './assets';
 
 interface Selection {
   itemId: string | null;
   rowId: string;
 }
 
+const INITIAL_CITY_IDS = [
+  '5368361', // Los Angeles
+  '5128581', // New York
+  '2643743', // London
+  '1275339', // Mumbai
+  '1642911', // Jakarta
+  '1850147', // Tokyo
+];
+
 export const useSelectionStore = create(
   persist(
-    combine({ selectedItems: [] as Selection[] }, (set) => ({
+    combine({ selectedItems: [] as Selection[] }, (set, get) => ({
+      preloadSelection: (data: LoadableSelectionData) => {
+        if (get().selectedItems.length > 0) {
+          return;
+        }
+
+        const localTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+        let localSelection = data.selectionData.find(
+          (selection) => selection.type === 'timezone' && selection.timezone === localTimeZone
+        );
+
+        if (
+          localSelection &&
+          localSelection.type === 'timezone' &&
+          localSelection.representativeCity
+        ) {
+          localSelection = localSelection.representativeCity;
+        }
+
+        const newIds = localSelection ? [localSelection.id] : [];
+
+        newIds.push(...INITIAL_CITY_IDS.filter((id) => id !== localSelection?.id));
+
+        set({
+          selectedItems: newIds.map((itemId) => ({ itemId, rowId: nanoid() })),
+        });
+      },
       addNewSelection: (itemId: string) => {
         set((state) => ({
           selectedItems: [...state.selectedItems, { itemId, rowId: nanoid() }],

@@ -12,3 +12,5 @@ export async function loadSelectionData() {
 
   return { selectionData, selectionDataById };
 }
+
+export type LoadableSelectionData = Awaited<ReturnType<typeof loadSelectionData>>;

@@ -1,4 +1,4 @@
-import { ComponentRef, RefObject, useRef, useState } from 'react';
+import { ComponentRef, RefObject, useEffect, useRef, useState } from 'react';
 import { DateTime } from 'luxon';
 import { DndContext } from '@dnd-kit/core';
 import { SortableContext } from '@dnd-kit/sortable';
@@ -14,6 +14,7 @@ export function TimeMap() {
   const [time, setTime] = useState<DateTime>(() => DateTime.now());
 
   const selectionStore = useSelectionStore();
+  const preloadSelection = selectionStore.preloadSelection;
 
   const { selectedItems } = selectionStore;
 
@@ -25,13 +26,19 @@ export function TimeMap() {
     staleTime: Infinity,
   });
 
+  useEffect(() => {
+    if (selectionDataQuery.isSuccess) {
+      preloadSelection(selectionDataQuery.data);
+    }
+  }, [selectionDataQuery.data, selectionDataQuery.isSuccess, preloadSelection]);
+
   const refsByRowId: RefObject<Record<string, ComponentRef<typeof TimezoneSelection>>> = useRef({});
 
   return (
-    <div className="flex max-w-full flex-col px-4 gap-4 items-stretch justify-center md:flex-row md:items-start bg-neutral-50 dark:bg-neutral-900">
+    <div className="flex max-w-full flex-col px-4 pb-4 gap-x-4 items-stretch justify-center md:flex-row md:items-start bg-neutral-50 dark:bg-neutral-900">
       <div
         style={{ maxWidth: 'calc(200vh - 16rem)' }}
-        className="flex-1 z-10 self-center md:self-start sticky top-0 py-4 flex items-stretch flex-col bg-neutral-50 dark:bg-neutral-900"
+        className="flex-1 z-10 self-center md:self-start sticky top-0 pt-4 pb-2 flex items-stretch flex-col bg-neutral-50 dark:bg-neutral-900"
       >
         <MapDisplay
           time={time.valueOf()}
@@ -60,7 +67,7 @@ export function TimeMap() {
           }}
         ></TimeBar>
       </div>
-      <div className="flex-1 py-4 min-h-0 md:max-w-[28rem] flex flex-col gap-4">
+      <div className="flex-1 pt-4 min-h-0 md:max-w-[28rem] flex flex-col gap-4">
         {selectionDataQuery.isSuccess ? (
           <>
             <DndContext
