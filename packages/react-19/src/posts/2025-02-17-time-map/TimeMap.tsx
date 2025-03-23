@@ -6,6 +6,7 @@ import { useQuery } from '@tanstack/react-query';
 import { loadSelectionData } from './assets';
 import { DayDisplayBar } from './components/DayDisplayBar';
 import { useSelectionStore } from './store';
+import { TimeBar } from './components/TimeBar';
 
 export function TimeMap() {
   const [time, setTime] = useState<DateTime>(() => DateTime.now());
@@ -24,7 +25,10 @@ export function TimeMap() {
 
   return (
     <div className="flex max-w-full flex-col p-4 gap-4 items-stretch justify-center md:flex-row md:items-start bg-neutral-50 dark:bg-neutral-900">
-      <div className="max-w-[170vh] flex-1 z-10 self-center md:self-start sticky top-0 py-4 flex items-stretch flex-col bg-neutral-50 dark:bg-neutral-900">
+      <div
+        style={{ maxWidth: 'calc(200vh - 16rem)' }}
+        className="flex-1 z-10 self-center md:self-start sticky top-0 py-4 flex items-stretch flex-col bg-neutral-50 dark:bg-neutral-900"
+      >
         <MapDisplay
           time={time.valueOf()}
           selectionDataById={selectionDataQuery.data?.selectionDataById ?? {}}
@@ -38,6 +42,12 @@ export function TimeMap() {
             setTime(DateTime.fromMillis(ms));
           }}
         ></DayDisplayBar>
+        <TimeBar
+          time={time}
+          setTime={(time) => {
+            setTime(time);
+          }}
+        ></TimeBar>
       </div>
       <div className="flex-1 min-h-0 md:max-w-[28rem] flex flex-col gap-4">
         {selectionDataQuery.isSuccess ? (
