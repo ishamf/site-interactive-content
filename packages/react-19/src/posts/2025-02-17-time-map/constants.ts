@@ -1,3 +1,7 @@
+export const DAY_LENGTH = 24 * 3600 * 1000;
+
+export const EPOCH_START_DAY = 4; // Thursday
+
 export const canvasWidth = 3600;
 export const canvasHeight = 1800;
 

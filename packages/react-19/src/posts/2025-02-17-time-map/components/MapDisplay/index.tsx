@@ -6,13 +6,17 @@ import { CityDisplay } from './CityDisplay';
 import { useCityDisplayStore } from './cityLayout';
 import { useElementSize } from '../../../../utils/hooks';
 import { SelectionData } from '../../assets';
+import { useGrabTime } from '../../utils';
+import classNames from 'classnames';
 
 export function MapDisplay({
   time,
   selectionDataById,
+  setTime,
 }: {
   time: number;
   selectionDataById: Record<string, SelectionData | undefined>;
+  setTime: (time: number) => void;
 }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -31,9 +35,20 @@ export function MapDisplay({
     },
   });
 
+  const { isGrabbing, listeners } = useGrabTime({ container: canvasRef.current, time, setTime });
+
   return (
     <div className="max-w-full relative">
-      <canvas className="max-w-full" ref={canvasRef} width={canvasWidth} height={canvasHeight} />
+      <canvas
+        {...listeners}
+        className={classNames('max-w-full select-none touch-pan-y', {
+          'cursor-grabbing': isGrabbing,
+          'cursor-grab': !isGrabbing,
+        })}
+        ref={canvasRef}
+        width={canvasWidth}
+        height={canvasHeight}
+      />
       {hasRenderedOnce
         ? selectedItems.map((selectionItem) => {
             if (!selectionItem.itemId) {
