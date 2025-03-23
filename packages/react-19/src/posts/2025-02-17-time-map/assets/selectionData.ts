@@ -23,15 +23,34 @@ interface TimezoneSelectionData extends BaseSelectionData {
 
 export type SelectionData = CitySelectionData | TimezoneSelectionData;
 
-const supportedTimezones = new Set(Intl.supportedValuesOf('timeZone'));
+const supportedSystemTimezones = new Set(Intl.supportedValuesOf('timeZone'));
+
+const timezoneIdToSystemTimezone = new Map<string, string>();
+
+for (const timezone of timezoneData) {
+  if (supportedSystemTimezones.has(timezone.TimeZoneId)) {
+    timezoneIdToSystemTimezone.set(timezone.TimeZoneId, timezone.TimeZoneId);
+  }
+
+  if (timezone.links) {
+    for (const link of timezone.links) {
+      if (
+        supportedSystemTimezones.has(link) &&
+        !timezoneIdToSystemTimezone.has(timezone.TimeZoneId)
+      ) {
+        timezoneIdToSystemTimezone.set(timezone.TimeZoneId, link);
+      }
+    }
+  }
+}
 
 const citiesSelectionData: CitySelectionData[] = citiesData
-  .filter((city) => supportedTimezones.has(city.timezone))
+  .filter((city) => timezoneIdToSystemTimezone.has(city.timezone))
   .map((city) => ({
     type: 'city',
     id: city.id.toString(),
     label: city.name,
-    timezone: city.timezone,
+    timezone: timezoneIdToSystemTimezone.get(city.timezone) ?? city.timezone,
     longitude: city.longitude,
     latitude: city.latitude,
     country: city.country_name,
@@ -48,7 +67,7 @@ const citiesSelectionDataById = citiesSelectionData.reduce(
 );
 
 const timezoneSelectionData: TimezoneSelectionData[] = timezoneData
-  .filter((timezone) => supportedTimezones.has(timezone.TimeZoneId))
+  .filter((timezone) => timezoneIdToSystemTimezone.has(timezone.TimeZoneId))
   .map((timezone) => {
     const representativeCity =
       timezone.city && citiesSelectionDataById[timezone.city.toString()]
@@ -59,7 +78,7 @@ const timezoneSelectionData: TimezoneSelectionData[] = timezoneData
       type: 'timezone',
       id: timezone.TimeZoneId.toString(),
       label: timezone.TimeZoneId,
-      timezone: timezone.TimeZoneId,
+      timezone: timezoneIdToSystemTimezone.get(timezone.TimeZoneId)!,
       representativeCity,
     };
   });

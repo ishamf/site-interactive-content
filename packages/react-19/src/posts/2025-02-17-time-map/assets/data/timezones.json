@@ -2,7 +2,8 @@
   {
     "TimeZoneId": "Africa/Abidjan",
     "CountryCode": "CI",
-    "city": 2293538
+    "city": 2293538,
+    "links": ["Africa/Timbuktu"]
   },
   {
     "TimeZoneId": "Africa/Accra",
@@ -71,8 +72,7 @@
   },
   {
     "TimeZoneId": "Africa/Ceuta",
-    "CountryCode": "ES",
-    "city": null
+    "CountryCode": "ES"
   },
   {
     "TimeZoneId": "Africa/Conakry",
@@ -212,7 +212,8 @@
   {
     "TimeZoneId": "Africa/Nairobi",
     "CountryCode": "KE",
-    "city": 184745
+    "city": 184745,
+    "links": ["Africa/Asmera"]
   },
   {
     "TimeZoneId": "Africa/Ndjamena",
@@ -256,18 +257,19 @@
   },
   {
     "TimeZoneId": "Africa/Windhoek",
-    "CountryCode": null,
+    "CountryCode": "NA",
     "city": 3352136
   },
   {
     "TimeZoneId": "America/Adak",
     "CountryCode": "US",
-    "city": null
+    "links": ["US/Aleutian", "America/Atka"]
   },
   {
     "TimeZoneId": "America/Anchorage",
     "CountryCode": "US",
-    "city": 5879400
+    "city": 5879400,
+    "links": ["US/Alaska"]
   },
   {
     "TimeZoneId": "America/Anguilla",
@@ -287,22 +289,26 @@
   {
     "TimeZoneId": "America/Argentina/Buenos_Aires",
     "CountryCode": "AR",
-    "city": 3435910
+    "city": 3435910,
+    "links": ["America/Buenos_Aires"]
   },
   {
     "TimeZoneId": "America/Argentina/Catamarca",
     "CountryCode": "AR",
-    "city": 3837702
+    "city": 3837702,
+    "links": ["America/Catamarca", "America/Argentina/ComodRivadavia"]
   },
   {
     "TimeZoneId": "America/Argentina/Cordoba",
     "CountryCode": "AR",
-    "city": 3860259
+    "city": 3860259,
+    "links": ["America/Cordoba", "America/Rosario"]
   },
   {
     "TimeZoneId": "America/Argentina/Jujuy",
     "CountryCode": "AR",
-    "city": 3836564
+    "city": 3836564,
+    "links": ["America/Jujuy"]
   },
   {
     "TimeZoneId": "America/Argentina/La_Rioja",
@@ -312,7 +318,8 @@
   {
     "TimeZoneId": "America/Argentina/Mendoza",
     "CountryCode": "AR",
-    "city": 3836669
+    "city": 3836669,
+    "links": ["America/Mendoza"]
   },
   {
     "TimeZoneId": "America/Argentina/Rio_Gallegos",
@@ -341,8 +348,7 @@
   },
   {
     "TimeZoneId": "America/Argentina/Ushuaia",
-    "CountryCode": "AR",
-    "city": null
+    "CountryCode": "AR"
   },
   {
     "TimeZoneId": "America/Aruba",
@@ -356,8 +362,7 @@
   },
   {
     "TimeZoneId": "America/Atikokan",
-    "CountryCode": "CA",
-    "city": null
+    "CountryCode": "CA"
   },
   {
     "TimeZoneId": "America/Bahia",
@@ -366,8 +371,7 @@
   },
   {
     "TimeZoneId": "America/Bahia_Banderas",
-    "CountryCode": "MX",
-    "city": null
+    "CountryCode": "MX"
   },
   {
     "TimeZoneId": "America/Barbados",
@@ -386,8 +390,7 @@
   },
   {
     "TimeZoneId": "America/Blanc-Sablon",
-    "CountryCode": "CA",
-    "city": null
+    "CountryCode": "CA"
   },
   {
     "TimeZoneId": "America/Boa_Vista",
@@ -406,8 +409,7 @@
   },
   {
     "TimeZoneId": "America/Cambridge_Bay",
-    "CountryCode": "CA",
-    "city": null
+    "CountryCode": "CA"
   },
   {
     "TimeZoneId": "America/Campo_Grande",
@@ -437,7 +439,8 @@
   {
     "TimeZoneId": "America/Chicago",
     "CountryCode": "US",
-    "city": 4887398
+    "city": 4887398,
+    "links": ["US/Central"]
   },
   {
     "TimeZoneId": "America/Chihuahua",
@@ -456,8 +459,7 @@
   },
   {
     "TimeZoneId": "America/Creston",
-    "CountryCode": "CA",
-    "city": null
+    "CountryCode": "CA"
   },
   {
     "TimeZoneId": "America/Cuiaba",
@@ -471,28 +473,27 @@
   },
   {
     "TimeZoneId": "America/Danmarkshavn",
-    "CountryCode": "GL",
-    "city": null
+    "CountryCode": "GL"
   },
   {
     "TimeZoneId": "America/Dawson",
-    "CountryCode": "CA",
-    "city": null
+    "CountryCode": "CA"
   },
   {
     "TimeZoneId": "America/Dawson_Creek",
-    "CountryCode": "CA",
-    "city": null
+    "CountryCode": "CA"
   },
   {
     "TimeZoneId": "America/Denver",
     "CountryCode": "US",
-    "city": 5419384
+    "city": 5419384,
+    "links": ["US/Mountain", "America/Shiprock"]
   },
   {
     "TimeZoneId": "America/Detroit",
     "CountryCode": "US",
-    "city": 4990729
+    "city": 4990729,
+    "links": ["US/Michigan"]
   },
   {
     "TimeZoneId": "America/Dominica",
@@ -502,12 +503,12 @@
   {
     "TimeZoneId": "America/Edmonton",
     "CountryCode": "CA",
-    "city": 5913490
+    "city": 5913490,
+    "links": ["Canada/Mountain"]
   },
   {
     "TimeZoneId": "America/Eirunepe",
-    "CountryCode": "BR",
-    "city": null
+    "CountryCode": "BR"
   },
   {
     "TimeZoneId": "America/El_Salvador",
@@ -516,8 +517,7 @@
   },
   {
     "TimeZoneId": "America/Fort_Nelson",
-    "CountryCode": "CA",
-    "city": null
+    "CountryCode": "CA"
   },
   {
     "TimeZoneId": "America/Fortaleza",
@@ -531,8 +531,7 @@
   },
   {
     "TimeZoneId": "America/Goose_Bay",
-    "CountryCode": "CA",
-    "city": null
+    "CountryCode": "CA"
   },
   {
     "TimeZoneId": "America/Grand_Turk",
@@ -567,7 +566,8 @@
   {
     "TimeZoneId": "America/Halifax",
     "CountryCode": "CA",
-    "city": 6324729
+    "city": 6324729,
+    "links": ["Canada/Atlantic"]
   },
   {
     "TimeZoneId": "America/Havana",
@@ -582,52 +582,46 @@
   {
     "TimeZoneId": "America/Indiana/Indianapolis",
     "CountryCode": "US",
-    "city": 4259418
+    "city": 4259418,
+    "links": ["US/East-Indiana", "America/Indianapolis", "America/Fort_Wayne"]
   },
   {
     "TimeZoneId": "America/Indiana/Knox",
     "CountryCode": "US",
-    "city": null
+    "links": ["US/Indiana-Starke", "America/Knox_IN"]
   },
   {
     "TimeZoneId": "America/Indiana/Marengo",
-    "CountryCode": "US",
-    "city": null
+    "CountryCode": "US"
   },
   {
     "TimeZoneId": "America/Indiana/Petersburg",
-    "CountryCode": "US",
-    "city": null
+    "CountryCode": "US"
   },
   {
     "TimeZoneId": "America/Indiana/Tell_City",
-    "CountryCode": "US",
-    "city": null
+    "CountryCode": "US"
   },
   {
     "TimeZoneId": "America/Indiana/Vevay",
-    "CountryCode": "US",
-    "city": null
+    "CountryCode": "US"
   },
   {
     "TimeZoneId": "America/Indiana/Vincennes",
-    "CountryCode": "US",
-    "city": null
+    "CountryCode": "US"
   },
   {
     "TimeZoneId": "America/Indiana/Winamac",
-    "CountryCode": "US",
-    "city": null
+    "CountryCode": "US"
   },
   {
     "TimeZoneId": "America/Inuvik",
-    "CountryCode": "CA",
-    "city": null
+    "CountryCode": "CA"
   },
   {
     "TimeZoneId": "America/Iqaluit",
     "CountryCode": "CA",
-    "city": null
+    "links": ["America/Pangnirtung"]
   },
   {
     "TimeZoneId": "America/Jamaica",
@@ -636,18 +630,17 @@
   },
   {
     "TimeZoneId": "America/Juneau",
-    "CountryCode": "US",
-    "city": null
+    "CountryCode": "US"
   },
   {
     "TimeZoneId": "America/Kentucky/Louisville",
     "CountryCode": "US",
-    "city": 4299276
+    "city": 4299276,
+    "links": ["America/Louisville"]
   },
   {
     "TimeZoneId": "America/Kentucky/Monticello",
-    "CountryCode": "US",
-    "city": null
+    "CountryCode": "US"
   },
   {
     "TimeZoneId": "America/Kralendijk",
@@ -667,7 +660,8 @@
   {
     "TimeZoneId": "America/Los_Angeles",
     "CountryCode": "US",
-    "city": 5368361
+    "city": 5368361,
+    "links": ["US/Pacific"]
   },
   {
     "TimeZoneId": "America/Lower_Princes",
@@ -687,7 +681,8 @@
   {
     "TimeZoneId": "America/Manaus",
     "CountryCode": "BR",
-    "city": 3663517
+    "city": 3663517,
+    "links": ["Brazil/West"]
   },
   {
     "TimeZoneId": "America/Marigot",
@@ -707,12 +702,12 @@
   {
     "TimeZoneId": "America/Mazatlan",
     "CountryCode": "MX",
-    "city": 4012176
+    "city": 4012176,
+    "links": ["Mexico/BajaSur"]
   },
   {
     "TimeZoneId": "America/Menominee",
-    "CountryCode": "US",
-    "city": null
+    "CountryCode": "US"
   },
   {
     "TimeZoneId": "America/Merida",
@@ -721,13 +716,13 @@
   },
   {
     "TimeZoneId": "America/Metlakatla",
-    "CountryCode": "US",
-    "city": null
+    "CountryCode": "US"
   },
   {
     "TimeZoneId": "America/Mexico_City",
     "CountryCode": "MX",
-    "city": 3530597
+    "city": 3530597,
+    "links": ["Mexico/General"]
   },
   {
     "TimeZoneId": "America/Miquelon",
@@ -762,47 +757,45 @@
   {
     "TimeZoneId": "America/New_York",
     "CountryCode": "US",
-    "city": 5128581
+    "city": 5128581,
+    "links": ["US/Eastern"]
   },
   {
     "TimeZoneId": "America/Nome",
-    "CountryCode": "US",
-    "city": null
+    "CountryCode": "US"
   },
   {
     "TimeZoneId": "America/Noronha",
     "CountryCode": "BR",
-    "city": null
+    "links": ["Brazil/DeNoronha"]
   },
   {
     "TimeZoneId": "America/North_Dakota/Beulah",
-    "CountryCode": "US",
-    "city": null
+    "CountryCode": "US"
   },
   {
     "TimeZoneId": "America/North_Dakota/Center",
-    "CountryCode": "US",
-    "city": null
+    "CountryCode": "US"
   },
   {
     "TimeZoneId": "America/North_Dakota/New_Salem",
-    "CountryCode": "US",
-    "city": null
+    "CountryCode": "US"
   },
   {
     "TimeZoneId": "America/Nuuk",
     "CountryCode": "GL",
-    "city": 3421319
+    "city": 3421319,
+    "links": ["America/Godthab"]
   },
   {
     "TimeZoneId": "America/Ojinaga",
-    "CountryCode": "MX",
-    "city": null
+    "CountryCode": "MX"
   },
   {
     "TimeZoneId": "America/Panama",
     "CountryCode": "PA",
-    "city": 3703443
+    "city": 3703443,
+    "links": ["America/Coral_Harbour"]
   },
   {
     "TimeZoneId": "America/Paramaribo",
@@ -812,7 +805,8 @@
   {
     "TimeZoneId": "America/Phoenix",
     "CountryCode": "US",
-    "city": 5308655
+    "city": 5308655,
+    "links": ["US/Arizona"]
   },
   {
     "TimeZoneId": "America/Port-au-Prince",
@@ -832,7 +826,8 @@
   {
     "TimeZoneId": "America/Puerto_Rico",
     "CountryCode": "PR",
-    "city": 4568127
+    "city": 4568127,
+    "links": ["America/Virgin"]
   },
   {
     "TimeZoneId": "America/Punta_Arenas",
@@ -841,8 +836,7 @@
   },
   {
     "TimeZoneId": "America/Rankin_Inlet",
-    "CountryCode": "CA",
-    "city": null
+    "CountryCode": "CA"
   },
   {
     "TimeZoneId": "America/Recife",
@@ -852,17 +846,18 @@
   {
     "TimeZoneId": "America/Regina",
     "CountryCode": "CA",
-    "city": 6141256
+    "city": 6141256,
+    "links": ["Canada/Saskatchewan"]
   },
   {
     "TimeZoneId": "America/Resolute",
-    "CountryCode": "CA",
-    "city": null
+    "CountryCode": "CA"
   },
   {
     "TimeZoneId": "America/Rio_Branco",
     "CountryCode": "BR",
-    "city": 3662574
+    "city": 3662574,
+    "links": ["Brazil/Acre", "America/Porto_Acre"]
   },
   {
     "TimeZoneId": "America/Santarem",
@@ -872,7 +867,8 @@
   {
     "TimeZoneId": "America/Santiago",
     "CountryCode": "CL",
-    "city": 3871336
+    "city": 3871336,
+    "links": ["Chile/Continental"]
   },
   {
     "TimeZoneId": "America/Santo_Domingo",
@@ -882,17 +878,16 @@
   {
     "TimeZoneId": "America/Sao_Paulo",
     "CountryCode": "BR",
-    "city": 3448439
+    "city": 3448439,
+    "links": ["Brazil/East"]
   },
   {
     "TimeZoneId": "America/Scoresbysund",
-    "CountryCode": "GL",
-    "city": null
+    "CountryCode": "GL"
   },
   {
     "TimeZoneId": "America/Sitka",
-    "CountryCode": "US",
-    "city": null
+    "CountryCode": "US"
   },
   {
     "TimeZoneId": "America/St_Barthelemy",
@@ -902,7 +897,8 @@
   {
     "TimeZoneId": "America/St_Johns",
     "CountryCode": "CA",
-    "city": 6324733
+    "city": 6324733,
+    "links": ["Canada/Newfoundland"]
   },
   {
     "TimeZoneId": "America/St_Kitts",
@@ -926,8 +922,7 @@
   },
   {
     "TimeZoneId": "America/Swift_Current",
-    "CountryCode": "CA",
-    "city": null
+    "CountryCode": "CA"
   },
   {
     "TimeZoneId": "America/Tegucigalpa",
@@ -936,18 +931,19 @@
   },
   {
     "TimeZoneId": "America/Thule",
-    "CountryCode": "GL",
-    "city": null
+    "CountryCode": "GL"
   },
   {
     "TimeZoneId": "America/Tijuana",
     "CountryCode": "MX",
-    "city": 3981609
+    "city": 3981609,
+    "links": ["Mexico/BajaNorte", "America/Ensenada", "America/Santa_Isabel"]
   },
   {
     "TimeZoneId": "America/Toronto",
     "CountryCode": "CA",
-    "city": 6167865
+    "city": 6167865,
+    "links": ["Canada/Eastern", "America/Montreal", "America/Nipigon", "America/Thunder_Bay"]
   },
   {
     "TimeZoneId": "America/Tortola",
@@ -957,82 +953,71 @@
   {
     "TimeZoneId": "America/Vancouver",
     "CountryCode": "CA",
-    "city": 6173331
+    "city": 6173331,
+    "links": ["Canada/Pacific"]
   },
   {
     "TimeZoneId": "America/Whitehorse",
     "CountryCode": "CA",
-    "city": null
+    "links": ["Canada/Yukon"]
   },
   {
     "TimeZoneId": "America/Winnipeg",
     "CountryCode": "CA",
-    "city": 6183235
+    "city": 6183235,
+    "links": ["Canada/Central", "America/Rainy_River"]
   },
   {
     "TimeZoneId": "America/Yakutat",
-    "CountryCode": "US",
-    "city": null
+    "CountryCode": "US"
   },
   {
     "TimeZoneId": "America/Yellowknife",
-    "CountryCode": "CA",
-    "city": null
+    "CountryCode": "CA"
   },
   {
     "TimeZoneId": "Antarctica/Casey",
-    "CountryCode": "AQ",
-    "city": null
+    "CountryCode": "AQ"
   },
   {
     "TimeZoneId": "Antarctica/Davis",
-    "CountryCode": "AQ",
-    "city": null
+    "CountryCode": "AQ"
   },
   {
     "TimeZoneId": "Antarctica/DumontDUrville",
-    "CountryCode": "AQ",
-    "city": null
+    "CountryCode": "AQ"
   },
   {
     "TimeZoneId": "Antarctica/Macquarie",
-    "CountryCode": "AU",
-    "city": null
+    "CountryCode": "AU"
   },
   {
     "TimeZoneId": "Antarctica/Mawson",
-    "CountryCode": "AQ",
-    "city": null
+    "CountryCode": "AQ"
   },
   {
     "TimeZoneId": "Antarctica/McMurdo",
-    "CountryCode": "AQ",
-    "city": null
+    "CountryCode": "AQ"
   },
   {
     "TimeZoneId": "Antarctica/Palmer",
-    "CountryCode": "AQ",
-    "city": null
+    "CountryCode": "AQ"
   },
   {
     "TimeZoneId": "Antarctica/Rothera",
-    "CountryCode": "AQ",
-    "city": null
+    "CountryCode": "AQ"
   },
   {
     "TimeZoneId": "Antarctica/Syowa",
-    "CountryCode": "AQ",
-    "city": null
+    "CountryCode": "AQ"
   },
   {
     "TimeZoneId": "Antarctica/Troll",
-    "CountryCode": "AQ",
-    "city": null
+    "CountryCode": "AQ"
   },
   {
     "TimeZoneId": "Antarctica/Vostok",
-    "CountryCode": "AQ",
-    "city": null
+    "CountryCode": "AQ"
   },
   {
     "TimeZoneId": "Arctic/Longyearbyen",
@@ -1056,8 +1041,7 @@
   },
   {
     "TimeZoneId": "Asia/Anadyr",
-    "CountryCode": "RU",
-    "city": null
+    "CountryCode": "RU"
   },
   {
     "TimeZoneId": "Asia/Aqtau",
@@ -1072,7 +1056,8 @@
   {
     "TimeZoneId": "Asia/Ashgabat",
     "CountryCode": "TM",
-    "city": 162183
+    "city": 162183,
+    "links": ["Asia/Ashkhabad"]
   },
   {
     "TimeZoneId": "Asia/Atyrau",
@@ -1126,8 +1111,7 @@
   },
   {
     "TimeZoneId": "Asia/Choibalsan",
-    "CountryCode": "MN",
-    "city": null
+    "CountryCode": "MN"
   },
   {
     "TimeZoneId": "Asia/Colombo",
@@ -1142,7 +1126,8 @@
   {
     "TimeZoneId": "Asia/Dhaka",
     "CountryCode": "BD",
-    "city": 1185241
+    "city": 1185241,
+    "links": ["Asia/Dacca"]
   },
   {
     "TimeZoneId": "Asia/Dili",
@@ -1161,8 +1146,7 @@
   },
   {
     "TimeZoneId": "Asia/Famagusta",
-    "CountryCode": "CY",
-    "city": null
+    "CountryCode": "CY"
   },
   {
     "TimeZoneId": "Asia/Gaza",
@@ -1177,7 +1161,8 @@
   {
     "TimeZoneId": "Asia/Ho_Chi_Minh",
     "CountryCode": "VN",
-    "city": 1566083
+    "city": 1566083,
+    "links": ["Asia/Saigon"]
   },
   {
     "TimeZoneId": "Asia/Hong_Kong",
@@ -1186,8 +1171,7 @@
   },
   {
     "TimeZoneId": "Asia/Hovd",
-    "CountryCode": "MN",
-    "city": null
+    "CountryCode": "MN"
   },
   {
     "TimeZoneId": "Asia/Irkutsk",
@@ -1207,7 +1191,8 @@
   {
     "TimeZoneId": "Asia/Jerusalem",
     "CountryCode": "IL",
-    "city": 281184
+    "city": 281184,
+    "links": ["Asia/Tel_Aviv"]
   },
   {
     "TimeZoneId": "Asia/Kabul",
@@ -1227,17 +1212,18 @@
   {
     "TimeZoneId": "Asia/Kathmandu",
     "CountryCode": "NP",
-    "city": 1283240
+    "city": 1283240,
+    "links": ["Asia/Katmandu"]
   },
   {
     "TimeZoneId": "Asia/Khandyga",
-    "CountryCode": "RU",
-    "city": null
+    "CountryCode": "RU"
   },
   {
     "TimeZoneId": "Asia/Kolkata",
     "CountryCode": "IN",
-    "city": 1275339
+    "city": 1275339,
+    "links": ["Asia/Calcutta"]
   },
   {
     "TimeZoneId": "Asia/Krasnoyarsk",
@@ -1262,7 +1248,8 @@
   {
     "TimeZoneId": "Asia/Macau",
     "CountryCode": "MO",
-    "city": 1821274
+    "city": 1821274,
+    "links": ["Asia/Macao"]
   },
   {
     "TimeZoneId": "Asia/Magadan",
@@ -1272,7 +1259,8 @@
   {
     "TimeZoneId": "Asia/Makassar",
     "CountryCode": "ID",
-    "city": 1622786
+    "city": 1622786,
+    "links": ["Asia/Ujung_Pandang"]
   },
   {
     "TimeZoneId": "Asia/Manila",
@@ -1287,7 +1275,8 @@
   {
     "TimeZoneId": "Asia/Nicosia",
     "CountryCode": "CY",
-    "city": 146268
+    "city": 146268,
+    "links": ["Europe/Nicosia"]
   },
   {
     "TimeZoneId": "Asia/Novokuznetsk",
@@ -1362,7 +1351,8 @@
   {
     "TimeZoneId": "Asia/Shanghai",
     "CountryCode": "CN",
-    "city": 1796236
+    "city": 1796236,
+    "links": ["Asia/Chongqing", "Asia/Harbin", "Asia/Chungking"]
   },
   {
     "TimeZoneId": "Asia/Singapore",
@@ -1371,8 +1361,7 @@
   },
   {
     "TimeZoneId": "Asia/Srednekolymsk",
-    "CountryCode": "RU",
-    "city": null
+    "CountryCode": "RU"
   },
   {
     "TimeZoneId": "Asia/Taipei",
@@ -1397,7 +1386,8 @@
   {
     "TimeZoneId": "Asia/Thimphu",
     "CountryCode": "BT",
-    "city": 1252416
+    "city": 1252416,
+    "links": ["Asia/Thimbu"]
   },
   {
     "TimeZoneId": "Asia/Tokyo",
@@ -1412,17 +1402,18 @@
   {
     "TimeZoneId": "Asia/Ulaanbaatar",
     "CountryCode": "MN",
-    "city": 2028462
+    "city": 2028462,
+    "links": ["Asia/Ulan_Bator"]
   },
   {
     "TimeZoneId": "Asia/Urumqi",
     "CountryCode": "CN",
-    "city": 1529102
+    "city": 1529102,
+    "links": ["Asia/Kashgar"]
   },
   {
     "TimeZoneId": "Asia/Ust-Nera",
-    "CountryCode": "RU",
-    "city": null
+    "CountryCode": "RU"
   },
   {
     "TimeZoneId": "Asia/Vientiane",
@@ -1442,7 +1433,8 @@
   {
     "TimeZoneId": "Asia/Yangon",
     "CountryCode": "MM",
-    "city": 1298824
+    "city": 1298824,
+    "links": ["Asia/Rangoon"]
   },
   {
     "TimeZoneId": "Asia/Yekaterinburg",
@@ -1456,8 +1448,7 @@
   },
   {
     "TimeZoneId": "Atlantic/Azores",
-    "CountryCode": "PT",
-    "city": null
+    "CountryCode": "PT"
   },
   {
     "TimeZoneId": "Atlantic/Bermuda",
@@ -1477,7 +1468,8 @@
   {
     "TimeZoneId": "Atlantic/Faroe",
     "CountryCode": "FO",
-    "city": 2611396
+    "city": 2611396,
+    "links": ["Atlantic/Faeroe"]
   },
   {
     "TimeZoneId": "Atlantic/Madeira",
@@ -1507,57 +1499,62 @@
   {
     "TimeZoneId": "Australia/Adelaide",
     "CountryCode": "AU",
-    "city": 2078025
+    "city": 2078025,
+    "links": ["Australia/South"]
   },
   {
     "TimeZoneId": "Australia/Brisbane",
     "CountryCode": "AU",
-    "city": 2174003
+    "city": 2174003,
+    "links": ["Australia/Queensland"]
   },
   {
     "TimeZoneId": "Australia/Broken_Hill",
     "CountryCode": "AU",
-    "city": null
+    "links": ["Australia/Yancowinna"]
   },
   {
     "TimeZoneId": "Australia/Darwin",
     "CountryCode": "AU",
-    "city": 2073124
+    "city": 2073124,
+    "links": ["Australia/North"]
   },
   {
     "TimeZoneId": "Australia/Eucla",
-    "CountryCode": "AU",
-    "city": null
+    "CountryCode": "AU"
   },
   {
     "TimeZoneId": "Australia/Hobart",
     "CountryCode": "AU",
-    "city": 2163355
+    "city": 2163355,
+    "links": ["Australia/Tasmania", "Australia/Currie"]
   },
   {
     "TimeZoneId": "Australia/Lindeman",
-    "CountryCode": "AU",
-    "city": null
+    "CountryCode": "AU"
   },
   {
     "TimeZoneId": "Australia/Lord_Howe",
     "CountryCode": "AU",
-    "city": null
+    "links": ["Australia/LHI"]
   },
   {
     "TimeZoneId": "Australia/Melbourne",
     "CountryCode": "AU",
-    "city": 2158177
+    "city": 2158177,
+    "links": ["Australia/Victoria"]
   },
   {
     "TimeZoneId": "Australia/Perth",
     "CountryCode": "AU",
-    "city": 2063523
+    "city": 2063523,
+    "links": ["Australia/West"]
   },
   {
     "TimeZoneId": "Australia/Sydney",
     "CountryCode": "AU",
-    "city": 2147714
+    "city": 2147714,
+    "links": ["Australia/ACT", "Australia/NSW", "Australia/Canberra"]
   },
   {
     "TimeZoneId": "Europe/Amsterdam",
@@ -1587,7 +1584,8 @@
   {
     "TimeZoneId": "Europe/Berlin",
     "CountryCode": "DE",
-    "city": 2950159
+    "city": 2950159,
+    "links": ["Atlantic/Jan_Mayen"]
   },
   {
     "TimeZoneId": "Europe/Bratislava",
@@ -1611,13 +1609,13 @@
   },
   {
     "TimeZoneId": "Europe/Busingen",
-    "CountryCode": "DE",
-    "city": null
+    "CountryCode": "DE"
   },
   {
     "TimeZoneId": "Europe/Chisinau",
     "CountryCode": "MD",
-    "city": 618426
+    "city": 618426,
+    "links": ["Europe/Tiraspol"]
   },
   {
     "TimeZoneId": "Europe/Copenhagen",
@@ -1652,7 +1650,8 @@
   {
     "TimeZoneId": "Europe/Istanbul",
     "CountryCode": "TR",
-    "city": 745044
+    "city": 745044,
+    "links": ["Asia/Istanbul"]
   },
   {
     "TimeZoneId": "Europe/Jersey",
@@ -1672,7 +1671,8 @@
   {
     "TimeZoneId": "Europe/Kyiv",
     "CountryCode": "UA",
-    "city": 703448
+    "city": 703448,
+    "links": ["Europe/Uzhgorod", "Europe/Zaporozhye", "Europe/Kiev"]
   },
   {
     "TimeZoneId": "Europe/Lisbon",
@@ -1687,7 +1687,8 @@
   {
     "TimeZoneId": "Europe/London",
     "CountryCode": "GB",
-    "city": 2643743
+    "city": 2643743,
+    "links": ["Europe/Belfast"]
   },
   {
     "TimeZoneId": "Europe/Luxembourg",
@@ -1856,8 +1857,7 @@
   },
   {
     "TimeZoneId": "Indian/Chagos",
-    "CountryCode": "IO",
-    "city": null
+    "CountryCode": "IO"
   },
   {
     "TimeZoneId": "Indian/Christmas",
@@ -1912,27 +1912,25 @@
   {
     "TimeZoneId": "Pacific/Auckland",
     "CountryCode": "NZ",
-    "city": 2193733
+    "city": 2193733,
+    "links": ["Antarctica/South_Pole"]
   },
   {
     "TimeZoneId": "Pacific/Bougainville",
-    "CountryCode": "PG",
-    "city": null
+    "CountryCode": "PG"
   },
   {
     "TimeZoneId": "Pacific/Chatham",
-    "CountryCode": "NZ",
-    "city": null
+    "CountryCode": "NZ"
   },
   {
     "TimeZoneId": "Pacific/Chuuk",
-    "CountryCode": "FM",
-    "city": null
+    "CountryCode": "FM"
   },
   {
     "TimeZoneId": "Pacific/Easter",
     "CountryCode": "CL",
-    "city": null
+    "links": ["Chile/EasterIsland"]
   },
   {
     "TimeZoneId": "Pacific/Efate",
@@ -1941,8 +1939,7 @@
   },
   {
     "TimeZoneId": "Pacific/Fakaofo",
-    "CountryCode": "TK",
-    "city": null
+    "CountryCode": "TK"
   },
   {
     "TimeZoneId": "Pacific/Fiji",
@@ -1956,18 +1953,17 @@
   },
   {
     "TimeZoneId": "Pacific/Galapagos",
-    "CountryCode": "EC",
-    "city": null
+    "CountryCode": "EC"
   },
   {
     "TimeZoneId": "Pacific/Gambier",
-    "CountryCode": "PF",
-    "city": null
+    "CountryCode": "PF"
   },
   {
     "TimeZoneId": "Pacific/Guadalcanal",
     "CountryCode": "SB",
-    "city": 2108502
+    "city": 2108502,
+    "links": ["Pacific/Ponape"]
   },
   {
     "TimeZoneId": "Pacific/Guam",
@@ -1977,27 +1973,25 @@
   {
     "TimeZoneId": "Pacific/Honolulu",
     "CountryCode": "US",
-    "city": 5856195
+    "city": 5856195,
+    "links": ["US/Hawaii", "Pacific/Johnston"]
   },
   {
     "TimeZoneId": "Pacific/Kanton",
     "CountryCode": "KI",
-    "city": null
+    "links": ["Pacific/Enderbury"]
   },
   {
     "TimeZoneId": "Pacific/Kiritimati",
-    "CountryCode": "KI",
-    "city": null
+    "CountryCode": "KI"
   },
   {
     "TimeZoneId": "Pacific/Kosrae",
-    "CountryCode": "FM",
-    "city": null
+    "CountryCode": "FM"
   },
   {
     "TimeZoneId": "Pacific/Kwajalein",
-    "CountryCode": "MH",
-    "city": null
+    "CountryCode": "MH"
   },
   {
     "TimeZoneId": "Pacific/Majuro",
@@ -2006,13 +2000,11 @@
   },
   {
     "TimeZoneId": "Pacific/Marquesas",
-    "CountryCode": "PF",
-    "city": null
+    "CountryCode": "PF"
   },
   {
     "TimeZoneId": "Pacific/Midway",
-    "CountryCode": "UM",
-    "city": null
+    "CountryCode": "UM"
   },
   {
     "TimeZoneId": "Pacific/Nauru",
@@ -2037,7 +2029,8 @@
   {
     "TimeZoneId": "Pacific/Pago_Pago",
     "CountryCode": "AS",
-    "city": 5881576
+    "city": 5881576,
+    "links": ["US/Samoa", "Pacific/Samoa"]
   },
   {
     "TimeZoneId": "Pacific/Palau",
@@ -2057,7 +2050,8 @@
   {
     "TimeZoneId": "Pacific/Port_Moresby",
     "CountryCode": "PG",
-    "city": 2088122
+    "city": 2088122,
+    "links": ["Pacific/Yap", "Pacific/Truk"]
   },
   {
     "TimeZoneId": "Pacific/Rarotonga",
@@ -2086,8 +2080,7 @@
   },
   {
     "TimeZoneId": "Pacific/Wake",
-    "CountryCode": "UM",
-    "city": null
+    "CountryCode": "UM"
   },
   {
     "TimeZoneId": "Pacific/Wallis",
