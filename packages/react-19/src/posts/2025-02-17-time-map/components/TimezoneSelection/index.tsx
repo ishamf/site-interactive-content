@@ -7,6 +7,12 @@ import { dayColors } from '../../constants';
 import classNames from 'classnames';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
+import { useImperativeHandle, useRef, useState } from 'react';
+
+interface TimezoneSelectionRef {
+  scrollIntoView: () => void;
+  focusSelector: () => void;
+}
 
 export function TimezoneSelection({
   rowId,
@@ -16,6 +22,7 @@ export function TimezoneSelection({
   onChangeId,
   onChangeTime,
   isNew,
+  ref,
 }: {
   rowId: string;
   time: DateTime;
@@ -24,6 +31,7 @@ export function TimezoneSelection({
   onChangeId: (selectionId: string | null, isDeleting: boolean) => void;
   onChangeTime: (t: DateTime) => void;
   isNew?: boolean;
+  ref?: React.Ref<TimezoneSelectionRef>;
 }) {
   const shouldShowDeleteButton = !currentSelection && !isNew;
   const isShowingEditArea = shouldShowDeleteButton;
@@ -31,6 +39,19 @@ export function TimezoneSelection({
   const localTime = currentSelection ? time.setZone(currentSelection.timezone) : null;
 
   const { attributes, listeners, transform, transition, setNodeRef } = useSortable({ id: rowId });
+
+  const [isPickerOpen, setIsPickerOpen] = useState(false);
+
+  const datepickerRef = useRef<HTMLInputElement>(null);
+
+  useImperativeHandle(ref, () => ({
+    scrollIntoView: () => {
+      datepickerRef.current?.scrollIntoView();
+    },
+    focusSelector: () => {
+      setIsPickerOpen(true);
+    },
+  }));
 
   return (
     <div
@@ -40,7 +61,7 @@ export function TimezoneSelection({
       style={{ transform: CSS.Transform.toString(transform), transition }}
     >
       <div
-        className={classNames('p-4 m-[-1rem]', {
+        className={classNames('p-4 m-[-1rem] touch-none', {
           invisible: !localTime,
           'cursor-grab': !isNew,
         })}
@@ -86,6 +107,10 @@ export function TimezoneSelection({
 
       <div className="flex-1 flex items-center gap-1">
         <DateTimePicker
+          inputRef={datepickerRef}
+          open={isPickerOpen}
+          onOpen={() => setIsPickerOpen(true)}
+          onClose={() => setIsPickerOpen(false)}
           className="flex-1"
           value={currentSelection ? time : null}
           disabled={!currentSelection}

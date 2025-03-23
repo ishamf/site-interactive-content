@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { ComponentRef, RefObject, useRef, useState } from 'react';
 import { DateTime } from 'luxon';
 import { DndContext } from '@dnd-kit/core';
 import { SortableContext } from '@dnd-kit/sortable';
@@ -25,6 +25,8 @@ export function TimeMap() {
     staleTime: Infinity,
   });
 
+  const refsByRowId: RefObject<Record<string, ComponentRef<typeof TimezoneSelection>>> = useRef({});
+
   return (
     <div className="flex max-w-full flex-col px-4 gap-4 items-stretch justify-center md:flex-row md:items-start bg-neutral-50 dark:bg-neutral-900">
       <div
@@ -36,6 +38,13 @@ export function TimeMap() {
           selectionDataById={selectionDataQuery.data?.selectionDataById ?? {}}
           setTime={(ms) => {
             setTime(DateTime.fromMillis(ms));
+          }}
+          onRowFocus={(rowId) => {
+            const selector = refsByRowId.current[rowId];
+            if (selector) {
+              selector.scrollIntoView();
+              selector.focusSelector();
+            }
           }}
         />
         <DayDisplayBar
@@ -65,6 +74,13 @@ export function TimeMap() {
                 {selectedItems.map(({ itemId, rowId }) => {
                   return (
                     <TimezoneSelection
+                      ref={(e) => {
+                        if (e) {
+                          refsByRowId.current[rowId] = e;
+                        } else {
+                          delete refsByRowId.current[rowId];
+                        }
+                      }}
                       key={rowId}
                       rowId={rowId}
                       selectionData={selectionDataQuery.data.selectionData}

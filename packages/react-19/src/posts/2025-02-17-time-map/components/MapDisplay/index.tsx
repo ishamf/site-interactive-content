@@ -13,10 +13,12 @@ export function MapDisplay({
   time,
   selectionDataById,
   setTime,
+  onRowFocus,
 }: {
   time: number;
   selectionDataById: Record<string, SelectionData | undefined>;
   setTime: (time: number) => void;
+  onRowFocus: (rowId: string) => void;
 }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -91,6 +93,9 @@ export function MapDisplay({
                 city={city}
                 time={time}
                 labelPosition={store.displayItemById[selectionItem.rowId]?.labelPosition ?? null}
+                onLabelClick={() => {
+                  onRowFocus(selectionItem.rowId);
+                }}
                 onLabelSizeChange={(size) => {
                   if (size) {
                     store.registerDisplayItem(selectionItem.rowId, { city, size });

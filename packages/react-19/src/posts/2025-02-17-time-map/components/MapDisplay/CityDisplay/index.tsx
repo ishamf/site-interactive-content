@@ -21,13 +21,15 @@ export function CityDisplay({
   city,
   labelPosition,
   onLabelSizeChange,
+  onLabelClick,
 }: {
   time: number;
   city: CitySelectionData;
   labelPosition: LabelPosition | null;
   onLabelSizeChange: (size: { width: number; height: number } | null) => void;
+  onLabelClick: () => void;
 }) {
-  const labelRef = useRef<HTMLDivElement>(null);
+  const labelRef = useRef<HTMLButtonElement>(null);
 
   useElementSize({ ref: labelRef, onSizeChange: onLabelSizeChange });
 
@@ -78,26 +80,32 @@ export function CityDisplay({
           <circle style={{ fill: dayColor }} cx="10" cy="10" r="10" />
         </svg>
 
-        <div
+        <button
           ref={labelRef}
+          onClick={onLabelClick}
           css={css`
             position: absolute;
             ${labelPosition === 'topleft' || labelPosition == 'topright' ? `bottom: 0;` : `top: 0;`}
             ${labelPosition === 'topleft' || labelPosition == 'bottomleft'
               ? `right: 0; text-align: right;`
-              : `left: 0;`}
+              : `left: 0; text-align: left;`}
             color: ${dayTextColor};
             text-shadow: ${Array(5).fill('0 0 7px #000000').join(',')};
             border-radius: 0.5rem;
             padding: 0.1rem 0.5rem;
             font-size: 0.75rem;
             white-space: nowrap;
+            cursor: pointer;
+
+            &:hover {
+              color: oklch(from ${dayTextColor} calc(l + 0.2) c h);
+            }
           `}
         >
           <p>{city.label}</p>
           {/* Set a min-width here so that the label size doesn't change based on time */}
           <p className="min-w-12">{localTime.toLocaleString(DateTime.TIME_24_SIMPLE)}</p>
-        </div>
+        </button>
       </div>
     </>
   );
