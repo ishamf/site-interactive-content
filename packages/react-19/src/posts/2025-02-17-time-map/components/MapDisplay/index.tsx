@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useMemo, useRef } from 'react';
 import { canvasWidth, canvasHeight } from '../../constants';
 import { useMapUpdater } from './updater';
 import { useSelectionStore } from '../../store';
@@ -21,6 +21,24 @@ export function MapDisplay({
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   const selectedItems = useSelectionStore((state) => state.selectedItems);
+
+  const uniqueSelectedItems = useMemo(() => {
+    const seenItems = new Set<string>();
+
+    return selectedItems.filter((item) => {
+      if (!item.itemId) {
+        return false;
+      }
+
+      if (seenItems.has(item.itemId)) {
+        return false;
+      }
+
+      seenItems.add(item.itemId);
+
+      return true;
+    });
+  }, [selectedItems]);
 
   const { hasRenderedOnce } = useMapUpdater(canvasRef, time);
 
@@ -50,7 +68,7 @@ export function MapDisplay({
         height={canvasHeight}
       />
       {hasRenderedOnce
-        ? selectedItems.map((selectionItem) => {
+        ? uniqueSelectedItems.map((selectionItem) => {
             if (!selectionItem.itemId) {
               return null;
             }
