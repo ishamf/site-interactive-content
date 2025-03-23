@@ -34,7 +34,7 @@ export function CityDisplay({
   const localTime = DateTime.fromMillis(time, { zone: city.timezone });
   const { longitude, latitude } = city;
 
-  const colorIndex = localTime.weekday % 7;
+  const colorIndex = localTime.weekday;
 
   const dayColor = dayColors[colorIndex];
   const dayTextColor = dayDarkTextColors[colorIndex];

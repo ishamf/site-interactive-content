@@ -15,6 +15,7 @@ export const dayColors: Record<number, string> = {
   5: 'oklch(68.67% 0.1707 45.53)',
   6: 'oklch(88% 0.1707 165.18)',
 };
+dayColors[7] = dayColors[0];
 
 export const dayLightTextColors: Record<number, string> = {
   // 0 - sunday
@@ -26,6 +27,7 @@ export const dayLightTextColors: Record<number, string> = {
   5: 'oklch(60.53% 0.1175 45.53)',
   6: 'oklch(60.53% 0.1175 165.18)',
 };
+dayLightTextColors[7] = dayLightTextColors[0];
 
 export const dayDarkTextColors: Record<number, string> = {
   // 0 - sunday
@@ -37,5 +39,6 @@ export const dayDarkTextColors: Record<number, string> = {
   5: 'oklch(82.05% 0.0829 45.53)',
   6: 'oklch(82.05% 0.0829 165.18)',
 };
+dayDarkTextColors[7] = dayDarkTextColors[0];
 
 export const dayBorderColors = dayLightTextColors;

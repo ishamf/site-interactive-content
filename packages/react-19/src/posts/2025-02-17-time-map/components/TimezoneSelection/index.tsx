@@ -3,8 +3,13 @@ import { DeleteOutline as DeleteIcon } from '@mui/icons-material';
 import { SelectionData } from '../../assets';
 import { DateTimePicker } from '@mui/x-date-pickers';
 import { DateTime } from 'luxon';
+import { dayColors } from '../../constants';
+import classNames from 'classnames';
+import { useSortable } from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 
 export function TimezoneSelection({
+  rowId,
   time,
   currentSelection,
   selectionData,
@@ -12,6 +17,7 @@ export function TimezoneSelection({
   onChangeTime,
   isNew,
 }: {
+  rowId: string;
   time: DateTime;
   currentSelection: SelectionData | null;
   selectionData: SelectionData[];
@@ -22,8 +28,30 @@ export function TimezoneSelection({
   const shouldShowDeleteButton = !currentSelection && !isNew;
   const isShowingEditArea = shouldShowDeleteButton;
 
+  const localTime = currentSelection ? time.setZone(currentSelection.timezone) : null;
+
+  const { attributes, listeners, transform, transition, setNodeRef } = useSortable({ id: rowId });
+
   return (
-    <div className="flex flex-row gap-4 items-center">
+    <div
+      className="flex flex-row gap-4 items-center"
+      ref={setNodeRef}
+      {...attributes}
+      style={{ transform: CSS.Transform.toString(transform), transition }}
+    >
+      <div
+        className={classNames('p-4 m-[-1rem]', {
+          invisible: !localTime,
+          'cursor-grab': !isNew,
+        })}
+        {...(isNew ? {} : listeners)}
+      >
+        <div
+          className="w-2 h-2 rounded-full"
+          style={{ backgroundColor: localTime ? dayColors[localTime.weekday] : `#999` }}
+        ></div>
+      </div>
+
       <Autocomplete
         className="flex-1"
         getOptionKey={(option) => option.id}

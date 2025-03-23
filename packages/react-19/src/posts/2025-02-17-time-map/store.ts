@@ -2,6 +2,7 @@ import { create } from 'zustand';
 
 import { persist, combine } from 'zustand/middleware';
 import { nanoid } from 'nanoid';
+import { arrayMove } from '@dnd-kit/sortable';
 
 interface Selection {
   itemId: string | null;
@@ -27,6 +28,18 @@ export const useSelectionStore = create(
         set((state) => ({
           selectedItems: state.selectedItems.filter((item) => item.rowId !== rowId),
         }));
+      },
+      reorderSelection: (fromId: string, toId: string) => {
+        set((state) => {
+          const fromIndex = state.selectedItems.findIndex((item) => item.rowId === fromId);
+          const toIndex = state.selectedItems.findIndex((item) => item.rowId === toId);
+
+          if (fromIndex === -1 || toIndex === -1) {
+            return state;
+          }
+
+          return { selectedItems: arrayMove(state.selectedItems, fromIndex, toIndex) };
+        });
       },
     })),
     {

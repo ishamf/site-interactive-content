@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import { DateTime } from 'luxon';
+import { DndContext } from '@dnd-kit/core';
+import { SortableContext } from '@dnd-kit/sortable';
 import { MapDisplay } from './components/MapDisplay';
 import { TimezoneSelection } from './components/TimezoneSelection';
 import { useQuery } from '@tanstack/react-query';
@@ -24,7 +26,7 @@ export function TimeMap() {
   });
 
   return (
-    <div className="flex max-w-full flex-col p-4 gap-4 items-stretch justify-center md:flex-row md:items-start bg-neutral-50 dark:bg-neutral-900">
+    <div className="flex max-w-full flex-col px-4 gap-4 items-stretch justify-center md:flex-row md:items-start bg-neutral-50 dark:bg-neutral-900">
       <div
         style={{ maxWidth: 'calc(200vh - 16rem)' }}
         className="flex-1 z-10 self-center md:self-start sticky top-0 py-4 flex items-stretch flex-col bg-neutral-50 dark:bg-neutral-900"
@@ -49,33 +51,45 @@ export function TimeMap() {
           }}
         ></TimeBar>
       </div>
-      <div className="flex-1 min-h-0 md:max-w-[28rem] flex flex-col gap-4">
+      <div className="flex-1 py-4 min-h-0 md:max-w-[28rem] flex flex-col gap-4">
         {selectionDataQuery.isSuccess ? (
           <>
-            {selectedItems.map(({ itemId, rowId }) => {
-              return (
-                <TimezoneSelection
-                  key={rowId}
-                  selectionData={selectionDataQuery.data.selectionData}
-                  currentSelection={
-                    itemId ? selectionDataQuery.data.selectionDataById[itemId] : null
-                  }
-                  time={time}
-                  onChangeId={(newId, isDeleting) => {
-                    if (isDeleting) {
-                      selectionStore.removeSelection(rowId);
-                    } else {
-                      selectionStore.updateSelection(rowId, newId);
-                    }
-                  }}
-                  onChangeTime={(t) => {
-                    setTime(t);
-                  }}
-                ></TimezoneSelection>
-              );
-            })}
+            <DndContext
+              onDragEnd={({ active, over }) => {
+                if (over && over.id !== active.id) {
+                  selectionStore.reorderSelection(active.id.toString(), over.id.toString());
+                }
+              }}
+            >
+              <SortableContext items={selectedItems.map((item) => item.rowId)}>
+                {selectedItems.map(({ itemId, rowId }) => {
+                  return (
+                    <TimezoneSelection
+                      key={rowId}
+                      rowId={rowId}
+                      selectionData={selectionDataQuery.data.selectionData}
+                      currentSelection={
+                        itemId ? selectionDataQuery.data.selectionDataById[itemId] : null
+                      }
+                      time={time}
+                      onChangeId={(newId, isDeleting) => {
+                        if (isDeleting) {
+                          selectionStore.removeSelection(rowId);
+                        } else {
+                          selectionStore.updateSelection(rowId, newId);
+                        }
+                      }}
+                      onChangeTime={(t) => {
+                        setTime(t);
+                      }}
+                    ></TimezoneSelection>
+                  );
+                })}
+              </SortableContext>
+            </DndContext>
             <TimezoneSelection
               key={selectedItems.length}
+              rowId={'newItem'}
               selectionData={selectionDataQuery.data.selectionData}
               currentSelection={null}
               time={time}
