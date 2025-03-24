@@ -126,7 +126,6 @@ export function TimezoneSelection({
           value={currentSelection ? time : null}
           disabled={!currentSelection}
           timezone={currentSelection?.timezone}
-          ampm={false}
           onChange={(value) => {
             if (value && value.isValid) {
               onChangeTime(value);

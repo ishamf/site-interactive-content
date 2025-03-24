@@ -85,7 +85,7 @@ export function TimeMap() {
           {timeBarNode}
         </div>
       </div>
-      <div className="flex-1 md:pt-4 pb-4 min-h-0 md:max-w-[28rem] flex flex-col gap-4">
+      <div className="flex-1 md:pt-4 pb-4 min-h-0 md:max-w-[30rem] flex flex-col gap-4">
         <div className="mt-4 md:hidden">{timeBarNode}</div>
         {selectionDataQuery.isSuccess ? (
           <>

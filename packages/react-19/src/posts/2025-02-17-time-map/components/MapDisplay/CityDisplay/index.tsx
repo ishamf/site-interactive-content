@@ -104,7 +104,7 @@ export function CityDisplay({
         >
           <p>{city.label}</p>
           {/* Set a min-width here so that the label size doesn't change based on time */}
-          <p className="min-w-12">{localTime.toLocaleString(DateTime.TIME_24_SIMPLE)}</p>
+          <p className="min-w-14">{localTime.toLocaleString(DateTime.TIME_SIMPLE)}</p>
         </button>
       </div>
     </>
