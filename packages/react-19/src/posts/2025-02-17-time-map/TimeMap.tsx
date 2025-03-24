@@ -9,7 +9,7 @@ import { loadSelectionData } from './assets';
 import { DayDisplayBar } from './components/DayDisplayBar';
 import { useSelectionStore } from './store';
 import { TimeBar } from './components/TimeBar';
-import { useMediaQuery } from 'usehooks-ts';
+import { useElementSize } from '../../utils/hooks';
 
 export function TimeMap() {
   const [time, setTime] = useState<DateTime>(() => DateTime.now());
@@ -35,8 +35,6 @@ export function TimeMap() {
 
   const refsByRowId: RefObject<Record<string, ComponentRef<typeof TimezoneSelection>>> = useRef({});
 
-  const isWidescreen = useMediaQuery('(width >= 48rem)');
-
   const timeBarNode = (
     <TimeBar
       time={time}
@@ -46,10 +44,21 @@ export function TimeMap() {
     ></TimeBar>
   );
 
+  const timeBarContainerRef = useRef<HTMLDivElement>(null);
+
+  const [timeBarHeight, setTimeBarHeight] = useState(0);
+
+  useElementSize({
+    ref: timeBarContainerRef,
+    onSizeChange: (size) => {
+      setTimeBarHeight(size?.height ?? 0);
+    },
+  });
+
   return (
     <div className="flex max-w-full flex-col px-4 gap-x-4 items-stretch justify-center md:flex-row md:items-start bg-neutral-50 dark:bg-neutral-900">
       <div
-        style={{ maxWidth: 'calc(200vh - 16rem)' }}
+        style={{ maxWidth: `calc(200vh - 10rem - ${timeBarHeight * 2}px)` }}
         className="flex-1 z-10 self-center md:self-start sticky top-0 pt-4 pb-2 md:pb-4 flex items-stretch flex-col bg-neutral-50 dark:bg-neutral-900"
       >
         <MapDisplay
@@ -72,10 +81,12 @@ export function TimeMap() {
             setTime(DateTime.fromMillis(ms));
           }}
         ></DayDisplayBar>
-        {isWidescreen ? <div className="mt-4">{timeBarNode}</div> : null}
+        <div className="mt-4 hidden md:block" ref={timeBarContainerRef}>
+          {timeBarNode}
+        </div>
       </div>
       <div className="flex-1 md:pt-4 pb-4 min-h-0 md:max-w-[28rem] flex flex-col gap-4">
-        {!isWidescreen ? timeBarNode : null}
+        <div className="mt-4 md:hidden">{timeBarNode}</div>
         {selectionDataQuery.isSuccess ? (
           <>
             <DndContext
