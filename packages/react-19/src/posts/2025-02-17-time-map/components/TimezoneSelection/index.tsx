@@ -1,8 +1,11 @@
+/** @jsxImportSource @emotion/react */
+
 import { Autocomplete, createFilterOptions, IconButton, TextField } from '@mui/material';
 import { DeleteOutline as DeleteIcon } from '@mui/icons-material';
 import { SelectionData } from '../../assets';
 import { DateTimePicker } from '@mui/x-date-pickers';
 import { DateTime } from 'luxon';
+import { css } from '@emotion/react';
 import { dayColors } from '../../constants';
 import classNames from 'classnames';
 import { useSortable } from '@dnd-kit/sortable';
@@ -69,7 +72,15 @@ export function TimezoneSelection({
       >
         <div
           className="w-2 h-2 rounded-full"
-          style={{ backgroundColor: localTime ? dayColors[localTime.weekday] : `#999` }}
+          css={css`
+            background-color: ${localTime
+              ? `oklch(from ${dayColors[localTime.weekday]} min(l, 0.8) c h)`
+              : `#666`};
+
+            @media (prefers-color-scheme: dark) {
+              background-color: ${localTime ? dayColors[localTime.weekday] : `#999`};
+            }
+          `}
         ></div>
       </div>
 
