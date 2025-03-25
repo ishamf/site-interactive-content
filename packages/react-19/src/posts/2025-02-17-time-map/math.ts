@@ -1,4 +1,5 @@
 import { flMod } from '../../utils/math';
+import { SunAndEarthState } from './types';
 
 function toRad(deg: number) {
   return (deg * Math.PI) / 180;
@@ -8,13 +9,37 @@ function toDeg(rad: number) {
   return (rad * 180) / Math.PI;
 }
 
-export function createAlphaCalculator({
-  precalculate: { width, height },
-  time,
-}: {
-  time: number;
-  precalculate: { width: number; height: number };
-}) {
+function convertCircularValueToAllowNegative(value: number, size: number) {
+  return value <= size / 2 ? value : value - size;
+}
+
+function linearlyInterpolateCircularValues(from: number, to: number, size: number, amount: number) {
+  const d1 = flMod(to - from, size);
+  const d2 = d1 - size;
+  const diff = -d2 < d1 ? d2 : d1;
+
+  return flMod(from + diff * amount, size);
+}
+
+export function linearlyInterpolateSunAndEarthState(
+  from: SunAndEarthState,
+  to: SunAndEarthState,
+  amount: number
+): SunAndEarthState {
+  return {
+    gmstHours: linearlyInterpolateCircularValues(from.gmstHours, to.gmstHours, 24, amount),
+    rightAscension: convertCircularValueToAllowNegative(
+      linearlyInterpolateCircularValues(from.rightAscension, to.rightAscension, 360, amount),
+      360
+    ),
+    declination: convertCircularValueToAllowNegative(
+      linearlyInterpolateCircularValues(from.declination, to.declination, 360, amount),
+      360
+    ),
+  };
+}
+
+export function getSunAndEarthStateAtTime(time: number): SunAndEarthState {
   // https://aa.usno.navy.mil/faq/sun_approx
   const julianDate = time / 86400000 + 2440587.5;
   const daysSinceEpoch = julianDate - 2451545.0;
@@ -49,6 +74,17 @@ export function createAlphaCalculator({
     24
   );
 
+  return { rightAscension, declination, gmstHours };
+}
+
+export function createAlphaCalculator({
+  rightAscension,
+  declination,
+  gmstHours,
+  precalculate: { width, height },
+}: SunAndEarthState & {
+  precalculate: { width: number; height: number };
+}) {
   // We just use GMST to keep it simple
   // > The maximum value of the equation of the equinoxes is about 1.1 seconds,
   // > so if an error of ~1 second is unimportant, the transformation from GMST to GAST can be skipped.
@@ -81,13 +117,14 @@ export function createAlphaCalculator({
   }
 
   function getAlphaFromAltitude(altitude: number) {
-    const shadeAngle = 5;
+    const shadeUpperAngle = 8;
+    const shadeLowerAngle = -2;
 
-    return altitude > shadeAngle
+    return altitude > shadeUpperAngle
       ? 1
-      : altitude < -shadeAngle
+      : altitude < shadeLowerAngle
         ? 0
-        : (altitude + shadeAngle) / (2 * shadeAngle);
+        : (altitude - shadeLowerAngle) / (shadeUpperAngle - shadeLowerAngle);
   }
 
   function getAlphaWithPrecalculatedComponents(x: number, y: number) {

@@ -1,5 +1,6 @@
 import { loadImageData, MapImageData } from '../../../assets';
 import { canvasHeight, canvasWidth } from '../../../constants';
+import { SunAndEarthState } from '../../../types';
 import { renderAlphaMap } from './renderAlphaMap';
 import { WorkerMessage, WorkerResponse } from './types';
 
@@ -9,12 +10,12 @@ let taskIdCounter = 0;
 
 async function renderAlphaMapWithWorker({
   worker,
-  time,
+  state,
   width,
   height,
 }: {
   worker: Worker;
-  time: number;
+  state: SunAndEarthState;
   width: number;
   height: number;
 }) {
@@ -37,7 +38,7 @@ async function renderAlphaMapWithWorker({
   const message: WorkerMessage = {
     type: 'renderAlpha',
     id: taskId,
-    time,
+    state,
     width,
     height,
   };
@@ -57,15 +58,15 @@ async function getMapImageData() {
   return mapImageDataPromise;
 }
 
-export async function drawMapAtTime({
+export async function drawMap({
   ctx,
-  time,
+  state,
   alphaSize = 1,
   useWorker,
   abortSignal,
 }: {
   ctx: CanvasRenderingContext2D;
-  time: number;
+  state: SunAndEarthState;
   alphaSize: number;
   useWorker: boolean;
   abortSignal?: AbortSignal;
@@ -80,12 +81,12 @@ export async function drawMapAtTime({
   const alphaMapData = useWorker
     ? await renderAlphaMapWithWorker({
         worker: imageWorker,
-        time,
+        state,
         width: alphaMapWidth,
         height: alphaMapHeight,
       })
     : renderAlphaMap({
-        time,
+        state,
         width: alphaMapWidth,
         height: alphaMapHeight,
       });

@@ -12,7 +12,7 @@ self.addEventListener('message', (event) => {
     const imageData = renderAlphaMap({
       width: data.width,
       height: data.height,
-      time: data.time,
+      state: data.state,
     });
 
     const response: WorkerResponse = { id: data.id, imageData };

@@ -1,9 +1,11 @@
+import { SunAndEarthState } from '../../../types';
+
 export interface WorkerMessage {
   type: 'renderAlpha';
   id: number;
   width: number;
   height: number;
-  time: number;
+  state: SunAndEarthState;
 }
 
 export interface WorkerResponse {

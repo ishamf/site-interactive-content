@@ -13,6 +13,7 @@ import { useElementSize } from '../../utils/hooks';
 
 export function TimeMap() {
   const [time, setTime] = useState<DateTime>(() => DateTime.now());
+  const [useAnimation, setUseAnimation] = useState(false);
 
   const selectionStore = useSelectionStore();
   const preloadSelection = selectionStore.preloadSelection;
@@ -40,6 +41,7 @@ export function TimeMap() {
       time={time}
       setTime={(time) => {
         setTime(time);
+        setUseAnimation(true);
       }}
     ></TimeBar>
   );
@@ -66,7 +68,9 @@ export function TimeMap() {
           selectionDataById={selectionDataQuery.data?.selectionDataById ?? {}}
           setTime={(ms) => {
             setTime(DateTime.fromMillis(ms));
+            setUseAnimation(false);
           }}
+          animateTime={useAnimation}
           onRowFocus={(rowId) => {
             const selector = refsByRowId.current[rowId];
             if (selector) {
@@ -79,6 +83,7 @@ export function TimeMap() {
           time={time.valueOf()}
           setTime={(ms) => {
             setTime(DateTime.fromMillis(ms));
+            setUseAnimation(false);
           }}
         ></DayDisplayBar>
         <div className="mt-4 hidden md:block" ref={timeBarContainerRef}>
@@ -123,6 +128,7 @@ export function TimeMap() {
                       }}
                       onChangeTime={(t) => {
                         setTime(t);
+                        setUseAnimation(true);
                       }}
                     ></TimezoneSelection>
                   );
@@ -142,6 +148,7 @@ export function TimeMap() {
               }}
               onChangeTime={(t) => {
                 setTime(t);
+                setUseAnimation(true);
               }}
               isNew
             ></TimezoneSelection>

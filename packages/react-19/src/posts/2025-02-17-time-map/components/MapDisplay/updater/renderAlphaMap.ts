@@ -1,18 +1,19 @@
 import { createAlphaCalculator } from '../../../math';
+import { SunAndEarthState } from '../../../types';
 
 export function renderAlphaMap({
   width,
   height,
-  time,
+  state,
 }: {
   width: number;
   height: number;
-  time: number;
+  state: SunAndEarthState;
 }) {
   const imageData = new ImageData(width, height);
 
   const { getAlphaWithPrecalculatedComponents: getAlpha } = createAlphaCalculator({
-    time,
+    ...state,
     precalculate: { width, height },
   });
 

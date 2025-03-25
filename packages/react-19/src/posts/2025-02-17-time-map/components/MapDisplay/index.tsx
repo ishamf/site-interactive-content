@@ -11,11 +11,13 @@ import classNames from 'classnames';
 
 export function MapDisplay({
   time,
+  animateTime = true,
   selectionDataById,
   setTime,
   onRowFocus,
 }: {
   time: number;
+  animateTime: boolean;
   selectionDataById: Record<string, SelectionData | undefined>;
   setTime: (time: number) => void;
   onRowFocus: (rowId: string) => void;
@@ -42,7 +44,7 @@ export function MapDisplay({
     });
   }, [selectedItems]);
 
-  const { hasRenderedOnce } = useMapUpdater(canvasRef, time);
+  const { hasRenderedOnce } = useMapUpdater(canvasRef, time, animateTime);
 
   const store = useCityDisplayStore();
 
