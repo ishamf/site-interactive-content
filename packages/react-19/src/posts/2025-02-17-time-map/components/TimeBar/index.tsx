@@ -24,7 +24,7 @@ export function TimeBar({ time, setTime }: { time: DateTime; setTime: (time: Dat
           }
         `}
       >
-        <p className="text-neutral-700 dark:text-neutral-300 min-w-40 text-center">
+        <p className="text-neutral-900 dark:text-neutral-100 min-w-40 text-center">
           <span className="inline-block">{utcTime.toLocaleString(DateTime.DATETIME_FULL)}</span>{' '}
           <span className="inline-block">
             (<RelativeTime time={utcTime} />)

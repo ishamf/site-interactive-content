@@ -9,6 +9,17 @@ function toDeg(rad: number) {
   return (rad * 180) / Math.PI;
 }
 
+/**
+ * Converts a circular value to a range that includes negative values.
+ *
+ * Example:
+ * - Input: value = 270, size = 360
+ * - Output: -90 (since 270 is equivalent to -90 in a circular range)
+ *
+ * @param value - The circular value to convert.
+ * @param size - The size of the circular range (e.g., 360 for degrees).
+ * @returns The converted value, allowing for negative values.
+ */
 function convertCircularValueToAllowNegative(value: number, size: number) {
   return value <= size / 2 ? value : value - size;
 }

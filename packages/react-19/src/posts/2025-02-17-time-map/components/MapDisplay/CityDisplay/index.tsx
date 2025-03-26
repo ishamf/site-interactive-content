@@ -47,15 +47,15 @@ export function CityDisplay({
         css={css`
           width: 0px;
           height: 0px;
-          /* box-shadow: 0 0 2px 2px rgba(0, 0, 0, 0.35);
-          border-radius: 50%;
-          background-color: ${dayColor}; */
           position: absolute;
           transform: translate(-50%, -50%);
-          left: ${(longitude * 100) / 360 + 50}%;
-          top: ${(latitude * -100) / 180 + 50}%;
+
           ${!labelPosition ? 'visibility: hidden;' : ''}
         `}
+        style={{
+          left: `${(longitude * 100) / 360 + 50}%`,
+          top: `${(latitude * -100) / 180 + 50}%`,
+        }}
       >
         <svg
           css={css`
@@ -68,7 +68,6 @@ export function CityDisplay({
           `}
           viewBox="0 0 50 20"
         >
-          {/* <path style={{ fill: dayColor }} d="m 10 2 v 16 L 35 10 z" /> */}
           <path
             style={{
               stroke: dayTextColor,
