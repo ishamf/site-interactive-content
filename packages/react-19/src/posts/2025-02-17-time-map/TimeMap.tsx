@@ -1,4 +1,13 @@
-import { ComponentRef, RefObject, useEffect, useRef, useState } from 'react';
+import {
+  ComponentProps,
+  ComponentPropsWithRef,
+  ComponentRef,
+  RefObject,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { DateTime } from 'luxon';
 import { DndContext } from '@dnd-kit/core';
 import { SortableContext } from '@dnd-kit/sortable';
@@ -11,9 +20,34 @@ import { useSelectionStore } from './store';
 import { TimeBar } from './components/TimeBar';
 import { useElementSize } from '../../utils/hooks';
 
+interface TimeState {
+  time: DateTime;
+  useAnimation: boolean;
+  isRapidlyChanging: boolean;
+}
+
 export function TimeMap() {
-  const [time, setTime] = useState<DateTime>(() => DateTime.now());
-  const [useAnimation, setUseAnimation] = useState(false);
+  const [timeState, setTime] = useState<TimeState>(() => ({
+    time: DateTime.now(),
+    useAnimation: false,
+    isRapidlyChanging: false,
+  }));
+  const [slowlyChangingTime, setSlowlyChangingTime] = useState<DateTime>(timeState.time);
+
+  useEffect(() => {
+    if (timeState.isRapidlyChanging) {
+      const timeout = setTimeout(() => {
+        setSlowlyChangingTime(timeState.time);
+        setTime((state) => ({ ...state, isRapidlyChanging: false }));
+      }, 500);
+
+      return () => {
+        clearTimeout(timeout);
+      };
+    } else {
+      setSlowlyChangingTime(timeState.time);
+    }
+  }, [timeState.isRapidlyChanging, timeState.time]);
 
   const selectionStore = useSelectionStore();
   const preloadSelection = selectionStore.preloadSelection;
@@ -38,10 +72,9 @@ export function TimeMap() {
 
   const timeBarNode = (
     <TimeBar
-      time={time}
+      time={timeState.time}
       setTime={(time) => {
-        setTime(time);
-        setUseAnimation(true);
+        setTime({ time, useAnimation: true, isRapidlyChanging: false });
       }}
     ></TimeBar>
   );
@@ -57,6 +90,81 @@ export function TimeMap() {
     },
   });
 
+  const selectedItemsRenderElements = useMemo(() => {
+    function createFunctionProps(
+      rowId: string
+    ): Pick<
+      ComponentPropsWithRef<typeof TimezoneSelection>,
+      'ref' | 'onChangeId' | 'onChangeTime'
+    > {
+      return {
+        ref: (e) => {
+          if (e) {
+            refsByRowId.current[rowId] = e;
+          } else {
+            delete refsByRowId.current[rowId];
+          }
+        },
+        onChangeId: (newId, isDeleting) => {
+          if (isDeleting) {
+            selectionStore.removeSelection(rowId);
+          } else {
+            selectionStore.updateSelection(rowId, newId);
+          }
+        },
+        onChangeTime: (time) => {
+          setTime({ time, useAnimation: true, isRapidlyChanging: false });
+        },
+      };
+    }
+
+    const renderElements = selectedItems.map((item) => {
+      const functionProps: Pick<
+        ComponentPropsWithRef<typeof TimezoneSelection>,
+        'ref' | 'onChangeId' | 'onChangeTime'
+      > = createFunctionProps(item.rowId);
+      return {
+        item,
+        functionProps,
+        isNew: false,
+      };
+    });
+
+    const newRowId = `newItem-${selectedItems.length}`;
+
+    renderElements.push({
+      item: { itemId: null, rowId: newRowId },
+      functionProps: {
+        ...createFunctionProps(newRowId),
+        onChangeId: (newId) => {
+          if (newId) {
+            selectionStore.addNewSelection(newId);
+          }
+        },
+      },
+      isNew: true,
+    });
+
+    return renderElements;
+  }, [selectedItems, selectionStore]);
+
+  const dndContextProps = useMemo(() => {
+    const props: ComponentProps<typeof DndContext> = {
+      onDragEnd: ({ active, over }) => {
+        if (over && over.id !== active.id) {
+          selectionStore.reorderSelection(active.id.toString(), over.id.toString());
+        }
+      },
+    };
+
+    return props;
+  }, [selectionStore]);
+
+  const sortableContextItems = useMemo(
+    () => selectedItems.map((item) => item.rowId),
+    [selectedItems]
+  );
+
   return (
     <div className="flex max-w-full flex-col px-4 gap-x-4 items-stretch justify-center md:flex-row md:items-start bg-neutral-50 dark:bg-neutral-900">
       <div
@@ -64,13 +172,16 @@ export function TimeMap() {
         className="flex-1 z-10 self-center md:self-start sticky top-0 pt-4 pb-2 md:pb-4 flex items-stretch flex-col bg-neutral-50 dark:bg-neutral-900"
       >
         <MapDisplay
-          time={time.valueOf()}
+          time={timeState.time.valueOf()}
           selectionDataById={selectionDataQuery.data?.selectionDataById ?? {}}
           setTime={(ms) => {
-            setTime(DateTime.fromMillis(ms));
-            setUseAnimation(false);
+            setTime({
+              time: DateTime.fromMillis(ms),
+              useAnimation: false,
+              isRapidlyChanging: true,
+            });
           }}
-          animateTime={useAnimation}
+          animateTime={timeState.useAnimation}
           onRowFocus={(rowId) => {
             const selector = refsByRowId.current[rowId];
             if (selector) {
@@ -80,10 +191,13 @@ export function TimeMap() {
           }}
         />
         <DayDisplayBar
-          time={time.valueOf()}
+          time={timeState.time.valueOf()}
           setTime={(ms) => {
-            setTime(DateTime.fromMillis(ms));
-            setUseAnimation(false);
+            setTime({
+              time: DateTime.fromMillis(ms),
+              useAnimation: false,
+              isRapidlyChanging: true,
+            });
           }}
         ></DayDisplayBar>
         <div className="mt-4 hidden md:block" ref={timeBarContainerRef}>
@@ -94,64 +208,28 @@ export function TimeMap() {
         <div className="mt-4 md:hidden">{timeBarNode}</div>
         {selectionDataQuery.isSuccess ? (
           <>
-            <DndContext
-              onDragEnd={({ active, over }) => {
-                if (over && over.id !== active.id) {
-                  selectionStore.reorderSelection(active.id.toString(), over.id.toString());
-                }
-              }}
-            >
-              <SortableContext items={selectedItems.map((item) => item.rowId)}>
-                {selectedItems.map(({ itemId, rowId }) => {
-                  return (
-                    <TimezoneSelection
-                      ref={(e) => {
-                        if (e) {
-                          refsByRowId.current[rowId] = e;
-                        } else {
-                          delete refsByRowId.current[rowId];
+            <DndContext {...dndContextProps}>
+              <SortableContext items={sortableContextItems}>
+                {selectedItemsRenderElements.map(
+                  ({ item: { itemId, rowId }, functionProps, isNew }) => {
+                    return (
+                      <TimezoneSelection
+                        key={rowId}
+                        rowId={rowId}
+                        {...functionProps}
+                        selectionData={selectionDataQuery.data.selectionData}
+                        currentSelection={
+                          itemId ? selectionDataQuery.data.selectionDataById[itemId] : null
                         }
-                      }}
-                      key={rowId}
-                      rowId={rowId}
-                      selectionData={selectionDataQuery.data.selectionData}
-                      currentSelection={
-                        itemId ? selectionDataQuery.data.selectionDataById[itemId] : null
-                      }
-                      time={time}
-                      onChangeId={(newId, isDeleting) => {
-                        if (isDeleting) {
-                          selectionStore.removeSelection(rowId);
-                        } else {
-                          selectionStore.updateSelection(rowId, newId);
-                        }
-                      }}
-                      onChangeTime={(t) => {
-                        setTime(t);
-                        setUseAnimation(true);
-                      }}
-                    ></TimezoneSelection>
-                  );
-                })}
+                        isDateTimeFrozen={timeState.isRapidlyChanging}
+                        time={slowlyChangingTime}
+                        isNew={isNew}
+                      ></TimezoneSelection>
+                    );
+                  }
+                )}
               </SortableContext>
             </DndContext>
-            <TimezoneSelection
-              key={selectedItems.length}
-              rowId={'newItem'}
-              selectionData={selectionDataQuery.data.selectionData}
-              currentSelection={null}
-              time={time}
-              onChangeId={(newId) => {
-                if (newId) {
-                  selectionStore.addNewSelection(newId);
-                }
-              }}
-              onChangeTime={(t) => {
-                setTime(t);
-                setUseAnimation(true);
-              }}
-              isNew
-            ></TimezoneSelection>
           </>
         ) : null}
       </div>

@@ -10,140 +10,150 @@ import { dayColors } from '../../constants';
 import classNames from 'classnames';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { useImperativeHandle, useRef, useState } from 'react';
+import { memo, useEffect, useImperativeHandle, useRef, useState } from 'react';
 
 interface TimezoneSelectionRef {
   scrollIntoView: () => void;
   focusSelector: () => void;
 }
 
-export function TimezoneSelection({
-  rowId,
-  time,
-  currentSelection,
-  selectionData,
-  onChangeId,
-  onChangeTime,
-  isNew,
-  ref,
-}: {
-  rowId: string;
-  time: DateTime;
-  currentSelection: SelectionData | null;
-  selectionData: SelectionData[];
-  onChangeId: (selectionId: string | null, isDeleting: boolean) => void;
-  onChangeTime: (t: DateTime) => void;
-  isNew?: boolean;
-  ref?: React.Ref<TimezoneSelectionRef>;
-}) {
-  const shouldShowDeleteButton = !currentSelection && !isNew;
-  const isShowingEditArea = shouldShowDeleteButton;
+export const TimezoneSelection = memo(
+  ({
+    rowId,
+    time,
+    currentSelection,
+    selectionData,
+    onChangeId,
+    onChangeTime,
+    isNew,
+    ref,
+    isDateTimeFrozen,
+  }: {
+    rowId: string;
+    time: DateTime;
+    currentSelection: SelectionData | null;
+    selectionData: SelectionData[];
+    onChangeId: (selectionId: string | null, isDeleting: boolean) => void;
+    onChangeTime: (t: DateTime) => void;
+    isNew?: boolean;
+    isDateTimeFrozen: boolean;
+    ref?: React.Ref<TimezoneSelectionRef>;
+  }) => {
+    const shouldShowDeleteButton = !currentSelection && !isNew;
+    const isShowingEditArea = shouldShowDeleteButton;
 
-  const localTime = currentSelection ? time.setZone(currentSelection.timezone) : null;
+    const localTime = currentSelection ? time.setZone(currentSelection.timezone) : null;
 
-  const { attributes, listeners, transform, transition, setNodeRef } = useSortable({ id: rowId });
+    const { attributes, listeners, transform, transition, setNodeRef } = useSortable({ id: rowId });
 
-  const [isPickerOpen, setIsPickerOpen] = useState(false);
+    const [isPickerOpen, setIsPickerOpen] = useState(false);
 
-  const datepickerRef = useRef<HTMLInputElement>(null);
+    const datepickerRef = useRef<HTMLInputElement>(null);
 
-  useImperativeHandle(ref, () => ({
-    scrollIntoView: () => {
-      datepickerRef.current?.scrollIntoView();
-    },
-    focusSelector: () => {
-      setIsPickerOpen(true);
-    },
-  }));
+    useEffect(() => {
+      if (isPickerOpen && isDateTimeFrozen) {
+        setIsPickerOpen(false);
+      }
+    }, [isDateTimeFrozen, isPickerOpen]);
 
-  return (
-    <div
-      className="flex flex-row gap-4 items-center"
-      ref={setNodeRef}
-      {...attributes}
-      style={{ transform: CSS.Transform.toString(transform), transition }}
-    >
+    useImperativeHandle(ref, () => ({
+      scrollIntoView: () => {
+        datepickerRef.current?.scrollIntoView();
+      },
+      focusSelector: () => {
+        setIsPickerOpen(true);
+      },
+    }));
+
+    return (
       <div
-        className={classNames('p-4 m-[-1rem] touch-none', {
-          invisible: !localTime,
-          'cursor-grab': !isNew,
-        })}
-        {...(isNew ? {} : listeners)}
+        className="flex flex-row gap-4 items-center"
+        ref={setNodeRef}
+        {...attributes}
+        style={{ transform: CSS.Transform.toString(transform), transition }}
       >
         <div
-          className="w-2 h-2 rounded-full"
-          css={css`
-            background-color: ${localTime
-              ? `oklch(from ${dayColors[localTime.weekday]} min(l, 0.8) c h)`
-              : `#666`};
+          className={classNames('p-4 m-[-1rem] touch-none', {
+            invisible: !localTime,
+            'cursor-grab': !isNew,
+          })}
+          {...(isNew ? {} : listeners)}
+        >
+          <div
+            className="w-2 h-2 rounded-full"
+            css={css`
+              background-color: ${localTime
+                ? `oklch(from ${dayColors[localTime.weekday]} min(l, 0.8) c h)`
+                : `#666`};
 
-            @media (prefers-color-scheme: dark) {
-              background-color: ${localTime ? dayColors[localTime.weekday] : `#999`};
-            }
-          `}
-        ></div>
-      </div>
+              @media (prefers-color-scheme: dark) {
+                background-color: ${localTime ? dayColors[localTime.weekday] : `#999`};
+              }
+            `}
+          ></div>
+        </div>
 
-      <Autocomplete
-        className="flex-1"
-        getOptionKey={(option) => option.id}
-        filterOptions={createFilterOptions({
-          limit: 20,
-          stringify: (option) => {
-            if (option.type === 'city' && option.isCapital) {
-              return `${option.label} ${option.country}`;
-            }
-
-            return option.label;
-          },
-        })}
-        renderOption={({ key, ...props }, option) => (
-          <TimezoneOption key={key} {...props} option={option} />
-        )}
-        options={selectionData}
-        renderInput={(params) => <TextField {...params} label="Time Zone" />}
-        value={currentSelection}
-        isOptionEqualToValue={(option, value) => option.id === value.id}
-        onChange={(_e, value) => {
-          onChangeId(value?.id ?? null, false);
-        }}
-        slotProps={{
-          clearIndicator: {
-            onClick: () => {
-              onChangeId(null, true);
-            },
-          },
-        }}
-      ></Autocomplete>
-
-      <div className="flex-1 flex items-center gap-1">
-        <DateTimePicker
-          inputRef={datepickerRef}
-          open={isPickerOpen}
-          onOpen={() => setIsPickerOpen(true)}
-          onClose={() => setIsPickerOpen(false)}
+        <Autocomplete
           className="flex-1"
-          value={currentSelection ? time : null}
-          disabled={!currentSelection}
-          timezone={currentSelection?.timezone}
-          onChange={(value) => {
-            if (value && value.isValid) {
-              onChangeTime(value);
-            }
-          }}
-        />
+          getOptionKey={(option) => option.id}
+          filterOptions={createFilterOptions({
+            limit: 20,
+            stringify: (option) => {
+              if (option.type === 'city' && option.isCapital) {
+                return `${option.label} ${option.country}`;
+              }
 
-        {isShowingEditArea ? (
-          <div>
-            <IconButton onClick={() => onChangeId(null, true)}>
-              <DeleteIcon />
-            </IconButton>
-          </div>
-        ) : null}
+              return option.label;
+            },
+          })}
+          renderOption={({ key, ...props }, option) => (
+            <TimezoneOption key={key} {...props} option={option} />
+          )}
+          options={selectionData}
+          renderInput={(params) => <TextField {...params} label="Time Zone" />}
+          value={currentSelection}
+          isOptionEqualToValue={(option, value) => option.id === value.id}
+          onChange={(_e, value) => {
+            onChangeId(value?.id ?? null, false);
+          }}
+          slotProps={{
+            clearIndicator: {
+              onClick: () => {
+                onChangeId(null, true);
+              },
+            },
+          }}
+        ></Autocomplete>
+
+        <div className="flex-1 flex items-center gap-1">
+          <DateTimePicker
+            inputRef={datepickerRef}
+            open={isPickerOpen && !isDateTimeFrozen}
+            onOpen={() => setIsPickerOpen(true)}
+            onClose={() => setIsPickerOpen(false)}
+            className="flex-1"
+            value={currentSelection ? time : null}
+            disabled={!currentSelection || isDateTimeFrozen}
+            timezone={currentSelection?.timezone}
+            onChange={(value) => {
+              if (value && value.isValid) {
+                onChangeTime(value);
+              }
+            }}
+          />
+
+          {isShowingEditArea ? (
+            <div>
+              <IconButton onClick={() => onChangeId(null, true)}>
+                <DeleteIcon />
+              </IconButton>
+            </div>
+          ) : null}
+        </div>
       </div>
-    </div>
-  );
-}
+    );
+  }
+);
 
 function TimezoneOption({
   option,
