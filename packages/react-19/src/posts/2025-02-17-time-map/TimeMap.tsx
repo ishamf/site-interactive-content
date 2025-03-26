@@ -19,6 +19,7 @@ import { DayDisplayBar } from './components/DayDisplayBar';
 import { useSelectionStore } from './store';
 import { TimeBar } from './components/TimeBar';
 import { useElementSize } from '../../utils/hooks';
+import { canvasWidth } from './constants';
 
 interface TimeState {
   time: DateTime;
@@ -172,7 +173,7 @@ export function TimeMap() {
   return (
     <div className="flex max-w-full flex-col px-4 gap-x-4 items-stretch justify-center md:flex-row md:items-start bg-neutral-50 dark:bg-neutral-900">
       <div
-        style={{ maxWidth: `calc(200vh - 10rem - ${timeBarHeight * 2}px)` }}
+        style={{ maxWidth: `min(calc(200vh - 10rem - ${timeBarHeight * 2}px), ${canvasWidth}px)` }}
         className="flex-1 z-10 self-center md:self-start sticky top-0 pt-4 pb-2 md:pb-4 flex items-stretch flex-col bg-neutral-50 dark:bg-neutral-900"
       >
         <MapDisplay
