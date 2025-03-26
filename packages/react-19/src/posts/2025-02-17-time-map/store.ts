@@ -22,7 +22,7 @@ const INITIAL_CITY_IDS = [
 export const useSelectionStore = create(
   persist(
     combine({ selectedItems: [] as Selection[] }, (set, get) => ({
-      preloadSelection: (data: LoadableSelectionData) => {
+      addInitialCitiesIfEmpty: (data: LoadableSelectionData) => {
         if (get().selectedItems.length > 0) {
           return;
         }

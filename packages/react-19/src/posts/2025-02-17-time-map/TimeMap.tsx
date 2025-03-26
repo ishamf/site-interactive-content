@@ -35,6 +35,8 @@ export function TimeMap() {
   const [slowlyChangingTime, setSlowlyChangingTime] = useState<DateTime>(timeState.time);
 
   useEffect(() => {
+    // Update the slowly changing time.
+    // If it's rapidly changing, wait for a bit before updating.
     if (timeState.isRapidlyChanging) {
       const timeout = setTimeout(() => {
         setSlowlyChangingTime(timeState.time);
@@ -50,7 +52,7 @@ export function TimeMap() {
   }, [timeState.isRapidlyChanging, timeState.time]);
 
   const selectionStore = useSelectionStore();
-  const preloadSelection = selectionStore.preloadSelection;
+  const addInitialCitiesIfEmpty = selectionStore.addInitialCitiesIfEmpty;
 
   const { selectedItems } = selectionStore;
 
@@ -63,10 +65,12 @@ export function TimeMap() {
   });
 
   useEffect(() => {
+    // Add initial cities to the store if it's empty.
+    // This requires the selectionData to be loaded.
     if (selectionDataQuery.isSuccess) {
-      preloadSelection(selectionDataQuery.data);
+      addInitialCitiesIfEmpty(selectionDataQuery.data);
     }
-  }, [selectionDataQuery.data, selectionDataQuery.isSuccess, preloadSelection]);
+  }, [selectionDataQuery.data, selectionDataQuery.isSuccess, addInitialCitiesIfEmpty]);
 
   const refsByRowId: RefObject<Record<string, ComponentRef<typeof TimezoneSelection>>> = useRef({});
 
