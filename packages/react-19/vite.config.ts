@@ -13,6 +13,7 @@ export default defineConfig({
   plugins: [react(), tailwindcss()],
   build: {
     outDir: 'dist',
+    assetsDir: 'static/assets',
     lib: {
       entry: readdirSync(resolve(__dirname, 'src/entries')).map((x) => 'src/entries/' + x),
       formats: ['es'],
@@ -26,7 +27,8 @@ export default defineConfig({
         manualChunks: {
           css: ['./src/app-css.ts'],
         },
-        assetFileNames: 'assets/[name]-[hash].[ext]',
+        assetFileNames: 'static/assets/[name]-[hash].[ext]',
+        chunkFileNames: 'static/chunks/[name]-[hash].js',
       },
     },
   },

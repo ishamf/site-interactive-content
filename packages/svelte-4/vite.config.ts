@@ -29,6 +29,8 @@ export default defineConfig({
           css: ['./src/lib/app-css.ts'],
         },
         inlineDynamicImports: false,
+        assetFileNames: 'static/assets/[name]-[hash].[ext]',
+        chunkFileNames: 'static/chunks/[name]-[hash].js',
       },
     },
   },

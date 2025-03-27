@@ -3,3 +3,6 @@
 
 /test-*.html
     cache-control: public, max-age=0, must-revalidate
+
+/static/*
+    cache-control: public, max-age=31536000
