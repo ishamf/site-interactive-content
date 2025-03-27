@@ -12,8 +12,10 @@ export interface CitySelectionData extends BaseSelectionData {
   longitude: number;
   latitude: number;
   country: string;
+  region?: string;
   population: number;
   isCapital: boolean;
+  isRegionalCapital: boolean;
 }
 
 interface TimezoneSelectionData extends BaseSelectionData {
@@ -47,17 +49,21 @@ for (const timezone of timezoneData) {
 
 const citiesSelectionData: CitySelectionData[] = citiesData
   .filter((city) => timezoneIdToSystemTimezone.has(city.timezone))
-  .map((city) => ({
-    type: 'city',
-    id: city.id.toString(),
-    label: city.name,
-    timezone: timezoneIdToSystemTimezone.get(city.timezone) ?? city.timezone,
-    longitude: city.longitude,
-    latitude: city.latitude,
-    country: city.country_name,
-    population: city.population,
-    isCapital: city.is_capital,
-  }));
+  .map(
+    (city): CitySelectionData => ({
+      type: 'city',
+      id: city.id.toString(),
+      label: city.name,
+      timezone: timezoneIdToSystemTimezone.get(city.timezone) ?? city.timezone,
+      longitude: city.longitude,
+      latitude: city.latitude,
+      country: city.country_name,
+      region: city.region_name,
+      population: city.population,
+      isCapital: !!city.is_capital,
+      isRegionalCapital: !!city.is_regional_capital,
+    })
+  );
 
 const citiesSelectionDataById = citiesSelectionData.reduce(
   (acc, city) => {
@@ -95,6 +101,12 @@ selectionData.sort((a, b) => {
     if (a.isCapital && !b.isCapital) {
       return -1;
     } else if (!a.isCapital && b.isCapital) {
+      return 1;
+    }
+
+    if (a.isRegionalCapital && !b.isRegionalCapital) {
+      return -1;
+    } else if (!a.isRegionalCapital && b.isRegionalCapital) {
       return 1;
     }
 

@@ -99,8 +99,12 @@ export const TimezoneSelection = memo(
           filterOptions={createFilterOptions({
             limit: 20,
             stringify: (option) => {
-              if (option.type === 'city' && option.isCapital) {
-                return `${option.label} ${option.country}`;
+              if (option.type === 'city') {
+                if (option.isCapital) {
+                  return `${option.label} ${option.region ?? ''} ${option.country}`;
+                }
+
+                return `${option.label} ${option.region}`;
               }
 
               return option.label;
@@ -177,12 +181,23 @@ function TimezoneOption({
     <li {...rest}>
       <div className="py-2 w-full text-left">
         <p className="text-neutral-900 dark:text-neutral-100">{option.label}</p>
-        <p className="text-sm text-neutral-700 dark:text-neutral-300">
+        <p className="text-xs text-neutral-700 dark:text-neutral-300">
           {option.type === 'city' ? (
             option.isCapital ? (
-              <>Capital of {option.country}</>
+              <>
+                Capital of {option.country}
+                {option.region &&
+                !option.label.includes(option.region) &&
+                !option.country.includes(option.region) ? (
+                  <>, in {option.region} region</>
+                ) : null}
+              </>
+            ) : option.isRegionalCapital && option.region ? (
+              <>
+                Regional capital of {option.region}, {option.country}
+              </>
             ) : (
-              <>City in {option.country}</>
+              <>City in {option.region ? `${option.region}, ${option.country}` : option.country}</>
             )
           ) : (
             <>Timezone</>
