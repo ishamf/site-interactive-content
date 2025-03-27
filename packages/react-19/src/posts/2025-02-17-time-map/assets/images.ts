@@ -3,8 +3,8 @@ import nightImageUrl from './data/night.jpg?no-inline';
 import smallDayImageUrl from './data/daysmall.jpg?no-inline';
 import smallNightImageUrl from './data/nightsmall.jpg?no-inline';
 
-async function loadImage(url: string) {
-  const res = await fetch(url);
+async function loadImage(relativeUrl: string) {
+  const res = await fetch(new URL(relativeUrl, import.meta.url));
   const blob = await res.blob();
   return createImageBitmap(blob);
 }

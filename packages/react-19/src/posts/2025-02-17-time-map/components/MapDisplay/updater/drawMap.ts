@@ -1,10 +1,11 @@
+import { loadWorker } from '../../../../../utils/worker';
 import { MapImageData } from '../../../assets';
 import { canvasHeight, canvasWidth } from '../../../constants';
 import { SunAndEarthState } from '../../../types';
 import { renderAlphaMap } from './renderAlphaMap';
 import { WorkerMessage, WorkerResponse } from './types';
 
-const imageWorker = new Worker(new URL('./worker.js', import.meta.url), { type: 'module' });
+const imageWorker = loadWorker('2025-time-map');
 
 let taskIdCounter = 0;
 

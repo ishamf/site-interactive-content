@@ -1,6 +1,6 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react-swc';
-import { resolve } from 'path';
+import { resolve, extname, basename } from 'path';
 import { readdirSync } from 'fs';
 import tailwindcss from '@tailwindcss/vite';
 
@@ -15,11 +15,17 @@ export default defineConfig({
     outDir: 'dist',
     assetsDir: 'static/assets',
     lib: {
-      entry: readdirSync(resolve(__dirname, 'src/entries')).map((x) => 'src/entries/' + x),
+      entry: Object.fromEntries([
+        ...readdirSync(resolve(__dirname, 'src/entries')).map((x) => [
+          'entry-' + basename(x, extname(x)),
+          'src/entries/' + x,
+        ]),
+        ...readdirSync(resolve(__dirname, 'src/workers')).map((x) => [
+          'workers/' + basename(x, extname(x)),
+          'src/workers/' + x,
+        ]),
+      ]),
       formats: ['es'],
-      fileName(_format, entryName) {
-        return 'entry-' + entryName + '.js';
-      },
     },
     sourcemap: true,
     rollupOptions: {
