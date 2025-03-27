@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { DAY_LENGTH } from './constants';
 
 const ACCURACY_LIMIT = 5 * 60 * 1000; // 5 minutes
@@ -16,13 +16,23 @@ export function useGrabTime({
   container,
   time,
   setTime,
+  onDragEnd,
 }: {
   container: HTMLElement | null;
   time: number;
   setTime: (time: number) => void;
+  onDragEnd?: () => void;
 }) {
   const [isGrabbing, setIsGrabbing] = useState(false);
   const stateRef = useRef(null as DragState | null);
+
+  const prevIsGrabbing = useRef(isGrabbing);
+  useEffect(() => {
+    if (prevIsGrabbing.current && !isGrabbing && onDragEnd) {
+      onDragEnd();
+    }
+    prevIsGrabbing.current = isGrabbing;
+  }, [isGrabbing, onDragEnd]);
 
   const onPointerDown = useCallback(
     (event: React.PointerEvent) => {

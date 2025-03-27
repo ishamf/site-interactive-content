@@ -15,12 +15,14 @@ export function MapDisplay({
   selectionDataById,
   setTime,
   onRowFocus,
+  onTimeDragEnd,
 }: {
   time: number;
   animateTime: boolean;
   selectionDataById: Record<string, SelectionData | undefined>;
   setTime: (time: number) => void;
   onRowFocus: (rowId: string) => void;
+  onTimeDragEnd?: () => void;
 }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -57,7 +59,12 @@ export function MapDisplay({
     },
   });
 
-  const { isGrabbing, listeners } = useGrabTime({ container: canvasRef.current, time, setTime });
+  const { isGrabbing, listeners } = useGrabTime({
+    container: canvasRef.current,
+    time,
+    setTime,
+    onDragEnd: onTimeDragEnd,
+  });
 
   return (
     <div className="max-w-full relative">

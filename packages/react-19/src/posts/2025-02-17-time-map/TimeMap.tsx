@@ -186,6 +186,9 @@ export function TimeMap() {
               isRapidlyChanging: true,
             });
           }}
+          onTimeDragEnd={() => {
+            setTime((state) => ({ ...state, isRapidlyChanging: false }));
+          }}
           animateTime={timeState.useAnimation}
           onRowFocus={(rowId) => {
             const selector = refsByRowId.current[rowId];
@@ -203,6 +206,9 @@ export function TimeMap() {
               useAnimation: false,
               isRapidlyChanging: true,
             });
+          }}
+          onTimeDragEnd={() => {
+            setTime((state) => ({ ...state, isRapidlyChanging: false }));
           }}
         ></DayDisplayBar>
         <div className="mt-4 hidden md:block" ref={timeBarContainerRef}>

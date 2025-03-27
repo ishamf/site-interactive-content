@@ -13,9 +13,11 @@ const DAY_LENGTH = 24 * 3600 * 1000;
 export function DayDisplayBar({
   time,
   setTime,
+  onTimeDragEnd,
 }: {
   time: number;
   setTime: (time: number) => void;
+  onTimeDragEnd?: () => void;
 }) {
   const currentDaysSinceEpoch = Math.floor(time / DAY_LENGTH);
   const dayPercentage = (flMod(time, DAY_LENGTH) / DAY_LENGTH) * 100;
@@ -36,7 +38,12 @@ export function DayDisplayBar({
 
   const isTextShowingNextDay = dayPercentage >= 50;
 
-  const { listeners, isGrabbing } = useGrabTime({ container: containerRef.current, time, setTime });
+  const { listeners, isGrabbing } = useGrabTime({
+    container: containerRef.current,
+    time,
+    setTime,
+    onDragEnd: onTimeDragEnd,
+  });
 
   const leftTextColorIndex = isTextShowingNextDay ? currentDayColorIndex : prevDayColorIndex;
   const rightTextColorIndex =
