@@ -71,7 +71,7 @@ export function MapDisplay({
     <div className="max-w-full relative">
       <canvas
         {...listeners}
-        className={classNames('max-w-full select-none touch-pan-y', {
+        className={classNames('max-w-full select-none touch-pan-y touch-pinch-zoom', {
           'cursor-grabbing': isGrabbing,
           'cursor-grab': !isGrabbing,
         })}

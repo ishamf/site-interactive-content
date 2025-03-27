@@ -78,7 +78,7 @@ export function DayDisplayBar({
 
   return (
     <div
-      className={classNames('w-full overflow-hidden select-none touch-pan-y', {
+      className={classNames('w-full overflow-hidden select-none touch-pan-y touch-pinch-zoom', {
         'cursor-grab': !isGrabbing,
         'cursor-grabbing': isGrabbing,
       })}
