@@ -1,3 +1,4 @@
+/** @jsxImportSource @emotion/react */
 import {
   ComponentProps,
   ComponentPropsWithRef,
@@ -8,6 +9,7 @@ import {
   useRef,
   useState,
 } from 'react';
+import { css } from '@emotion/react';
 import { DateTime } from 'luxon';
 import { DndContext } from '@dnd-kit/core';
 import { SortableContext } from '@dnd-kit/sortable';
@@ -174,8 +176,16 @@ export function TimeMap() {
   return (
     <div className="flex max-w-full flex-col px-4 gap-x-4 items-stretch justify-center md:flex-row md:items-start bg-neutral-50 dark:bg-neutral-900">
       <div
-        style={{ maxWidth: `min(calc(200vh - 10rem - ${timeBarHeight * 2}px), ${canvasWidth}px)` }}
-        className="flex-1 z-10 self-center md:self-start sticky top-0 pt-4 pb-2 md:pb-4 flex items-stretch flex-col bg-neutral-50 dark:bg-neutral-900"
+        className="flex-1 z-10 self-center md:self-start pt-4 pb-2 md:pb-4 flex items-stretch flex-col bg-neutral-50 dark:bg-neutral-900"
+        style={{
+          maxWidth: `min(max(calc(200vh - 10rem - ${timeBarHeight * 2}px), min(30rem - ${timeBarHeight * 2}px, 100%)), ${canvasWidth}px)`,
+        }}
+        css={css`
+          @media ((width >= 48rem) and (height >= 20rem)) or (height >= 150vw) {
+            position: sticky;
+            top: 0;
+          }
+        `}
       >
         <MapDisplay
           time={timeState.time.valueOf()}
