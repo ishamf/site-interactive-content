@@ -24,6 +24,7 @@ interface TimezoneSelectionData extends BaseSelectionData {
 export type SelectionData = CitySelectionData | TimezoneSelectionData;
 
 const supportedSystemTimezones = new Set(Intl.supportedValuesOf('timeZone'));
+supportedSystemTimezones.add('UTC');
 
 const timezoneIdToSystemTimezone = new Map<string, string>();
 
@@ -34,11 +35,11 @@ for (const timezone of timezoneData) {
 
   if (timezone.links) {
     for (const link of timezone.links) {
-      if (
-        supportedSystemTimezones.has(link) &&
-        !timezoneIdToSystemTimezone.has(timezone.TimeZoneId)
-      ) {
-        timezoneIdToSystemTimezone.set(timezone.TimeZoneId, link);
+      if (supportedSystemTimezones.has(link)) {
+        if (!timezoneIdToSystemTimezone.has(timezone.TimeZoneId)) {
+          timezoneIdToSystemTimezone.set(timezone.TimeZoneId, link);
+        }
+        break;
       }
     }
   }

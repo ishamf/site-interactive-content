@@ -2086,5 +2086,13 @@
     "TimeZoneId": "Pacific/Wallis",
     "CountryCode": "WF",
     "city": 4034821
+  },
+  {
+    "TimeZoneId": "Etc/UTC",
+    "links": ["UTC"]
+  },
+  {
+    "TimeZoneId": "Etc/GMT",
+    "links": ["GMT", "UTC"]
   }
 ]
