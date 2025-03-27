@@ -74,6 +74,9 @@
     "*.json": [
       "prettier --write"
     ],
+    "*.html": [
+      "prettier --write"
+    ],
     "*.yml": [
       "prettier --write"
     ]
