@@ -72,7 +72,8 @@
   },
   {
     "TimeZoneId": "Africa/Ceuta",
-    "CountryCode": "ES"
+    "CountryCode": "ES",
+    "city": 2513947
   },
   {
     "TimeZoneId": "Africa/Conakry",
@@ -318,7 +319,7 @@
   {
     "TimeZoneId": "America/Argentina/Mendoza",
     "CountryCode": "AR",
-    "city": 3836669,
+    "city": 3844421,
     "links": ["America/Mendoza"]
   },
   {
@@ -348,7 +349,8 @@
   },
   {
     "TimeZoneId": "America/Argentina/Ushuaia",
-    "CountryCode": "AR"
+    "CountryCode": "AR",
+    "city": 3833367
   },
   {
     "TimeZoneId": "America/Aruba",
@@ -386,7 +388,7 @@
   {
     "TimeZoneId": "America/Belize",
     "CountryCode": "BZ",
-    "city": 3582672
+    "city": 3582677
   },
   {
     "TimeZoneId": "America/Blanc-Sablon",
@@ -526,8 +528,7 @@
   },
   {
     "TimeZoneId": "America/Glace_Bay",
-    "CountryCode": "CA",
-    "city": 6354908
+    "CountryCode": "CA"
   },
   {
     "TimeZoneId": "America/Goose_Bay",
@@ -630,7 +631,8 @@
   },
   {
     "TimeZoneId": "America/Juneau",
-    "CountryCode": "US"
+    "CountryCode": "US",
+    "city": 5554072
   },
   {
     "TimeZoneId": "America/Kentucky/Louisville",
@@ -732,7 +734,7 @@
   {
     "TimeZoneId": "America/Moncton",
     "CountryCode": "CA",
-    "city": 6076211
+    "city": 5957776
   },
   {
     "TimeZoneId": "America/Monterrey",
@@ -816,7 +818,7 @@
   {
     "TimeZoneId": "America/Port_of_Spain",
     "CountryCode": "TT",
-    "city": 3573890
+    "city": 3574810
   },
   {
     "TimeZoneId": "America/Porto_Velho",
@@ -846,7 +848,7 @@
   {
     "TimeZoneId": "America/Regina",
     "CountryCode": "CA",
-    "city": 6141256,
+    "city": 6119109,
     "links": ["Canada/Saskatchewan"]
   },
   {
@@ -861,8 +863,7 @@
   },
   {
     "TimeZoneId": "America/Santarem",
-    "CountryCode": "BR",
-    "city": 3389353
+    "CountryCode": "BR"
   },
   {
     "TimeZoneId": "America/Santiago",
@@ -908,12 +909,12 @@
   {
     "TimeZoneId": "America/St_Lucia",
     "CountryCode": "LC",
-    "city": 3576812
+    "city": 3576686
   },
   {
     "TimeZoneId": "America/St_Thomas",
     "CountryCode": "VI",
-    "city": 4795467
+    "city": 4796512
   },
   {
     "TimeZoneId": "America/St_Vincent",
@@ -959,6 +960,7 @@
   {
     "TimeZoneId": "America/Whitehorse",
     "CountryCode": "CA",
+    "city": 6180550,
     "links": ["Canada/Yukon"]
   },
   {
@@ -973,7 +975,8 @@
   },
   {
     "TimeZoneId": "America/Yellowknife",
-    "CountryCode": "CA"
+    "CountryCode": "CA",
+    "city": 6185377
   },
   {
     "TimeZoneId": "Antarctica/Casey",
@@ -1041,7 +1044,8 @@
   },
   {
     "TimeZoneId": "Asia/Anadyr",
-    "CountryCode": "RU"
+    "CountryCode": "RU",
+    "city": 2127202
   },
   {
     "TimeZoneId": "Asia/Aqtau",
@@ -1072,7 +1076,7 @@
   {
     "TimeZoneId": "Asia/Bahrain",
     "CountryCode": "BH",
-    "city": 385038
+    "city": 290340
   },
   {
     "TimeZoneId": "Asia/Baku",
@@ -1111,7 +1115,8 @@
   },
   {
     "TimeZoneId": "Asia/Choibalsan",
-    "CountryCode": "MN"
+    "CountryCode": "MN",
+    "city": 2032614
   },
   {
     "TimeZoneId": "Asia/Colombo",
@@ -1146,7 +1151,8 @@
   },
   {
     "TimeZoneId": "Asia/Famagusta",
-    "CountryCode": "CY"
+    "CountryCode": "CY",
+    "city": 146617
   },
   {
     "TimeZoneId": "Asia/Gaza",
@@ -1171,7 +1177,8 @@
   },
   {
     "TimeZoneId": "Asia/Hovd",
-    "CountryCode": "MN"
+    "CountryCode": "MN",
+    "city": 1515029
   },
   {
     "TimeZoneId": "Asia/Irkutsk",
@@ -1448,7 +1455,8 @@
   },
   {
     "TimeZoneId": "Atlantic/Azores",
-    "CountryCode": "PT"
+    "CountryCode": "PT",
+    "city": 6941014
   },
   {
     "TimeZoneId": "Atlantic/Bermuda",
@@ -1703,7 +1711,7 @@
   {
     "TimeZoneId": "Europe/Malta",
     "CountryCode": "MT",
-    "city": 2562305
+    "city": 2562541
   },
   {
     "TimeZoneId": "Europe/Mariehamn",
@@ -1944,7 +1952,7 @@
   {
     "TimeZoneId": "Pacific/Fiji",
     "CountryCode": "FJ",
-    "city": 8740209
+    "city": 2198148
   },
   {
     "TimeZoneId": "Pacific/Funafuti",
@@ -1968,7 +1976,7 @@
   {
     "TimeZoneId": "Pacific/Guam",
     "CountryCode": "GU",
-    "city": 4044012
+    "city": 4043909
   },
   {
     "TimeZoneId": "Pacific/Honolulu",
