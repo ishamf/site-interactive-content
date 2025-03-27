@@ -26,6 +26,7 @@ export default defineConfig({
         manualChunks: {
           css: ['./src/app-css.ts'],
         },
+        assetFileNames: 'assets/[name]-[hash].[ext]',
       },
     },
   },
