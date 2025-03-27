@@ -110,7 +110,18 @@ export const TimezoneSelection = memo(
             <TimezoneOption key={key} {...props} option={option} />
           )}
           options={selectionData}
-          renderInput={(params) => <TextField {...params} label="Time Zone" />}
+          renderInput={(params) => (
+            <TextField
+              {...params}
+              label={
+                !currentSelection
+                  ? 'City / Time Zone'
+                  : currentSelection.type === 'city'
+                    ? 'City'
+                    : 'Time Zone'
+              }
+            />
+          )}
           value={currentSelection}
           isOptionEqualToValue={(option, value) => option.id === value.id}
           onChange={(_e, value) => {
