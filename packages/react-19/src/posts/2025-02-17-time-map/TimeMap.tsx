@@ -16,10 +16,11 @@ import { TimezoneSelection } from './components/TimezoneSelection';
 import { useQuery } from '@tanstack/react-query';
 import { loadSelectionData } from './assets';
 import { DayDisplayBar } from './components/DayDisplayBar';
-import { useSelectionStore } from './store';
+import { INITIAL_DISPLAY_LENGTH, useSelectionStore } from './store';
 import { TimeBar } from './components/TimeBar';
 import { useElementSize } from '../../utils/hooks';
 import { canvasWidth } from './constants';
+import { TimezoneSelectionSkeleton } from './components/TimezoneSelectionSkeleton';
 
 interface TimeState {
   time: DateTime;
@@ -86,7 +87,7 @@ export function TimeMap() {
 
   const timeBarContainerRef = useRef<HTMLDivElement>(null);
 
-  const [timeBarHeight, setTimeBarHeight] = useState(0);
+  const [timeBarHeight, setTimeBarHeight] = useState(36.5);
 
   useElementSize({
     ref: timeBarContainerRef,
@@ -242,7 +243,11 @@ export function TimeMap() {
               </SortableContext>
             </DndContext>
           </>
-        ) : null}
+        ) : (
+          Array((selectedItems.length || INITIAL_DISPLAY_LENGTH) + 1)
+            .fill(null)
+            .map((_, index) => <TimezoneSelectionSkeleton key={index}></TimezoneSelectionSkeleton>)
+        )}
       </div>
     </div>
   );

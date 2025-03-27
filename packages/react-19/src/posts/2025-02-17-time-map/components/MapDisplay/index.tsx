@@ -1,4 +1,5 @@
 import { useMemo, useRef } from 'react';
+import { CircularProgress } from '@mui/material';
 import { canvasWidth, canvasHeight } from '../../constants';
 import { useMapUpdater } from './updater';
 import { useSelectionStore } from '../../store';
@@ -46,7 +47,7 @@ export function MapDisplay({
     });
   }, [selectedItems]);
 
-  const { hasRenderedOnce } = useMapUpdater(canvasRef, time, animateTime);
+  const { hasRenderedOnce, isLoadingImages } = useMapUpdater(canvasRef, time, animateTime);
 
   const store = useCityDisplayStore();
 
@@ -78,6 +79,11 @@ export function MapDisplay({
         width={canvasWidth}
         height={canvasHeight}
       />
+      {isLoadingImages ? (
+        <div className="absolute top-0 left-0 right-0 bottom-0 bg-neutral-900 flex items-center justify-center">
+          <CircularProgress></CircularProgress>
+        </div>
+      ) : null}
       {hasRenderedOnce
         ? uniqueSelectedItems.map((selectionItem) => {
             if (!selectionItem.itemId) {

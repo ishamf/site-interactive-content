@@ -3,6 +3,7 @@ import { drawMap } from './drawMap';
 import { getSunAndEarthStateAtTime, linearlyInterpolateSunAndEarthState } from '../../../math';
 import { SunAndEarthState } from '../../../types';
 import { loadImageData, loadSmallImageData, MapImageData } from '../../../assets';
+import { waitForMs } from '../../../utils';
 
 type RenderingState =
   | {
@@ -90,7 +91,7 @@ function reducer(state: State, action: Action): State {
         ...state,
         imageDataState: 'largeLoaded',
         imageData: action.imageData,
-        renderingState: 'renderingHighRes',
+        renderingState: 'renderingLowRes',
       };
     }
   }
@@ -112,13 +113,30 @@ export function useMapUpdater(
 
   useEffect(() => {
     (async () => {
-      const smallImageData = await loadSmallImageData();
+      const smallImageDataPromise: Promise<Action> = loadSmallImageData().then((imageData) => ({
+        type: 'doneLoadingSmallImages',
+        imageData,
+      }));
+      const largeImageDataPromise: Promise<Action> = loadImageData().then((imageData) => ({
+        type: 'doneLoadingLargeImages',
+        imageData,
+      }));
 
-      dispatch({ type: 'doneLoadingSmallImages', imageData: smallImageData });
+      // If the large image data finishes quickly enough (e.g. if it's cached), just use it
+      const possiblyLargeImageData = await Promise.race([waitForMs(100), largeImageDataPromise]);
 
-      const largeImageData = await loadImageData();
+      if (possiblyLargeImageData) {
+        dispatch(possiblyLargeImageData);
+        return;
+      }
 
-      dispatch({ type: 'doneLoadingLargeImages', imageData: largeImageData });
+      const earliestPromise = await Promise.race([smallImageDataPromise, largeImageDataPromise]);
+
+      dispatch(earliestPromise);
+
+      if (earliestPromise.type === 'doneLoadingSmallImages') {
+        dispatch(await largeImageDataPromise);
+      }
     })().catch((e) => {
       console.error(e);
     });
@@ -269,5 +287,8 @@ export function useMapUpdater(
     };
   }, [canvasRef, state]);
 
-  return { hasRenderedOnce: state.hasRenderedOnce };
+  return {
+    hasRenderedOnce: state.hasRenderedOnce,
+    isLoadingImages: state.imageDataState === 'loading',
+  };
 }

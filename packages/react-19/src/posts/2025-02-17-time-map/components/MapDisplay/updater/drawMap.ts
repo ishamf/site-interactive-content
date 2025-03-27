@@ -63,7 +63,7 @@ export async function drawMap({
   abortSignal?: AbortSignal;
   mapImageData: MapImageData;
 }) {
-  const start = performance.now();
+  // const start = performance.now();
 
   const alphaMapWidth = canvasWidth / alphaSize;
   const alphaMapHeight = canvasHeight / alphaSize;
@@ -98,7 +98,7 @@ export async function drawMap({
   ctx.globalCompositeOperation = 'destination-over';
   ctx.drawImage(mapImageData.nightImageBitmap, 0, 0, canvasWidth, canvasHeight);
 
-  const end = performance.now();
+  // const end = performance.now();
 
-  console.log('Rendered map with alphaSize', alphaSize, 'in', end - start);
+  // console.log('Rendered map with alphaSize', alphaSize, 'in', end - start);
 }

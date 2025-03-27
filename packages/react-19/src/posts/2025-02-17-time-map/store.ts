@@ -10,14 +10,22 @@ interface Selection {
   rowId: string;
 }
 
-const INITIAL_CITY_IDS = [
-  '5368361', // Los Angeles
-  '5128581', // New York
-  '2643743', // London
-  '1275339', // Mumbai
-  '1642911', // Jakarta
-  '1850147', // Tokyo
+const INITIAL_CITY_DATA = [
+  { id: '5368361', timezone: 'America/Los_Angeles' },
+  { id: '5128581', timezone: 'America/New_York' },
+  { id: '2643743', timezone: 'Europe/London' },
+  { id: '1275339', timezone: 'Asia/Kolkata', links: ['Asia/Calcutta'] },
+  { id: '1642911', timezone: 'Asia/Jakarta' },
+  { id: '1850147', timezone: 'Asia/Tokyo' },
 ];
+
+const localTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+export const INITIAL_DISPLAY_LENGTH =
+  // Local timezone
+  (INITIAL_CITY_DATA.map((city) => city.timezone).includes(localTimeZone) ? 0 : 1) +
+  // Initial cities
+  INITIAL_CITY_DATA.length;
 
 export const useSelectionStore = create(
   persist(
@@ -43,7 +51,11 @@ export const useSelectionStore = create(
 
         const newIds = localSelection ? [localSelection.id] : [];
 
-        newIds.push(...INITIAL_CITY_IDS.filter((id) => id !== localSelection?.id));
+        newIds.push(
+          ...INITIAL_CITY_DATA.filter((city) => city.id !== localSelection?.id).map(
+            (city) => city.id
+          )
+        );
 
         set({
           selectedItems: newIds.map((itemId) => ({ itemId, rowId: nanoid() })),

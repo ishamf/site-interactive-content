@@ -1,2 +1,5 @@
 /entry-*
     cache-control: public, max-age=0, must-revalidate
+
+/test-*.html
+    cache-control: public, max-age=0, must-revalidate
