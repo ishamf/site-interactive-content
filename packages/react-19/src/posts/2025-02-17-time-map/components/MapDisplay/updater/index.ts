@@ -2,6 +2,7 @@ import { RefObject, useEffect, useReducer, useRef } from 'react';
 import { drawMap } from './drawMap';
 import { getSunAndEarthStateAtTime, linearlyInterpolateSunAndEarthState } from '../../../math';
 import { SunAndEarthState } from '../../../types';
+import { loadImageData, loadSmallImageData, MapImageData } from '../../../assets';
 
 type RenderingState =
   | {
@@ -15,16 +16,32 @@ type RenderingState =
   | { renderingState: 'renderingLowRes'; time: number }
   | { renderingState: 'renderingHighRes'; time: number };
 
-type State = RenderingState & {
-  hasRenderedOnce: boolean;
-};
+type ImageDataState =
+  | {
+      imageDataState: 'loading';
+    }
+  | {
+      imageDataState: 'smallLoaded';
+      imageData: MapImageData;
+    }
+  | {
+      imageDataState: 'largeLoaded';
+      imageData: MapImageData;
+    };
+
+type State = RenderingState &
+  ImageDataState & {
+    hasRenderedOnce: boolean;
+  };
 
 type Action =
   | { type: 'newTime'; time: number }
   | { type: 'animateToTime'; time: number }
   | { type: 'doneAnimating'; time: number }
   | { type: 'doneRenderingLowRes'; time: number }
-  | { type: 'doneRenderingHighRes'; time: number };
+  | { type: 'doneRenderingHighRes'; time: number }
+  | { type: 'doneLoadingSmallImages'; imageData: MapImageData }
+  | { type: 'doneLoadingLargeImages'; imageData: MapImageData };
 
 function reducer(state: State, action: Action): State {
   switch (action.type) {
@@ -34,22 +51,48 @@ function reducer(state: State, action: Action): State {
       return { ...state, renderingState: 'animatingToTime', time: action.time };
     case 'doneAnimating':
       if (state.renderingState === 'animatingToTime' && state.time === action.time) {
-        return { renderingState: 'renderingLowRes', time: state.time, hasRenderedOnce: true };
+        return {
+          ...state,
+          renderingState: 'renderingLowRes',
+          time: state.time,
+          hasRenderedOnce: true,
+        };
       } else {
         return state;
       }
     case 'doneRenderingLowRes':
       if (state.renderingState === 'renderingLowRes' && state.time === action.time) {
-        return { renderingState: 'renderingHighRes', time: state.time, hasRenderedOnce: true };
+        return {
+          ...state,
+          renderingState: 'renderingHighRes',
+          time: state.time,
+          hasRenderedOnce: true,
+        };
       } else {
         return state;
       }
     case 'doneRenderingHighRes':
       if (state.renderingState === 'renderingHighRes' && state.time === action.time) {
-        return { renderingState: 'idle', time: state.time, hasRenderedOnce: true };
+        return { ...state, renderingState: 'idle', time: state.time, hasRenderedOnce: true };
       } else {
         return state;
       }
+    case 'doneLoadingSmallImages': {
+      return {
+        ...state,
+        imageDataState: 'smallLoaded',
+        imageData: action.imageData,
+        renderingState: 'renderingLowRes',
+      };
+    }
+    case 'doneLoadingLargeImages': {
+      return {
+        ...state,
+        imageDataState: 'largeLoaded',
+        imageData: action.imageData,
+        renderingState: 'renderingHighRes',
+      };
+    }
   }
 }
 
@@ -62,9 +105,24 @@ export function useMapUpdater(
 ) {
   const [state, dispatch] = useReducer<State, [Action]>(reducer, {
     renderingState: 'idle',
+    imageDataState: 'loading',
     time: 0,
     hasRenderedOnce: false,
   });
+
+  useEffect(() => {
+    (async () => {
+      const smallImageData = await loadSmallImageData();
+
+      dispatch({ type: 'doneLoadingSmallImages', imageData: smallImageData });
+
+      const largeImageData = await loadImageData();
+
+      dispatch({ type: 'doneLoadingLargeImages', imageData: largeImageData });
+    })().catch((e) => {
+      console.error(e);
+    });
+  }, []);
 
   useEffect(() => {
     if (time === state.time) return;
@@ -80,6 +138,8 @@ export function useMapUpdater(
 
   useEffect(() => {
     if (state.renderingState !== 'animatingToTime') return;
+    if (state.imageDataState === 'loading') return;
+    const mapImageData = state.imageData;
 
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -113,6 +173,7 @@ export function useMapUpdater(
         state: animatedSolarState,
         alphaSize: 20,
         useWorker: false,
+        mapImageData,
       })
         .then(() => {
           currentRenderedSolarState.current = animatedSolarState;
@@ -136,6 +197,8 @@ export function useMapUpdater(
 
   useEffect(() => {
     if (state.renderingState !== 'renderingLowRes') return;
+    if (state.imageDataState === 'loading') return;
+    const mapImageData = state.imageData;
 
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -150,6 +213,7 @@ export function useMapUpdater(
       state: solarState,
       alphaSize: 20,
       useWorker: false,
+      mapImageData,
     })
       .then(() => {
         currentRenderedSolarState.current = solarState;
@@ -162,6 +226,8 @@ export function useMapUpdater(
 
   useEffect(() => {
     if (state.renderingState !== 'renderingHighRes') return;
+    if (state.imageDataState === 'loading') return;
+    const mapImageData = state.imageData;
 
     let abortController: AbortController | undefined;
 
@@ -184,6 +250,7 @@ export function useMapUpdater(
         alphaSize: 1,
         useWorker: true,
         abortSignal: abortController.signal,
+        mapImageData,
       })
         .then(() => {
           if (!definedAbortController.signal.aborted) {

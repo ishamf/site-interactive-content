@@ -1,5 +1,5 @@
-import dayImageSrc from './data/day.jpg?url';
-import nightImageSrc from './data/night.jpg?url';
+import dayImageSrc from './data/daysmall.jpg?url';
+import nightImageSrc from './data/nightsmall.jpg?url';
 import { loadImage } from './utils';
 
 export async function loadImageData() {

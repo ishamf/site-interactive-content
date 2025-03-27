@@ -7,6 +7,12 @@ export async function loadImageData() {
   return load();
 }
 
+export async function loadSmallImageData() {
+  const { loadImageData: load } = await import('./smallImages');
+
+  return load();
+}
+
 export async function loadSelectionData() {
   const { selectionData, selectionDataById } = await import('./selectionData');
 

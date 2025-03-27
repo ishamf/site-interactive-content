@@ -1,4 +1,4 @@
-import { loadImageData, MapImageData } from '../../../assets';
+import { MapImageData } from '../../../assets';
 import { canvasHeight, canvasWidth } from '../../../constants';
 import { SunAndEarthState } from '../../../types';
 import { renderAlphaMap } from './renderAlphaMap';
@@ -48,32 +48,22 @@ async function renderAlphaMapWithWorker({
   return promise;
 }
 
-let mapImageDataPromise: Promise<MapImageData> | null = null;
-
-async function getMapImageData() {
-  if (mapImageDataPromise) return mapImageDataPromise;
-
-  mapImageDataPromise = loadImageData();
-
-  return mapImageDataPromise;
-}
-
 export async function drawMap({
   ctx,
   state,
   alphaSize = 1,
   useWorker,
   abortSignal,
+  mapImageData,
 }: {
   ctx: CanvasRenderingContext2D;
   state: SunAndEarthState;
   alphaSize: number;
   useWorker: boolean;
   abortSignal?: AbortSignal;
+  mapImageData: MapImageData;
 }) {
-  const mapImageData = await getMapImageData();
-
-  // const start  = performance.now();
+  const start = performance.now();
 
   const alphaMapWidth = canvasWidth / alphaSize;
   const alphaMapHeight = canvasHeight / alphaSize;
@@ -103,12 +93,12 @@ export async function drawMap({
   ctx.drawImage(alphaBitmap, 0, 0, canvasWidth, canvasHeight);
 
   ctx.globalCompositeOperation = 'source-in';
-  ctx.drawImage(mapImageData.dayImageBitmap, 0, 0);
+  ctx.drawImage(mapImageData.dayImageBitmap, 0, 0, canvasWidth, canvasHeight);
 
   ctx.globalCompositeOperation = 'destination-over';
-  ctx.drawImage(mapImageData.nightImageBitmap, 0, 0);
+  ctx.drawImage(mapImageData.nightImageBitmap, 0, 0, canvasWidth, canvasHeight);
 
-  // const end = performance.now();
+  const end = performance.now();
 
-  // console.log('Rendered map with alphaSize', alphaSize, 'in', end - start);
+  console.log('Rendered map with alphaSize', alphaSize, 'in', end - start);
 }
