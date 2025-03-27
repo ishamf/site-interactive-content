@@ -58,7 +58,9 @@ export const TimezoneSelection = memo(
 
     useImperativeHandle(ref, () => ({
       scrollIntoView: () => {
-        datepickerRef.current?.scrollIntoView();
+        datepickerRef.current?.scrollIntoView({
+          block: 'nearest',
+        });
       },
       focusSelector: () => {
         setIsPickerOpen(true);
