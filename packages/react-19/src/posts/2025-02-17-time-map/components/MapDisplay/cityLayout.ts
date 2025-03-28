@@ -38,8 +38,18 @@ function createStore() {
     },
 
     registerDisplayItem(rowId, item) {
+      let isChanged = false;
+
       set((state) => {
         if (item) {
+          const currentItem = state.displayItemById[rowId];
+
+          if (currentItem && currentItem.city === item.city && currentItem.size === item.size) {
+            return state;
+          }
+
+          isChanged = true;
+
           return {
             displayItemById: {
               ...state.displayItemById,
@@ -54,24 +64,40 @@ function createStore() {
         } else {
           const { [rowId]: _, ...rest } = state.displayItemById;
 
+          isChanged = true;
+
           return { displayItemById: rest };
         }
       });
 
-      get().queueRecalculatePositions();
+      if (isChanged) {
+        get().queueRecalculatePositions();
+      }
     },
 
+    // If the queueRecalculatePositions is called multiple times in a row,
+    // we only want to call recalculatePositions twice, once at start and once at end
     queueRecalculatePositions: (() => {
-      let isExecuting = false;
+      let state: 'idle' | 'calledOnce' | 'pendingEndCall' = 'idle';
       return () => {
-        if (isExecuting) {
+        if (state === 'calledOnce') {
+          state = 'pendingEndCall';
           return;
         }
 
-        isExecuting = true;
+        if (state === 'pendingEndCall') {
+          return;
+        }
+
+        get().recalculatePositions();
+
+        state = 'calledOnce';
+
         setTimeout(() => {
-          get().recalculatePositions();
-          isExecuting = false;
+          if (state === 'pendingEndCall') {
+            get().recalculatePositions();
+          }
+          state = 'idle';
         }, 0);
       };
     })(),

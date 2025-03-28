@@ -8,6 +8,7 @@ import {
   useMemo,
   useRef,
   useState,
+  useCallback,
 } from 'react';
 import { css } from '@emotion/react';
 import { DateTime } from 'luxon';
@@ -169,6 +170,14 @@ export function TimeMap() {
     [selectedItems]
   );
 
+  const onRowFocus = useCallback((rowId: string) => {
+    const selector = refsByRowId.current[rowId];
+    if (selector) {
+      selector.scrollIntoView();
+      selector.focusSelector();
+    }
+  }, []);
+
   return (
     <div className="flex max-w-full flex-col px-4 gap-x-4 items-stretch justify-center md:flex-row md:items-start bg-neutral-50 dark:bg-neutral-900">
       <div
@@ -197,13 +206,7 @@ export function TimeMap() {
             setTime((state) => ({ ...state, isRapidlyChanging: false }));
           }}
           animateTime={timeState.useAnimation}
-          onRowFocus={(rowId) => {
-            const selector = refsByRowId.current[rowId];
-            if (selector) {
-              selector.scrollIntoView();
-              selector.focusSelector();
-            }
-          }}
+          onRowFocus={onRowFocus}
         />
         <DayDisplayBar
           time={timeState.time.valueOf()}
