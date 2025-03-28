@@ -22,12 +22,14 @@ export function CityDisplay({
   labelPosition,
   onLabelSizeChange,
   onLabelClick,
+  className,
 }: {
   time: number;
   city: CitySelectionData;
   labelPosition: LabelPosition | null;
   onLabelSizeChange: (size: { width: number; height: number } | null) => void;
   onLabelClick: () => void;
+  className?: string;
 }) {
   const labelRef = useRef<HTMLButtonElement>(null);
 
@@ -60,6 +62,7 @@ export function CityDisplay({
           left: `${(longitude * 100) / 360 + 50}%`,
           top: `${(latitude * -100) / 180 + 50}%`,
         }}
+        className={className}
       >
         <svg
           css={css`

@@ -131,6 +131,9 @@ export function MapDisplay({
             return (
               <CityDisplay
                 {...displayProps}
+                className={classNames({
+                  'pointer-events-none': isGrabbing,
+                })}
                 key={rowId}
                 time={time}
                 labelPosition={displayItemById[rowId]?.labelPosition ?? null}
