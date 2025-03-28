@@ -2,7 +2,7 @@ import { ComponentProps, useEffect, useMemo, useRef } from 'react';
 import { CircularProgress } from '@mui/material';
 import { canvasWidth, canvasHeight } from '../../constants';
 import { useMapUpdater } from './updater';
-import { useSelectionStore } from '../../store';
+import { HiddenRowInput, useHiddenRowsStore, useSelectionStore } from '../../store';
 import { CityDisplay } from './CityDisplay';
 import { useCityDisplayStore } from './cityLayout';
 import { useElementSize } from '../../../../utils/hooks';
@@ -29,10 +29,15 @@ export function MapDisplay({
 
   const selectedItems = useSelectionStore((state) => state.selectedItems);
 
-  const { registerContainerSize, registerDisplayItem, displayItemById } = useCityDisplayStore();
+  const setHiddenRows = useHiddenRowsStore((state) => state.setHiddenRows);
 
-  const cityDisplayItems = useMemo(() => {
+  const { registerContainerSize, registerDisplayItem, displayItemById, setValidRowIds } =
+    useCityDisplayStore();
+
+  const { uniqueSelectedItems, duplicatedSelectedItems } = useMemo(() => {
     const seenItems = new Set<string>();
+
+    const duplicatedSelectedItems: typeof selectedItems = [];
 
     const uniqueSelectedItems = selectedItems.filter((item) => {
       if (!item.itemId) {
@@ -40,6 +45,7 @@ export function MapDisplay({
       }
 
       if (seenItems.has(item.itemId)) {
+        duplicatedSelectedItems.push(item);
         return false;
       }
 
@@ -48,6 +54,14 @@ export function MapDisplay({
       return true;
     });
 
+    return { uniqueSelectedItems, duplicatedSelectedItems };
+  }, [selectedItems]);
+
+  useEffect(() => {
+    setValidRowIds(uniqueSelectedItems.map((x) => x.rowId));
+  }, [setValidRowIds, uniqueSelectedItems]);
+
+  const cityDisplayItems = useMemo(() => {
     return uniqueSelectedItems.map((selectionItem) => {
       if (!selectionItem.itemId) {
         return null;
@@ -84,7 +98,7 @@ export function MapDisplay({
 
       return { rowId: selectionItem.rowId, displayProps };
     });
-  }, [onRowFocus, registerDisplayItem, selectedItems, selectionDataById]);
+  }, [onRowFocus, registerDisplayItem, selectionDataById, uniqueSelectedItems]);
 
   const cityDisplayItemsWithPositions = useMemo(() => {
     const renderedItems: Record<string, boolean> = {};
@@ -106,7 +120,7 @@ export function MapDisplay({
       return {
         ...cityItem,
         labelPosition: displayItem?.labelPosition || null,
-        labelIntersectsOthers: !isCurrentItemRendered,
+        labelIntersectsOthers: !!(displayItem && !isCurrentItemRendered),
       };
     });
 
@@ -115,6 +129,24 @@ export function MapDisplay({
 
     return result;
   }, [cityDisplayItems, displayItemById]);
+
+  useEffect(() => {
+    const intersectionRowIds = cityDisplayItemsWithPositions
+      .filter(
+        (item): item is Exclude<(typeof cityDisplayItemsWithPositions)[number], null> =>
+          !!item && item.labelIntersectsOthers
+      )
+      .map((item) => item.rowId);
+
+    const duplicateRowIds = duplicatedSelectedItems.map((item) => item.rowId);
+
+    setHiddenRows([
+      ...intersectionRowIds.map(
+        (rowId): HiddenRowInput => ({ rowId, data: { reason: 'intersect' } })
+      ),
+      ...duplicateRowIds.map((rowId): HiddenRowInput => ({ rowId, data: { reason: 'duplicate' } })),
+    ]);
+  }, [cityDisplayItemsWithPositions, duplicatedSelectedItems, setHiddenRows]);
 
   const { hasRenderedOnce, isLoadingImages } = useMapUpdater(canvasRef, time, animateTime);
 
@@ -156,12 +188,13 @@ export function MapDisplay({
         ? cityDisplayItemsWithPositions.map((displayItem) => {
             if (!displayItem) return null;
 
-            const { rowId, displayProps, labelPosition } = displayItem;
+            const { rowId, displayProps, labelPosition, labelIntersectsOthers } = displayItem;
 
             return (
               <CityDisplay
                 {...displayProps}
-                disabled={isGrabbing}
+                disabled={isGrabbing || labelIntersectsOthers}
+                labelHidden={labelIntersectsOthers}
                 key={rowId}
                 time={time}
                 labelPosition={labelPosition}

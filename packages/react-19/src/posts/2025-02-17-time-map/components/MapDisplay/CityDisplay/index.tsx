@@ -5,7 +5,7 @@ import { css } from '@emotion/react';
 import { DateTime } from 'luxon';
 import { CitySelectionData } from '../../../assets';
 import { dayColors, dayDarkTextColors } from '../../../constants';
-import { useEffect, useRef } from 'react';
+import { CSSProperties, useEffect, useRef } from 'react';
 import { useElementSize } from '../../../../../utils/hooks';
 import { LabelPosition } from '../cityLayout';
 import classNames from 'classnames';
@@ -15,6 +15,90 @@ const indicatorRotationBasedOnLabelPosition = {
   topright: -30,
   bottomleft: 150,
   bottomright: 30,
+  top: -90,
+  left: -180,
+  right: 0,
+  bottom: 90,
+};
+
+const leftPosStyle: CSSProperties = {
+  right: 0,
+  textAlign: 'right',
+  paddingRight: '0.5rem',
+};
+
+const rightPosStyle: CSSProperties = {
+  left: 0,
+  textAlign: 'left',
+  paddingLeft: '0.5rem',
+};
+
+const centerPosStyle: CSSProperties = {
+  left: 0,
+  transform: 'translateX(-50%)',
+  textAlign: 'center',
+  paddingLeft: '0.25rem',
+  paddingRight: '0.25rem',
+};
+
+const verticalCenterAlignStyle: CSSProperties = {
+  top: 0,
+  transform: 'translateY(-50%)',
+  paddingTop: '0.125rem',
+  paddingBottom: '0.125rem',
+};
+
+// The padding on these two are intentionally in the wrong direction
+// to reserve space for the top and bottom positions
+const topPosStyle: CSSProperties = {
+  bottom: 0,
+  paddingTop: '0.125rem',
+  paddingBottom: '0.125rem',
+};
+
+const bottomPosStyle: CSSProperties = {
+  top: 0,
+  paddingTop: '0.125rem',
+  paddingBottom: '0.125rem',
+};
+
+const styleByLabelPosition: Record<LabelPosition, CSSProperties> = {
+  topleft: {
+    ...topPosStyle,
+    ...leftPosStyle,
+  },
+  topright: {
+    ...topPosStyle,
+    ...rightPosStyle,
+  },
+  bottomleft: {
+    ...bottomPosStyle,
+    ...leftPosStyle,
+  },
+  bottomright: {
+    ...bottomPosStyle,
+    ...rightPosStyle,
+  },
+  left: {
+    ...verticalCenterAlignStyle,
+    ...leftPosStyle,
+  },
+  right: {
+    ...verticalCenterAlignStyle,
+    ...rightPosStyle,
+  },
+  top: {
+    ...topPosStyle,
+    ...centerPosStyle,
+    paddingTop: '0',
+    paddingBottom: '0.25rem',
+  },
+  bottom: {
+    ...bottomPosStyle,
+    ...centerPosStyle,
+    paddingBottom: '0',
+    paddingTop: '0.25rem',
+  },
 };
 
 export function CityDisplay({
@@ -59,7 +143,6 @@ export function CityDisplay({
           width: 0px;
           height: 0px;
           position: absolute;
-          transform: translate(-50%, -50%);
 
           ${!labelPosition ? 'visibility: hidden;' : ''}
         `}
@@ -67,16 +150,19 @@ export function CityDisplay({
           left: `${(longitude * 100) / 360 + 50}%`,
           top: `${(latitude * -100) / 180 + 50}%`,
         }}
-        className={classNames(className, {
-          'pointer-events-none': disabled,
-          'opacity-80': disabled && !labelHidden,
-          'opacity-50': labelHidden,
-        })}
+        className={classNames(
+          {
+            'pointer-events-none': disabled,
+            'opacity-50': labelHidden,
+          },
+          className
+        )}
       >
         <svg
           css={css`
             width: 12.5px;
             height: 5px;
+            z-index: 10;
             transform-origin: 2.5px 2.5px;
             transform: translate(-2.5px, -2.5px)
               rotate(${indicatorRotationBasedOnLabelPosition[labelPosition ?? 'bottomright']}deg);
@@ -101,14 +187,13 @@ export function CityDisplay({
           ref={labelRef}
           onClick={onLabelClick}
           style={{
+            ...styleByLabelPosition[labelPosition ?? 'bottomright'],
             visibility: labelHidden ? 'hidden' : 'visible',
           }}
           css={css`
             position: absolute;
-            ${labelPosition === 'topleft' || labelPosition == 'topright' ? `bottom: 0;` : `top: 0;`}
-            ${labelPosition === 'topleft' || labelPosition == 'bottomleft'
-              ? `right: 0; text-align: right; padding-right: 0.5rem;`
-              : `left: 0; text-align: left; padding-left: 0.5rem;`}
+            z-index: 20;
+
             color: ${dayTextColor};
             text-shadow: ${Array(5).fill('0 0 7px #000000').join(',')};
             border-radius: 0.5rem;

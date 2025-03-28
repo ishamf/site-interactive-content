@@ -2,10 +2,22 @@ import { useRef } from 'react';
 import { create } from 'zustand';
 import { CitySelectionData } from '../../assets';
 
-const labelPositions = ['topleft', 'topright', 'bottomleft', 'bottomright'] as const;
+const labelPositions = [
+  'topleft',
+  'topright',
+  'bottomleft',
+  'bottomright',
+  'left',
+  'top',
+  'right',
+  'bottom',
+] as const;
 export type LabelPosition = (typeof labelPositions)[number];
 
 export type BoxSize = { width: number; height: number };
+
+const boxRectKeys = [...labelPositions, 'potential'] as const;
+type BoxRectKey = (typeof boxRectKeys)[number];
 
 type BoxRect = BoxSize & { left: number; top: number };
 
@@ -19,7 +31,9 @@ type DisplayItem = {
 
 interface CityDisplayStore {
   containerSize: BoxSize | null;
+  validRowIds: Set<string>;
   displayItemById: Record<string, DisplayItem | undefined>;
+  setValidRowIds: (rowIds: string[]) => void;
   registerContainerSize(size: BoxSize): void;
   registerDisplayItem(rowId: string, item: { size: BoxSize; city: CitySelectionData } | null): void;
   queueRecalculatePositions(): void;
@@ -31,6 +45,23 @@ function createStore() {
     containerSize: null,
 
     displayItemById: {},
+    validRowIds: new Set(),
+
+    setValidRowIds(rowIds) {
+      set((state) => {
+        const newValidRowIds = new Set(rowIds);
+        const newDisplayItemById = Object.fromEntries(
+          Object.entries(state.displayItemById).filter(([rowId]) => newValidRowIds.has(rowId))
+        );
+
+        return {
+          displayItemById: newDisplayItemById,
+          validRowIds: newValidRowIds,
+        };
+      });
+
+      get().queueRecalculatePositions();
+    },
 
     registerContainerSize(size) {
       set({ containerSize: size });
@@ -42,6 +73,10 @@ function createStore() {
       let isChanged = false;
 
       set((state) => {
+        if (!state.validRowIds.has(rowId)) {
+          return state;
+        }
+
         if (item) {
           const currentItem = state.displayItemById[rowId];
 
@@ -140,7 +175,7 @@ export function useCityDisplayStore() {
 function getLabelRect(
   containerSize: BoxSize,
   displayItem: Omit<DisplayItem, 'labelPosition'>,
-  position: LabelPosition
+  position: BoxRectKey
 ) {
   const cityX = (displayItem.city.longitude / 360 + 0.5) * containerSize.width;
   const cityY = (displayItem.city.latitude / -180 + 0.5) * containerSize.height;
@@ -170,6 +205,37 @@ function getLabelRect(
         top: cityY,
         ...displayItem.size,
       };
+    case 'left':
+      return {
+        left: cityX - displayItem.size.width,
+        top: cityY - displayItem.size.height / 2,
+        ...displayItem.size,
+      };
+    case 'top':
+      return {
+        left: cityX - displayItem.size.width / 2,
+        top: cityY - displayItem.size.height,
+        ...displayItem.size,
+      };
+    case 'right':
+      return {
+        left: cityX,
+        top: cityY - displayItem.size.height / 2,
+        ...displayItem.size,
+      };
+    case 'bottom':
+      return {
+        left: cityX - displayItem.size.width / 2,
+        top: cityY,
+        ...displayItem.size,
+      };
+    case 'potential':
+      return {
+        left: cityX - displayItem.size.width,
+        top: cityY - displayItem.size.height,
+        width: displayItem.size.width * 2,
+        height: displayItem.size.height * 2,
+      };
   }
 }
 
@@ -192,36 +258,45 @@ function calculateItemCost({
   currentItemPosition,
   allItems,
   allItemPositions,
+  ignorePotential,
 }: {
   containerSize: BoxSize;
   currentItem: BoxRect;
   currentItemIndex: number;
   currentItemPosition: LabelPosition;
-  allItems: Record<LabelPosition, BoxRect[]>;
+  allItems: Record<BoxRectKey, BoxRect[]>;
   allItemPositions: LabelPosition[];
+  ignorePotential: boolean;
 }) {
   let cost = 0;
 
-  // Cost to prefer bottom right display if there's no intersections
-  if (currentItemPosition === 'topleft' || currentItemPosition === 'topright') {
+  // Cost to prefer certain display positions if there's no intersections,
+  // since they just look better (subjectively)
+  if (
+    currentItemPosition === 'left' ||
+    currentItemPosition === 'top' ||
+    currentItemPosition === 'bottom' ||
+    currentItemPosition === 'right'
+  ) {
+    cost += 5;
+  } else if (currentItemPosition === 'topleft' || currentItemPosition === 'topright') {
     cost += 2;
-  } else if (currentItemPosition === 'bottomleft') {
-    cost += 1;
   }
 
   // Cost for intersection with other items. This has the biggest effect for
   // items that are actually intersecting with each other, but it
   // also has a lesser effect with the "potential position" of the other items,
   // to open up more positions for items that are actually intersecting
-  for (const position of labelPositions) {
-    for (let i = 0; i < allItemPositions.length; i++) {
-      if (i === currentItemIndex) {
-        continue;
-      }
-      cost +=
-        getBoxIntersection(currentItem, allItems[position][i]) *
-        (allItemPositions[i] === position ? 10 : 1);
+  for (let i = 0; i < allItemPositions.length; i++) {
+    if (i === currentItemIndex) {
+      continue;
     }
+
+    const actualIntersection = getBoxIntersection(currentItem, allItems[allItemPositions[i]][i]);
+
+    cost +=
+      actualIntersection * 10 +
+      (ignorePotential ? 0 : getBoxIntersection(currentItem, allItems['potential'][i]) * 1);
   }
 
   // Cost for going out of bounds
@@ -245,18 +320,19 @@ type CandidateAction = {
 function optimizeLabelDisplays(containerSize: BoxSize, items: DisplayItem[]): DisplayItem[] {
   // const start = performance.now();
 
-  const boxRectsByPosition = labelPositions.reduce(
+  const boxRectsByPosition = boxRectKeys.reduce(
     (acc, position) => {
       acc[position] = items.map((item) => getLabelRect(containerSize, item, position));
       return acc;
     },
-    {} as Record<LabelPosition, BoxRect[]>
+    {} as Record<BoxRectKey, BoxRect[]>
   );
   const itemLabelPositions: LabelPosition[] = Array(items.length).fill('bottomright');
 
   const n = items.length;
   const maxIters = Math.max(n * 3, 20);
   let iter = 0;
+  let ignorePotential = false;
 
   for (iter = 0; iter < maxIters; iter++) {
     let bestCandidateAction: CandidateAction | null = null;
@@ -270,6 +346,7 @@ function optimizeLabelDisplays(containerSize: BoxSize, items: DisplayItem[]): Di
         currentItemPosition: currentPosition,
         allItems: boxRectsByPosition,
         allItemPositions: itemLabelPositions,
+        ignorePotential,
       });
 
       if (currentCost === 0) continue;
@@ -286,9 +363,20 @@ function optimizeLabelDisplays(containerSize: BoxSize, items: DisplayItem[]): Di
           currentItemPosition: candidatePosition,
           allItems: boxRectsByPosition,
           allItemPositions: itemLabelPositions,
+          ignorePotential,
         });
 
         const costDelta = candidateCost - currentCost;
+
+        // console.log(
+        //   'Cost of moving ',
+        //   items[i].city.label,
+        //   'from',
+        //   currentPosition,
+        //   'to',
+        //   candidatePosition,
+        //   costDelta
+        // );
 
         if (costDelta < 0 && (!bestCandidateAction || costDelta < bestCandidateAction.costDelta)) {
           bestCandidateAction = { costDelta, index: i, position: candidatePosition };
@@ -296,7 +384,16 @@ function optimizeLabelDisplays(containerSize: BoxSize, items: DisplayItem[]): Di
       }
     }
 
+    // console.log('Best candidate action:', bestCandidateAction);
+
     if (!bestCandidateAction) {
+      // Run the algorithm again while ignoring potential intersections
+      // to reduce the usage of non-preferred positions
+      if (!ignorePotential) {
+        ignorePotential = true;
+        continue;
+      }
+
       break;
     }
 
@@ -317,7 +414,10 @@ function optimizeLabelDisplays(containerSize: BoxSize, items: DisplayItem[]): Di
         const currentItem = boxRectsByPosition[itemLabelPositions[i]][i];
         const otherItemRect = boxRectsByPosition[itemLabelPositions[j]][j];
 
-        return getBoxIntersection(currentItem, otherItemRect) > 0;
+        return (
+          getBoxIntersection(currentItem, otherItemRect) >
+          currentItem.width * currentItem.height * 0.1
+        );
       })
       .map((x) => x.rowId),
   }));

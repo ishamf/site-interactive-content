@@ -96,3 +96,18 @@ export const useSelectionStore = create(
     }
   )
 );
+
+type HiddenRowData = { reason: 'intersect' | 'duplicate' };
+
+export type HiddenRowInput = {
+  rowId: string;
+  data: HiddenRowData;
+};
+
+export const useHiddenRowsStore = create(
+  combine({ hiddenRows: new Map<string, HiddenRowData>() }, (set) => ({
+    setHiddenRows: (hiddenRows: HiddenRowInput[]) => {
+      set({ hiddenRows: new Map(hiddenRows.map(({ rowId, data }) => [rowId, data])) });
+    },
+  }))
+);
