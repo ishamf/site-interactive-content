@@ -181,7 +181,7 @@ export function TimeMap() {
           maxWidth: `min(max(calc(200vh - 10rem - ${timeBarHeight * 2}px), min(30rem - ${timeBarHeight * 2}px, 100%)), ${canvasWidth}px)`,
         }}
         css={css`
-          @media ((width >= 48rem) and (height >= 20rem)) or (height >= 150vw) {
+          @media ((width >= 48rem) and (height >= 20rem)) or (height >= 100vw) {
             position: sticky;
             top: 0;
           }

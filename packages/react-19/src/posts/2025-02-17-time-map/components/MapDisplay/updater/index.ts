@@ -1,4 +1,5 @@
 import { RefObject, useEffect, useReducer, useRef } from 'react';
+import { spring } from 'motion';
 import { drawMap } from './drawMap';
 import { getSunAndEarthStateAtTime, linearlyInterpolateSunAndEarthState } from '../../../math';
 import { SunAndEarthState } from '../../../types';
@@ -97,7 +98,7 @@ function reducer(state: State, action: Action): State {
   }
 }
 
-const ANIMATION_DURATION = 100;
+const ANIMATION_DURATION = 150;
 
 export function useMapUpdater(
   canvasRef: RefObject<HTMLCanvasElement | null>,
@@ -175,15 +176,25 @@ export function useMapUpdater(
       currentRenderedSolarState.current || getSunAndEarthStateAtTime(state.time);
     const targetSolarState = getSunAndEarthStateAtTime(targetTime);
 
+    const springGenerator = spring({
+      keyframes: [0, 1],
+      visualDuration: ANIMATION_DURATION / 1000,
+      bounce: 0,
+    });
+
+    let animationStopped = false;
+
     function animateMap() {
       const currentTime = Date.now();
 
-      const animationProgress = Math.min((currentTime - animationStart) / ANIMATION_DURATION, 1);
+      const delta = currentTime - animationStart;
+
+      const { value, done } = springGenerator.next(delta);
 
       const animatedSolarState = linearlyInterpolateSunAndEarthState(
         initialSolarState,
         targetSolarState,
-        animationProgress
+        value
       );
 
       drawMap({
@@ -195,7 +206,7 @@ export function useMapUpdater(
       })
         .then(() => {
           currentRenderedSolarState.current = animatedSolarState;
-          if (Date.now() > animationStart + ANIMATION_DURATION) {
+          if (done || animationStopped) {
             dispatch({ type: 'doneAnimating', time: state.time });
           } else {
             animationCallback = requestAnimationFrame(animateMap);
@@ -209,6 +220,7 @@ export function useMapUpdater(
     let animationCallback = requestAnimationFrame(animateMap);
 
     return () => {
+      animationStopped = true;
       cancelAnimationFrame(animationCallback);
     };
   }, [canvasRef, state]);
