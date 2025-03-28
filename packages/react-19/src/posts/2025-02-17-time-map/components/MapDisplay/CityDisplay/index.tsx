@@ -8,6 +8,7 @@ import { dayColors, dayDarkTextColors } from '../../../constants';
 import { useEffect, useRef } from 'react';
 import { useElementSize } from '../../../../../utils/hooks';
 import { LabelPosition } from '../cityLayout';
+import classNames from 'classnames';
 
 const indicatorRotationBasedOnLabelPosition = {
   topleft: -150,
@@ -23,6 +24,8 @@ export function CityDisplay({
   onLabelSizeChange,
   onLabelClick,
   className,
+  disabled,
+  labelHidden,
 }: {
   time: number;
   city: CitySelectionData;
@@ -30,6 +33,8 @@ export function CityDisplay({
   onLabelSizeChange: (size: { width: number; height: number } | null) => void;
   onLabelClick: () => void;
   className?: string;
+  disabled?: boolean;
+  labelHidden?: boolean;
 }) {
   const labelRef = useRef<HTMLButtonElement>(null);
 
@@ -62,7 +67,11 @@ export function CityDisplay({
           left: `${(longitude * 100) / 360 + 50}%`,
           top: `${(latitude * -100) / 180 + 50}%`,
         }}
-        className={className}
+        className={classNames(className, {
+          'pointer-events-none': disabled,
+          'opacity-80': disabled && !labelHidden,
+          'opacity-50': labelHidden,
+        })}
       >
         <svg
           css={css`
@@ -75,30 +84,34 @@ export function CityDisplay({
           `}
           viewBox="0 0 50 20"
         >
-          <path
-            style={{
-              stroke: dayTextColor,
-              strokeWidth: 8,
-              strokeLinecap: 'round',
-            }}
-            d="M 10 10 h 30"
-          />
+          {labelHidden ? null : (
+            <path
+              style={{
+                stroke: dayTextColor,
+                strokeWidth: 8,
+                strokeLinecap: 'round',
+              }}
+              d="M 10 10 h 30"
+            />
+          )}
           <circle style={{ fill: dayColor }} cx="10" cy="10" r="10" />
         </svg>
 
         <button
           ref={labelRef}
           onClick={onLabelClick}
+          style={{
+            visibility: labelHidden ? 'hidden' : 'visible',
+          }}
           css={css`
             position: absolute;
             ${labelPosition === 'topleft' || labelPosition == 'topright' ? `bottom: 0;` : `top: 0;`}
             ${labelPosition === 'topleft' || labelPosition == 'bottomleft'
-              ? `right: 0; text-align: right;`
-              : `left: 0; text-align: left;`}
+              ? `right: 0; text-align: right; padding-right: 0.5rem;`
+              : `left: 0; text-align: left; padding-left: 0.5rem;`}
             color: ${dayTextColor};
             text-shadow: ${Array(5).fill('0 0 7px #000000').join(',')};
             border-radius: 0.5rem;
-            padding: 0.1rem 0.5rem;
             font-size: 0.75rem;
             white-space: nowrap;
             cursor: pointer;

@@ -13,12 +13,13 @@ type DisplayItem = {
   rowId: string;
   city: CitySelectionData;
   labelPosition: LabelPosition | null;
+  intersections: string[];
   size: BoxSize;
 };
 
 interface CityDisplayStore {
   containerSize: BoxSize | null;
-  displayItemById: Record<string, DisplayItem>;
+  displayItemById: Record<string, DisplayItem | undefined>;
   registerContainerSize(size: BoxSize): void;
   registerDisplayItem(rowId: string, item: { size: BoxSize; city: CitySelectionData } | null): void;
   queueRecalculatePositions(): void;
@@ -58,6 +59,7 @@ function createStore() {
                 city: item.city,
                 size: item.size,
                 labelPosition: state.displayItemById[rowId]?.labelPosition ?? null,
+                intersections: state.displayItemById[rowId]?.intersections ?? [],
               },
             },
           };
@@ -109,7 +111,7 @@ function createStore() {
 
       const optimizedDisplayItems = optimizeLabelDisplays(
         this.containerSize,
-        Object.values(get().displayItemById)
+        Object.values(get().displayItemById).filter((item): item is DisplayItem => !!item)
       );
 
       set({
@@ -183,14 +185,21 @@ function getBoxIntersection(box1: BoxRect, box2: BoxRect): number {
   return xOverlap * yOverlap;
 }
 
-function calculateItemCost(
-  containerSize: BoxSize,
-  currentItem: BoxRect,
-  currentItemIndex: number,
-  currentItemPosition: LabelPosition,
-  allItems: Record<LabelPosition, BoxRect[]>,
-  allItemPositions: LabelPosition[]
-) {
+function calculateItemCost({
+  containerSize,
+  currentItem,
+  currentItemIndex,
+  currentItemPosition,
+  allItems,
+  allItemPositions,
+}: {
+  containerSize: BoxSize;
+  currentItem: BoxRect;
+  currentItemIndex: number;
+  currentItemPosition: LabelPosition;
+  allItems: Record<LabelPosition, BoxRect[]>;
+  allItemPositions: LabelPosition[];
+}) {
   let cost = 0;
 
   // Cost to prefer bottom right display if there's no intersections
@@ -254,14 +263,14 @@ function optimizeLabelDisplays(containerSize: BoxSize, items: DisplayItem[]): Di
 
     for (let i = 0; i < n; i++) {
       const currentPosition = itemLabelPositions[i];
-      const currentCost = calculateItemCost(
+      const currentCost = calculateItemCost({
         containerSize,
-        boxRectsByPosition[currentPosition][i],
-        i,
-        currentPosition,
-        boxRectsByPosition,
-        itemLabelPositions
-      );
+        currentItem: boxRectsByPosition[currentPosition][i],
+        currentItemIndex: i,
+        currentItemPosition: currentPosition,
+        allItems: boxRectsByPosition,
+        allItemPositions: itemLabelPositions,
+      });
 
       if (currentCost === 0) continue;
 
@@ -270,14 +279,14 @@ function optimizeLabelDisplays(containerSize: BoxSize, items: DisplayItem[]): Di
           continue;
         }
 
-        const candidateCost = calculateItemCost(
+        const candidateCost = calculateItemCost({
           containerSize,
-          boxRectsByPosition[candidatePosition][i],
-          i,
-          candidatePosition,
-          boxRectsByPosition,
-          itemLabelPositions
-        );
+          currentItem: boxRectsByPosition[candidatePosition][i],
+          currentItemIndex: i,
+          currentItemPosition: candidatePosition,
+          allItems: boxRectsByPosition,
+          allItemPositions: itemLabelPositions,
+        });
 
         const costDelta = candidateCost - currentCost;
 
@@ -299,5 +308,17 @@ function optimizeLabelDisplays(containerSize: BoxSize, items: DisplayItem[]): Di
   return items.map((item, i) => ({
     ...item,
     labelPosition: itemLabelPositions[i],
+    intersections: items
+      .filter((_, j) => {
+        if (i === j) {
+          return false;
+        }
+
+        const currentItem = boxRectsByPosition[itemLabelPositions[i]][i];
+        const otherItemRect = boxRectsByPosition[itemLabelPositions[j]][j];
+
+        return getBoxIntersection(currentItem, otherItemRect) > 0;
+      })
+      .map((x) => x.rowId),
   }));
 }

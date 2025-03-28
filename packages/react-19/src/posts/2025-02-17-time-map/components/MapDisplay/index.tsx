@@ -86,6 +86,36 @@ export function MapDisplay({
     });
   }, [onRowFocus, registerDisplayItem, selectedItems, selectionDataById]);
 
+  const cityDisplayItemsWithPositions = useMemo(() => {
+    const renderedItems: Record<string, boolean> = {};
+
+    const result = cityDisplayItems.map((cityItem) => {
+      if (!cityItem) {
+        return null;
+      }
+
+      const displayItem = displayItemById[cityItem.rowId];
+
+      const isCurrentItemRendered =
+        displayItem &&
+        (displayItem.intersections.length == 0 ||
+          displayItem.intersections.every((item) => !renderedItems[item]));
+
+      renderedItems[cityItem.rowId] = !!isCurrentItemRendered;
+
+      return {
+        ...cityItem,
+        labelPosition: displayItem?.labelPosition || null,
+        labelIntersectsOthers: !isCurrentItemRendered,
+      };
+    });
+
+    // Render the items in reverse order to ensure that the first item is on top
+    result.reverse();
+
+    return result;
+  }, [cityDisplayItems, displayItemById]);
+
   const { hasRenderedOnce, isLoadingImages } = useMapUpdater(canvasRef, time, animateTime);
 
   const containerSize = useElementSize({
@@ -123,20 +153,18 @@ export function MapDisplay({
         </div>
       ) : null}
       {hasRenderedOnce
-        ? cityDisplayItems.map((displayItem) => {
+        ? cityDisplayItemsWithPositions.map((displayItem) => {
             if (!displayItem) return null;
 
-            const { rowId, displayProps } = displayItem;
+            const { rowId, displayProps, labelPosition } = displayItem;
 
             return (
               <CityDisplay
                 {...displayProps}
-                className={classNames({
-                  'pointer-events-none': isGrabbing,
-                })}
+                disabled={isGrabbing}
                 key={rowId}
                 time={time}
-                labelPosition={displayItemById[rowId]?.labelPosition ?? null}
+                labelPosition={labelPosition}
               ></CityDisplay>
             );
           })

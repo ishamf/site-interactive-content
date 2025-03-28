@@ -14,9 +14,9 @@ const INITIAL_CITY_DATA = [
   { id: '5368361', timezone: 'America/Los_Angeles' },
   { id: '5128581', timezone: 'America/New_York' },
   { id: '2643743', timezone: 'Europe/London' },
-  { id: '1275339', timezone: 'Asia/Kolkata', links: ['Asia/Calcutta'] },
   { id: '1642911', timezone: 'Asia/Jakarta' },
   { id: '1850147', timezone: 'Asia/Tokyo' },
+  { id: '1275339', timezone: 'Asia/Kolkata', links: ['Asia/Calcutta'] },
 ];
 
 const localTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
