@@ -89,14 +89,10 @@ export function TimeMap() {
 
   const timeBarContainerRef = useRef<HTMLDivElement>(null);
 
-  const [timeBarHeight, setTimeBarHeight] = useState(36.5);
-
-  useElementSize({
+  const timeBarSize = useElementSize({
     ref: timeBarContainerRef,
-    onSizeChange: (size) => {
-      setTimeBarHeight(size?.height ?? 0);
-    },
   });
+  const timeBarHeight = timeBarSize?.height ?? 36.5;
 
   const selectedItemsRenderElements = useMemo(() => {
     function createFunctionProps(

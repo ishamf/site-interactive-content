@@ -43,13 +43,19 @@ function createStore() {
           return {
             displayItemById: {
               ...state.displayItemById,
-              [rowId]: { rowId, city: item.city, size: item.size, labelPosition: null },
+              [rowId]: {
+                rowId,
+                city: item.city,
+                size: item.size,
+                labelPosition: state.displayItemById[rowId]?.labelPosition ?? null,
+              },
             },
           };
-        }
-        const { [rowId]: _, ...rest } = state.displayItemById;
+        } else {
+          const { [rowId]: _, ...rest } = state.displayItemById;
 
-        return { displayItemById: rest };
+          return { displayItemById: rest };
+        }
       });
 
       get().queueRecalculatePositions();

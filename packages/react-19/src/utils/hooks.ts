@@ -1,17 +1,7 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useState } from 'react';
 
-export function useElementSize({
-  ref,
-  onSizeChange,
-}: {
-  ref: React.RefObject<HTMLElement | null>;
-  onSizeChange: (size: { width: number; height: number } | null) => void;
-}) {
-  const latestOnSizeChange = useRef(onSizeChange);
-
-  useEffect(() => {
-    latestOnSizeChange.current = onSizeChange;
-  }, [onSizeChange]);
+export function useElementSize({ ref }: { ref: React.RefObject<HTMLElement | null> }) {
+  const [latestSize, setLatestSize] = useState<{ width: number; height: number } | null>(null);
 
   useEffect(() => {
     function updateSize() {
@@ -21,7 +11,7 @@ export function useElementSize({
 
       const { offsetWidth, offsetHeight } = ref.current;
 
-      latestOnSizeChange.current({ width: offsetWidth, height: offsetHeight });
+      setLatestSize({ width: offsetWidth, height: offsetHeight });
     }
 
     const resizeObserver = new ResizeObserver(() => {
@@ -34,7 +24,9 @@ export function useElementSize({
 
     return () => {
       resizeObserver.disconnect();
-      latestOnSizeChange.current(null);
+      setLatestSize(null);
     };
   }, [ref]);
+
+  return latestSize;
 }

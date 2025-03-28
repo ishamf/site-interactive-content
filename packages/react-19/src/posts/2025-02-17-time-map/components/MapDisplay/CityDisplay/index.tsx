@@ -5,7 +5,7 @@ import { css } from '@emotion/react';
 import { DateTime } from 'luxon';
 import { CitySelectionData } from '../../../assets';
 import { dayColors, dayDarkTextColors } from '../../../constants';
-import { useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { useElementSize } from '../../../../../utils/hooks';
 import { LabelPosition } from '../cityLayout';
 
@@ -31,7 +31,11 @@ export function CityDisplay({
 }) {
   const labelRef = useRef<HTMLButtonElement>(null);
 
-  useElementSize({ ref: labelRef, onSizeChange: onLabelSizeChange });
+  const labelSize = useElementSize({ ref: labelRef });
+
+  useEffect(() => {
+    onLabelSizeChange(labelSize);
+  }, [labelSize, onLabelSizeChange]);
 
   const localTime = DateTime.fromMillis(time, { zone: city.timezone });
   const { longitude, latitude } = city;

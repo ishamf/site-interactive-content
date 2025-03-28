@@ -1,4 +1,4 @@
-import { useMemo, useRef } from 'react';
+import { ComponentProps, useEffect, useMemo, useRef } from 'react';
 import { CircularProgress } from '@mui/material';
 import { canvasWidth, canvasHeight } from '../../constants';
 import { useMapUpdater } from './updater';
@@ -29,10 +29,12 @@ export function MapDisplay({
 
   const selectedItems = useSelectionStore((state) => state.selectedItems);
 
-  const uniqueSelectedItems = useMemo(() => {
+  const { registerContainerSize, registerDisplayItem, displayItemById } = useCityDisplayStore();
+
+  const cityDisplayItems = useMemo(() => {
     const seenItems = new Set<string>();
 
-    return selectedItems.filter((item) => {
+    const uniqueSelectedItems = selectedItems.filter((item) => {
       if (!item.itemId) {
         return false;
       }
@@ -45,20 +47,56 @@ export function MapDisplay({
 
       return true;
     });
-  }, [selectedItems]);
+
+    return uniqueSelectedItems.map((selectionItem) => {
+      if (!selectionItem.itemId) {
+        return null;
+      }
+
+      const item = selectionDataById[selectionItem.itemId];
+
+      if (!item) {
+        return null;
+      }
+
+      const city = item.type === 'city' ? item : item.representativeCity;
+
+      if (!city) {
+        return null;
+      }
+
+      const displayProps: Pick<
+        ComponentProps<typeof CityDisplay>,
+        'city' | 'onLabelClick' | 'onLabelSizeChange'
+      > = {
+        city,
+        onLabelClick: () => {
+          onRowFocus(selectionItem.rowId);
+        },
+        onLabelSizeChange: (size) => {
+          if (size) {
+            registerDisplayItem(selectionItem.rowId, { city, size });
+          } else {
+            registerDisplayItem(selectionItem.rowId, null);
+          }
+        },
+      };
+
+      return { rowId: selectionItem.rowId, displayProps };
+    });
+  }, [onRowFocus, registerDisplayItem, selectedItems, selectionDataById]);
 
   const { hasRenderedOnce, isLoadingImages } = useMapUpdater(canvasRef, time, animateTime);
 
-  const store = useCityDisplayStore();
-
-  useElementSize({
+  const containerSize = useElementSize({
     ref: canvasRef,
-    onSizeChange: (size) => {
-      if (size) {
-        store.registerContainerSize(size);
-      }
-    },
   });
+
+  useEffect(() => {
+    if (containerSize) {
+      registerContainerSize(containerSize);
+    }
+  }, [containerSize, registerContainerSize]);
 
   const { isGrabbing, listeners } = useGrabTime({
     container: canvasRef.current,
@@ -85,39 +123,17 @@ export function MapDisplay({
         </div>
       ) : null}
       {hasRenderedOnce
-        ? uniqueSelectedItems.map((selectionItem) => {
-            if (!selectionItem.itemId) {
-              return null;
-            }
+        ? cityDisplayItems.map((displayItem) => {
+            if (!displayItem) return null;
 
-            const item = selectionDataById[selectionItem.itemId];
-
-            if (!item) {
-              return null;
-            }
-
-            const city = item.type === 'city' ? item : item.representativeCity;
-
-            if (!city) {
-              return null;
-            }
+            const { rowId, displayProps } = displayItem;
 
             return (
               <CityDisplay
-                key={selectionItem.rowId}
-                city={city}
+                {...displayProps}
+                key={rowId}
                 time={time}
-                labelPosition={store.displayItemById[selectionItem.rowId]?.labelPosition ?? null}
-                onLabelClick={() => {
-                  onRowFocus(selectionItem.rowId);
-                }}
-                onLabelSizeChange={(size) => {
-                  if (size) {
-                    store.registerDisplayItem(selectionItem.rowId, { city, size });
-                  } else {
-                    store.registerDisplayItem(selectionItem.rowId, null);
-                  }
-                }}
+                labelPosition={displayItemById[rowId]?.labelPosition ?? null}
               ></CityDisplay>
             );
           })
