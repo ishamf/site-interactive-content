@@ -45,9 +45,10 @@ export const TimezoneSelection = memo(
 
     const localTime = currentSelection ? time.setZone(currentSelection.timezone) : null;
 
-    const { attributes, listeners, transform, transition, setNodeRef, isSorting } = useSortable({
-      id: rowId,
-    });
+    const { attributes, listeners, transform, transition, setNodeRef, isSorting, isDragging } =
+      useSortable({
+        id: rowId,
+      });
 
     const translateOnlyTransform = transform && { ...transform, scaleX: 1, scaleY: 1 };
 
@@ -87,7 +88,8 @@ export const TimezoneSelection = memo(
           <div
             className={classNames('p-4 m-[-1rem] touch-none relative', {
               invisible: !localTime,
-              'cursor-grab': !isNew,
+              'cursor-grab': !isNew && !isDragging,
+              'cursor-grabbing': isDragging,
             })}
             {...(isNew ? {} : listeners)}
           >
