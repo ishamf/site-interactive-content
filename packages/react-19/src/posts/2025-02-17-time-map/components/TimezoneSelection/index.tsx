@@ -192,8 +192,8 @@ export const TimezoneSelection = memo(
           >
             {currentRowHiddenData.reason === 'intersect' ? (
               <>
-                There's not enough space to show this city on the map! Drag it to the top to
-                prioritize it over other cities.
+                There's not enough space to show this city on the map! Drag it above{' '}
+                {currentRowHiddenData.intersectingLabels.join(', ')} to show it.
               </>
             ) : (
               <>This row is duplicated with another row above.</>

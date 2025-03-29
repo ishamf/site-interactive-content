@@ -110,17 +110,17 @@ export function MapDisplay({
 
       const displayItem = displayItemById[cityItem.rowId];
 
-      const isCurrentItemRendered =
-        displayItem &&
-        (displayItem.intersections.length == 0 ||
-          displayItem.intersections.every((item) => !renderedItems[item]));
+      const blockingItems = displayItem?.intersections.filter((id) => renderedItems[id]) || [];
 
-      renderedItems[cityItem.rowId] = !!isCurrentItemRendered;
+      const isBlocked = blockingItems.length > 0;
+
+      renderedItems[cityItem.rowId] = !!(displayItem && !isBlocked);
 
       return {
         ...cityItem,
         labelPosition: displayItem?.labelPosition || null,
-        labelIntersectsOthers: !!(displayItem && !isCurrentItemRendered),
+        labelIntersectsOthers: isBlocked,
+        intersectingLabels: blockingItems.map((rowId) => displayItemById[rowId]?.city.label || ''),
       };
     });
 
@@ -131,19 +131,22 @@ export function MapDisplay({
   }, [cityDisplayItems, displayItemById]);
 
   useEffect(() => {
-    const intersectionRowIds = cityDisplayItemsWithPositions
+    const intersectionRows = cityDisplayItemsWithPositions
       .filter(
         (item): item is Exclude<(typeof cityDisplayItemsWithPositions)[number], null> =>
           !!item && item.labelIntersectsOthers
       )
-      .map((item) => item.rowId);
+      .map(
+        (item): HiddenRowInput => ({
+          rowId: item.rowId,
+          data: { reason: 'intersect', intersectingLabels: item.intersectingLabels },
+        })
+      );
 
     const duplicateRowIds = duplicatedSelectedItems.map((item) => item.rowId);
 
     setHiddenRows([
-      ...intersectionRowIds.map(
-        (rowId): HiddenRowInput => ({ rowId, data: { reason: 'intersect' } })
-      ),
+      ...intersectionRows,
       ...duplicateRowIds.map((rowId): HiddenRowInput => ({ rowId, data: { reason: 'duplicate' } })),
     ]);
   }, [cityDisplayItemsWithPositions, duplicatedSelectedItems, setHiddenRows]);

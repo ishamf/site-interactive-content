@@ -97,7 +97,9 @@ export const useSelectionStore = create(
   )
 );
 
-type HiddenRowData = { reason: 'intersect' | 'duplicate' };
+type HiddenRowData =
+  | { reason: 'intersect'; intersectingLabels: string[] }
+  | { reason: 'duplicate' };
 
 export type HiddenRowInput = {
   rowId: string;
