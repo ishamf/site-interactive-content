@@ -1,5 +1,6 @@
 /** @jsxImportSource @emotion/react */
 import { Button } from '@mui/material';
+import styled from '@emotion/styled';
 import { DateTime } from 'luxon';
 import { useEffect, useState } from 'react';
 import { css } from '@emotion/react';
@@ -13,7 +14,7 @@ export function TimeBar({ time, setTime }: { time: DateTime; setTime: (time: Dat
   return (
     <div
       css={css`
-        container-type: inline-size;
+        container: time-bar / inline-size;
       `}
     >
       <div
@@ -24,14 +25,14 @@ export function TimeBar({ time, setTime }: { time: DateTime; setTime: (time: Dat
           }
         `}
       >
-        <p className="text-neutral-900 dark:text-neutral-100 min-w-40 text-center">
-          <span className="inline-block">{utcTime.toLocaleString(DateTime.DATETIME_FULL)}</span>{' '}
-          <span className="inline-block">
+        <TimeRow className="text-neutral-900 dark:text-neutral-100 min-w-40">
+          <TimeElement>{utcTime.toLocaleString(DateTime.DATETIME_FULL)}</TimeElement>{' '}
+          <TimeElement>
             (<RelativeTime time={utcTime} />)
-          </span>
-        </p>
+          </TimeElement>
+        </TimeRow>
 
-        <div className="shrink-0 flex gap-2 max-w-full overflow-x-auto">
+        <ButtonRow className="flex gap-2">
           <Button
             variant="outlined"
             onClick={() => {
@@ -72,11 +73,41 @@ export function TimeBar({ time, setTime }: { time: DateTime; setTime: (time: Dat
           >
             +1M
           </Button>
-        </div>
+        </ButtonRow>
       </div>
     </div>
   );
 }
+
+const TimeRow = styled.div`
+  flex: 1;
+  container: time-row / inline-size;
+  text-align: center;
+  align-self: stretch;
+
+  @container time-bar (min-width: 40rem) {
+    text-align: left;
+  }
+`;
+
+const TimeElement = styled.div`
+  display: block;
+  text-align: center;
+
+  @container time-row (min-width: 28rem) {
+    display: inline-block;
+    text-align: left;
+  }
+`;
+
+const ButtonRow = styled.div`
+  max-width: 100%;
+  overflow-x: auto;
+
+  @container time-bar (min-width: 40rem) {
+    max-width: fit-content;
+  }
+`;
 
 function RelativeTime({ time }: { time: DateTime }) {
   const [_, forceUpdate] = useState(0);
