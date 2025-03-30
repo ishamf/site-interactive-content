@@ -4,20 +4,7 @@ import '@ant-design/v5-patch-for-react-19';
 import { StyleProvider } from '@ant-design/cssinjs';
 import { ConfigProvider, theme } from 'antd';
 import { useMediaQuery } from 'usehooks-ts';
-
-import appStyles from './app-css';
-
-function addAppStylesheet(Element: any): any {
-  class WrappedElement extends Element {
-    constructor(...props: any) {
-      super(...props);
-
-      this.shadowRoot.adoptedStyleSheets = [appStyles];
-    }
-  }
-
-  return WrappedElement;
-}
+import { addAppStylesheet } from './utils/component';
 
 export function toAntdWebComponent(Component: any) {
   const AntdWrapperComponent = ({ container, ...rest }: { container: any }) => {

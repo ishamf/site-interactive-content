@@ -1,11 +1,13 @@
 import './demo.css';
 import './entries/2025-test-react';
+import './entries/2025-time-map';
 
 function App() {
   return (
     <>
-      {/* @ts-expect-error custom element */}
       <xif-react-test-component></xif-react-test-component>
+
+      <xif-time-map></xif-time-map>
     </>
   );
 }

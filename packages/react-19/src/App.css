@@ -1,1 +1,6 @@
+:host {
+  /* Prevent inheriting word-break from site */
+  word-break: normal;
+}
+
 @import 'tailwindcss';
