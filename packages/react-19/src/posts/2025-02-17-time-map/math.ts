@@ -85,6 +85,10 @@ export function getSunAndEarthStateAtTime(time: number): SunAndEarthState {
     24
   );
 
+  // We just use GMST to keep it simple
+  // > The maximum value of the equation of the equinoxes is about 1.1 seconds,
+  // > so if an error of ~1 second is unimportant, the transformation from GMST to GAST can be skipped.
+
   return { rightAscension, declination, gmstHours };
 }
 
@@ -96,10 +100,6 @@ export function createAlphaCalculator({
 }: SunAndEarthState & {
   precalculate: { width: number; height: number };
 }) {
-  // We just use GMST to keep it simple
-  // > The maximum value of the equation of the equinoxes is about 1.1 seconds,
-  // > so if an error of ~1 second is unimportant, the transformation from GMST to GAST can be skipped.
-
   // Calculate sun altitude
   // https://aa.usno.navy.mil/faq/alt_az
 
