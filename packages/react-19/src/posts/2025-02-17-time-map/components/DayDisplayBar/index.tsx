@@ -99,7 +99,7 @@ export function DayDisplayBar({
           <div className="flex-2 h-2" style={{ backgroundColor: currentDayColor }}></div>
           <div className="flex-1 h-2" style={{ backgroundColor: nextDayColor }}></div>
         </div>
-        <div className="flex justify-between">
+        <div className="flex justify-between pt-2">
           <div
             css={css`
               color: ${dayLightTextColors[leftTextColorIndex]};
