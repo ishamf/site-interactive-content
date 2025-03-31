@@ -19,7 +19,7 @@ import { TimezoneSelection } from './components/TimezoneSelection';
 import { useQuery } from '@tanstack/react-query';
 import { loadSelectionData } from './assets';
 import { DayDisplayBar } from './components/DayDisplayBar';
-import { INITIAL_DISPLAY_LENGTH, useSelectionStore } from './store';
+import { INITIAL_DISPLAY_LENGTH, useSelectionStore, useUIStateStore } from './store';
 import { TimeBar } from './components/TimeBar';
 import { useElementSize } from '../../utils/hooks';
 import { canvasWidth } from './constants';
@@ -170,6 +170,8 @@ export function TimeMap() {
     [selectedItems]
   );
 
+  const isAnyCitySelectorOpen = useUIStateStore((state) => state.openCitySelector !== null);
+
   const onRowFocus = useCallback((rowId: string) => {
     const selector = refsByRowId.current[rowId];
     if (selector) {
@@ -186,10 +188,19 @@ export function TimeMap() {
           maxWidth: `min(max(calc(200vh - 10rem - ${timeBarHeight * 2}px), min(30rem - ${timeBarHeight * 2}px, 100%)), ${canvasWidth}px)`,
         }}
         css={css`
-          @media ((width >= 48rem) and (height >= 20rem)) or (height >= 100vw) {
+          @media ((width >= 48rem) and (height >= 20rem)) {
             position: sticky;
             top: 0;
           }
+
+          ${!isAnyCitySelectorOpen
+            ? css`
+                @media (height >= 100vw) {
+                  position: sticky;
+                  top: 0;
+                }
+              `
+            : ''}
         `}
       >
         <MapDisplay

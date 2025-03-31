@@ -11,7 +11,7 @@ import classNames from 'classnames';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { memo, useEffect, useImperativeHandle, useRef, useState } from 'react';
-import { useHiddenRowsStore } from '../../store';
+import { useUIStateStore } from '../../store';
 
 interface TimezoneSelectionRef {
   scrollIntoView: () => void;
@@ -56,7 +56,10 @@ export const TimezoneSelection = memo(
 
     const datepickerRef = useRef<HTMLInputElement>(null);
 
-    const hiddenRows = useHiddenRowsStore((state) => state.hiddenRows);
+    const hiddenRows = useUIStateStore((state) => state.hiddenRows);
+    const isCitySelectorOpen = useUIStateStore((state) => state.openCitySelector === rowId);
+    const setOpenCitySelector = useUIStateStore((state) => state.setOpenCitySelector);
+    const closeCitySelector = useUIStateStore((state) => state.closeCitySelector);
 
     const currentRowHiddenData = hiddenRows.get(rowId);
 
@@ -112,6 +115,13 @@ export const TimezoneSelection = memo(
 
           <Autocomplete
             className="flex-1"
+            open={isCitySelectorOpen}
+            onOpen={() => {
+              setOpenCitySelector(rowId);
+            }}
+            onClose={() => {
+              closeCitySelector();
+            }}
             getOptionKey={(option) => option.id}
             filterOptions={createFilterOptions({
               limit: 20,

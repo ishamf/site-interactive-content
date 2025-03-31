@@ -106,10 +106,19 @@ export type HiddenRowInput = {
   data: HiddenRowData;
 };
 
-export const useHiddenRowsStore = create(
-  combine({ hiddenRows: new Map<string, HiddenRowData>() }, (set) => ({
-    setHiddenRows: (hiddenRows: HiddenRowInput[]) => {
-      set({ hiddenRows: new Map(hiddenRows.map(({ rowId, data }) => [rowId, data])) });
-    },
-  }))
+export const useUIStateStore = create(
+  combine(
+    { hiddenRows: new Map<string, HiddenRowData>(), openCitySelector: null as null | string },
+    (set) => ({
+      setHiddenRows: (hiddenRows: HiddenRowInput[]) => {
+        set({ hiddenRows: new Map(hiddenRows.map(({ rowId, data }) => [rowId, data])) });
+      },
+      setOpenCitySelector: (rowId: string) => {
+        set({ openCitySelector: rowId });
+      },
+      closeCitySelector: () => {
+        set({ openCitySelector: null });
+      },
+    })
+  )
 );
