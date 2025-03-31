@@ -57,8 +57,8 @@ export const TimezoneSelection = memo(
     const datepickerRef = useRef<HTMLInputElement>(null);
 
     const hiddenRows = useUIStateStore((state) => state.hiddenRows);
-    const isCitySelectorOpen = useUIStateStore((state) => state.openCitySelector === rowId);
-    const setOpenCitySelector = useUIStateStore((state) => state.setOpenCitySelector);
+    const isCitySelectorOpen = useUIStateStore((state) => state.rowWithOpenCitySelector === rowId);
+    const openCitySelector = useUIStateStore((state) => state.openCitySelector);
     const closeCitySelector = useUIStateStore((state) => state.closeCitySelector);
 
     const currentRowHiddenData = hiddenRows.get(rowId);
@@ -117,7 +117,7 @@ export const TimezoneSelection = memo(
             className="flex-1"
             open={isCitySelectorOpen}
             onOpen={() => {
-              setOpenCitySelector(rowId);
+              openCitySelector(rowId);
             }}
             onClose={() => {
               closeCitySelector();

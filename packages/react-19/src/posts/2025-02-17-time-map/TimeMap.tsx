@@ -170,7 +170,7 @@ export function TimeMap() {
     [selectedItems]
   );
 
-  const isAnyCitySelectorOpen = useUIStateStore((state) => state.openCitySelector !== null);
+  const isAnyCitySelectorOpen = useUIStateStore((state) => state.rowWithOpenCitySelector !== null);
 
   const onRowFocus = useCallback((rowId: string) => {
     const selector = refsByRowId.current[rowId];
