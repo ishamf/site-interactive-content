@@ -7,7 +7,6 @@ import {
   useEffect,
   useMemo,
   useRef,
-  useState,
   useCallback,
 } from 'react';
 import { css } from '@emotion/react';
@@ -24,37 +23,10 @@ import { TimeBar } from './components/TimeBar';
 import { useElementSize } from '../../utils/hooks';
 import { canvasWidth } from './constants';
 import { TimezoneSelectionSkeleton } from './components/TimezoneSelectionSkeleton';
-
-interface TimeState {
-  time: DateTime;
-  useAnimation: boolean;
-  isRapidlyChanging: boolean;
-}
+import { useTimeState } from './hooks';
 
 export function TimeMap() {
-  const [timeState, setTime] = useState<TimeState>(() => ({
-    time: DateTime.now(),
-    useAnimation: false,
-    isRapidlyChanging: false,
-  }));
-  const [slowlyChangingTime, setSlowlyChangingTime] = useState<DateTime>(timeState.time);
-
-  useEffect(() => {
-    // Update the slowly changing time.
-    // If it's rapidly changing, wait for a bit before updating.
-    if (timeState.isRapidlyChanging) {
-      const timeout = setTimeout(() => {
-        setSlowlyChangingTime(timeState.time);
-        setTime((state) => ({ ...state, isRapidlyChanging: false }));
-      }, 500);
-
-      return () => {
-        clearTimeout(timeout);
-      };
-    } else {
-      setSlowlyChangingTime(timeState.time);
-    }
-  }, [timeState.isRapidlyChanging, timeState.time]);
+  const { timeState, setTime, slowlyChangingTime } = useTimeState();
 
   const selectionStore = useSelectionStore();
   const addInitialCitiesIfEmpty = selectionStore.addInitialCitiesIfEmpty;
