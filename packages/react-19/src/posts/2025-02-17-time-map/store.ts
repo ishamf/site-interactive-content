@@ -107,6 +107,10 @@ const createSelectionSlice: StateCreator<
   removeSelection: (rowId: string) => {
     set((state) => ({
       selectedItems: state.selectedItems.filter((item) => item.rowId !== rowId),
+      rowWithOpenCitySelector:
+        state.rowWithOpenCitySelector === rowId ? null : state.rowWithOpenCitySelector,
+      rowWithOpenTimeSelector:
+        state.rowWithOpenTimeSelector === rowId ? null : state.rowWithOpenTimeSelector,
     }));
   },
   reorderSelection: (fromId: string, toId: string) => {
