@@ -67,12 +67,27 @@ export function useTimeState() {
   // Track the current time
   useEffect(() => {
     if (isTrackingCurrentTime && isDocumentVisible && !isAnyTimeSelectorOpen) {
-      const interval = setInterval(() => updateTimeToCurrentMinute(), 1000);
+      let timeout: ReturnType<typeof setTimeout> | undefined;
 
-      updateTimeToCurrentMinute();
+      function updateTimeTimeout() {
+        updateTimeToCurrentMinute();
+
+        const currentTime = DateTime.now();
+
+        const remainingTimeInCurrentMinute = currentTime.diff(
+          currentTime.endOf('minute'),
+          'milliseconds'
+        ).milliseconds;
+
+        timeout = setTimeout(updateTimeTimeout, remainingTimeInCurrentMinute + 10);
+      }
+
+      updateTimeTimeout();
 
       return () => {
-        clearInterval(interval);
+        if (timeout) {
+          clearTimeout(timeout);
+        }
       };
     }
   }, [isTrackingCurrentTime, isDocumentVisible, isAnyTimeSelectorOpen, updateTimeToCurrentMinute]);
