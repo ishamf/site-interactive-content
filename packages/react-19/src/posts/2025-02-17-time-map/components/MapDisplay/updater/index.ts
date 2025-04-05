@@ -2,7 +2,7 @@ import { RefObject, useEffect, useReducer, useRef } from 'react';
 import { spring } from 'motion';
 import { drawMap } from './drawMap';
 import { getSunAndEarthStateAtTime, linearlyInterpolateSunAndEarthState } from '../../../math';
-import { SunAndEarthState } from '../../../types';
+import { RenderBehavior, SunAndEarthState } from '../../../types';
 import { loadImageData, loadSmallImageData, MapImageData } from '../../../assets';
 import { waitForMs } from '../../../utils';
 
@@ -37,7 +37,7 @@ type State = RenderingState &
   };
 
 type Action =
-  | { type: 'newTime'; time: number }
+  | { type: 'newTime'; time: number; skipLowRes: boolean }
   | { type: 'animateToTime'; time: number }
   | { type: 'doneAnimating'; time: number }
   | { type: 'doneRenderingLowRes'; time: number }
@@ -48,7 +48,11 @@ type Action =
 function reducer(state: State, action: Action): State {
   switch (action.type) {
     case 'newTime':
-      return { ...state, renderingState: 'renderingLowRes', time: action.time };
+      return {
+        ...state,
+        renderingState: action.skipLowRes ? 'renderingHighRes' : 'renderingLowRes',
+        time: action.time,
+      };
     case 'animateToTime':
       return { ...state, renderingState: 'animatingToTime', time: action.time };
     case 'doneAnimating':
@@ -103,7 +107,7 @@ const ANIMATION_DURATION = 150;
 export function useMapUpdater(
   canvasRef: RefObject<HTMLCanvasElement | null>,
   time: number,
-  animated: boolean
+  renderBehavior: RenderBehavior
 ) {
   const [state, dispatch] = useReducer<State, [Action]>(reducer, {
     renderingState: 'idle',
@@ -146,12 +150,12 @@ export function useMapUpdater(
   useEffect(() => {
     if (time === state.time) return;
 
-    if (animated) {
+    if (renderBehavior === 'animated') {
       dispatch({ type: 'animateToTime', time });
     } else {
-      dispatch({ type: 'newTime', time });
+      dispatch({ type: 'newTime', time, skipLowRes: renderBehavior === 'deferred' });
     }
-  }, [time, animated, state.time]);
+  }, [time, state.time, renderBehavior]);
 
   const currentRenderedSolarState = useRef<SunAndEarthState>(null);
 

@@ -1,4 +1,5 @@
 import type { DateTime } from 'luxon';
+import type { renderBehaviors } from './constants';
 
 export interface SunAndEarthState {
   rightAscension: number;
@@ -6,8 +7,10 @@ export interface SunAndEarthState {
   gmstHours: number;
 }
 
+export type RenderBehavior = (typeof renderBehaviors)[number];
+
 export interface TimeState {
   time: DateTime;
-  useAnimation: boolean;
+  renderBehavior: RenderBehavior;
   isRapidlyChanging: boolean;
 }

@@ -1,14 +1,5 @@
 /** @jsxImportSource @emotion/react */
-import {
-  ComponentProps,
-  ComponentPropsWithRef,
-  ComponentRef,
-  RefObject,
-  useEffect,
-  useMemo,
-  useRef,
-  useCallback,
-} from 'react';
+import { ComponentProps, useEffect, useMemo, useRef, useCallback } from 'react';
 import { css } from '@emotion/react';
 import { DateTime } from 'luxon';
 import { DndContext } from '@dnd-kit/core';
@@ -26,12 +17,18 @@ import { TimezoneSelectionSkeleton } from './components/TimezoneSelectionSkeleto
 import { useTimeState } from './hooks';
 
 export function TimeMap() {
-  const { timeState, setTime, slowlyChangingTime } = useTimeState();
+  const { timeState, setTime, slowlyChangingTime, trackCurrentTime, isTrackingCurrentTime } =
+    useTimeState();
 
-  const selectionStore = useSelectionStore();
-  const addInitialCitiesIfEmpty = selectionStore.addInitialCitiesIfEmpty;
+  const selectedItems = useSelectionStore((s) => s.selectedItems);
+  const addInitialCitiesIfEmpty = useSelectionStore((s) => s.addInitialCitiesIfEmpty);
+  const removeSelection = useSelectionStore((s) => s.removeSelection);
+  const updateSelection = useSelectionStore((s) => s.updateSelection);
+  const addNewSelection = useSelectionStore((s) => s.addNewSelection);
+  const reorderSelection = useSelectionStore((s) => s.reorderSelection);
 
-  const { selectedItems } = selectionStore;
+  const isAnyCitySelectorOpen = useUIStateStore((state) => state.rowWithOpenCitySelector !== null);
+  const openTimeSelector = useUIStateStore((state) => state.openTimeSelector);
 
   const selectionDataQuery = useQuery({
     queryKey: ['selectionData'],
@@ -49,17 +46,6 @@ export function TimeMap() {
     }
   }, [selectionDataQuery.data, selectionDataQuery.isSuccess, addInitialCitiesIfEmpty]);
 
-  const refsByRowId: RefObject<Record<string, ComponentRef<typeof TimezoneSelection>>> = useRef({});
-
-  const timeBarNode = (
-    <TimeBar
-      time={timeState.time}
-      setTime={(time) => {
-        setTime({ time, useAnimation: true, isRapidlyChanging: false });
-      }}
-    ></TimeBar>
-  );
-
   const timeBarContainerRef = useRef<HTMLDivElement>(null);
 
   const timeBarSize = useElementSize({
@@ -70,36 +56,23 @@ export function TimeMap() {
   const selectedItemsRenderElements = useMemo(() => {
     function createFunctionProps(
       rowId: string
-    ): Pick<
-      ComponentPropsWithRef<typeof TimezoneSelection>,
-      'ref' | 'onChangeId' | 'onChangeTime'
-    > {
+    ): Pick<ComponentProps<typeof TimezoneSelection>, 'onChangeId' | 'onChangeTime'> {
       return {
-        ref: (e) => {
-          if (e) {
-            refsByRowId.current[rowId] = e;
-          } else {
-            delete refsByRowId.current[rowId];
-          }
-        },
         onChangeId: (newId, isDeleting) => {
           if (isDeleting) {
-            selectionStore.removeSelection(rowId);
+            removeSelection(rowId);
           } else {
-            selectionStore.updateSelection(rowId, newId);
+            updateSelection(rowId, newId);
           }
         },
         onChangeTime: (time) => {
-          setTime({ time, useAnimation: true, isRapidlyChanging: false });
+          setTime({ time, renderBehavior: 'animated', isRapidlyChanging: false });
         },
       };
     }
 
     const renderElements = selectedItems.map((item) => {
-      const functionProps: Pick<
-        ComponentPropsWithRef<typeof TimezoneSelection>,
-        'ref' | 'onChangeId' | 'onChangeTime'
-      > = createFunctionProps(item.rowId);
+      const functionProps = createFunctionProps(item.rowId);
       return {
         item,
         functionProps,
@@ -115,7 +88,7 @@ export function TimeMap() {
         ...createFunctionProps(newRowId),
         onChangeId: (newId) => {
           if (newId) {
-            selectionStore.addNewSelection(newId);
+            addNewSelection(newId);
           }
         },
       },
@@ -123,34 +96,44 @@ export function TimeMap() {
     });
 
     return renderElements;
-  }, [selectedItems, selectionStore]);
+  }, [addNewSelection, removeSelection, selectedItems, setTime, updateSelection]);
 
   const dndContextProps = useMemo(() => {
     const props: ComponentProps<typeof DndContext> = {
       onDragEnd: ({ active, over }) => {
         if (over && over.id !== active.id) {
-          selectionStore.reorderSelection(active.id.toString(), over.id.toString());
+          reorderSelection(active.id.toString(), over.id.toString());
         }
       },
     };
 
     return props;
-  }, [selectionStore]);
+  }, [reorderSelection]);
 
   const sortableContextItems = useMemo(
     () => selectedItems.map((item) => item.rowId),
     [selectedItems]
   );
 
-  const isAnyCitySelectorOpen = useUIStateStore((state) => state.rowWithOpenCitySelector !== null);
+  const onRowFocus = useCallback(
+    (rowId: string) => {
+      openTimeSelector(rowId);
+    },
+    [openTimeSelector]
+  );
 
-  const onRowFocus = useCallback((rowId: string) => {
-    const selector = refsByRowId.current[rowId];
-    if (selector) {
-      selector.scrollIntoView();
-      selector.focusSelector();
-    }
-  }, []);
+  const timeBarNode = (
+    <TimeBar
+      time={timeState.time}
+      setTime={(time) => {
+        setTime({ time, renderBehavior: 'animated', isRapidlyChanging: false });
+      }}
+      setToNow={() => {
+        trackCurrentTime();
+      }}
+      isTrackingCurrentTime={isTrackingCurrentTime}
+    ></TimeBar>
+  );
 
   return (
     <div className="flex max-w-full flex-col px-4 gap-x-4 items-stretch justify-center md:flex-row md:items-start bg-neutral-50 dark:bg-neutral-900">
@@ -181,14 +164,14 @@ export function TimeMap() {
           setTime={(ms) => {
             setTime({
               time: DateTime.fromMillis(ms),
-              useAnimation: false,
+              renderBehavior: 'instant',
               isRapidlyChanging: true,
             });
           }}
           onTimeDragEnd={() => {
             setTime((state) => ({ ...state, isRapidlyChanging: false }));
           }}
-          animateTime={timeState.useAnimation}
+          renderBehavior={timeState.renderBehavior}
           onRowFocus={onRowFocus}
         />
         <DayDisplayBar
@@ -196,7 +179,7 @@ export function TimeMap() {
           setTime={(ms) => {
             setTime({
               time: DateTime.fromMillis(ms),
-              useAnimation: false,
+              renderBehavior: 'instant',
               isRapidlyChanging: true,
             });
           }}
