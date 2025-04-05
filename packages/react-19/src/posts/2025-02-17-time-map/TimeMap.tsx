@@ -9,7 +9,7 @@ import { TimezoneSelection } from './components/TimezoneSelection';
 import { useQuery } from '@tanstack/react-query';
 import { loadSelectionData } from './assets';
 import { DayDisplayBar } from './components/DayDisplayBar';
-import { INITIAL_DISPLAY_LENGTH, useSelectionStore, useUIStateStore } from './store';
+import { INITIAL_DISPLAY_LENGTH, useTimeMapStore } from './store';
 import { TimeBar } from './components/TimeBar';
 import { useElementSize } from '../../utils/hooks';
 import { canvasWidth } from './constants';
@@ -20,15 +20,15 @@ export function TimeMap() {
   const { timeState, setTime, slowlyChangingTime, trackCurrentTime, isTrackingCurrentTime } =
     useTimeState();
 
-  const selectedItems = useSelectionStore((s) => s.selectedItems);
-  const addInitialCitiesIfEmpty = useSelectionStore((s) => s.addInitialCitiesIfEmpty);
-  const removeSelection = useSelectionStore((s) => s.removeSelection);
-  const updateSelection = useSelectionStore((s) => s.updateSelection);
-  const addNewSelection = useSelectionStore((s) => s.addNewSelection);
-  const reorderSelection = useSelectionStore((s) => s.reorderSelection);
+  const selectedItems = useTimeMapStore((s) => s.selectedItems);
+  const addInitialCitiesIfEmpty = useTimeMapStore((s) => s.addInitialCitiesIfEmpty);
+  const removeSelection = useTimeMapStore((s) => s.removeSelection);
+  const updateSelection = useTimeMapStore((s) => s.updateSelection);
+  const addNewSelection = useTimeMapStore((s) => s.addNewSelection);
+  const reorderSelection = useTimeMapStore((s) => s.reorderSelection);
 
-  const isAnyCitySelectorOpen = useUIStateStore((state) => state.rowWithOpenCitySelector !== null);
-  const openTimeSelector = useUIStateStore((state) => state.openTimeSelector);
+  const isAnyCitySelectorOpen = useTimeMapStore((state) => state.rowWithOpenCitySelector !== null);
+  const openTimeSelector = useTimeMapStore((state) => state.openTimeSelector);
 
   const selectionDataQuery = useQuery({
     queryKey: ['selectionData'],
