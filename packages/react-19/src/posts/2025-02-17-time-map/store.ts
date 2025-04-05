@@ -111,6 +111,7 @@ export const useUIStateStore = create(
     {
       hiddenRows: new Map<string, HiddenRowData>(),
       rowWithOpenCitySelector: null as null | string,
+      rowWithOpenTimeSelector: null as null | string,
     },
     (set) => ({
       setHiddenRows: (hiddenRows: HiddenRowInput[]) => {
@@ -121,6 +122,12 @@ export const useUIStateStore = create(
       },
       closeCitySelector: () => {
         set({ rowWithOpenCitySelector: null });
+      },
+      openTimeSelector: (rowId: string) => {
+        set({ rowWithOpenTimeSelector: rowId });
+      },
+      closeTimeSelector: () => {
+        set({ rowWithOpenTimeSelector: null });
       },
     })
   )

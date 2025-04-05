@@ -9,21 +9,22 @@ import { useElementSize } from '../../../../utils/hooks';
 import { SelectionData } from '../../assets';
 import { useGrabTime } from '../../utils';
 import classNames from 'classnames';
+import { RenderBehavior } from '../../types';
 
 export function MapDisplay({
   time,
-  animateTime = true,
   selectionDataById,
   setTime,
   onRowFocus,
   onTimeDragEnd,
+  renderBehavior,
 }: {
   time: number;
-  animateTime: boolean;
   selectionDataById: Record<string, SelectionData | undefined>;
   setTime: (time: number) => void;
   onRowFocus: (rowId: string) => void;
   onTimeDragEnd?: () => void;
+  renderBehavior: RenderBehavior;
 }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -151,7 +152,7 @@ export function MapDisplay({
     ]);
   }, [cityDisplayItemsWithPositions, duplicatedSelectedItems, setHiddenRows]);
 
-  const { hasRenderedOnce, isLoadingImages } = useMapUpdater(canvasRef, time, animateTime);
+  const { hasRenderedOnce, isLoadingImages } = useMapUpdater(canvasRef, time, renderBehavior);
 
   const containerSize = useElementSize({
     ref: canvasRef,

@@ -10,13 +10,8 @@ import { dayColors } from '../../constants';
 import classNames from 'classnames';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { memo, useEffect, useImperativeHandle, useRef, useState } from 'react';
+import { memo, useEffect, useRef } from 'react';
 import { useUIStateStore } from '../../store';
-
-interface TimezoneSelectionRef {
-  scrollIntoView: () => void;
-  focusSelector: () => void;
-}
 
 export const TimezoneSelection = memo(
   ({
@@ -27,7 +22,6 @@ export const TimezoneSelection = memo(
     onChangeId,
     onChangeTime,
     isNew,
-    ref,
     isDateTimeFrozen,
   }: {
     rowId: string;
@@ -38,7 +32,6 @@ export const TimezoneSelection = memo(
     onChangeTime: (t: DateTime) => void;
     isNew?: boolean;
     isDateTimeFrozen: boolean;
-    ref?: React.Ref<TimezoneSelectionRef>;
   }) => {
     const shouldShowDeleteButton = !currentSelection && !isNew;
     const isShowingEditArea = shouldShowDeleteButton;
@@ -52,33 +45,38 @@ export const TimezoneSelection = memo(
 
     const translateOnlyTransform = transform && { ...transform, scaleX: 1, scaleY: 1 };
 
-    const [isPickerOpen, setIsPickerOpen] = useState(false);
-
     const datepickerRef = useRef<HTMLInputElement>(null);
 
     const hiddenRows = useUIStateStore((state) => state.hiddenRows);
     const isCitySelectorOpen = useUIStateStore((state) => state.rowWithOpenCitySelector === rowId);
     const openCitySelector = useUIStateStore((state) => state.openCitySelector);
     const closeCitySelector = useUIStateStore((state) => state.closeCitySelector);
+    const isTimeSelectorOpen = useUIStateStore((state) => state.rowWithOpenTimeSelector === rowId);
+    const openTimeSelector = useUIStateStore((state) => state.openTimeSelector);
+    const closeTimeSelector = useUIStateStore((state) => state.closeTimeSelector);
 
     const currentRowHiddenData = hiddenRows.get(rowId);
 
     useEffect(() => {
-      if (isPickerOpen && isDateTimeFrozen) {
-        setIsPickerOpen(false);
+      if (isTimeSelectorOpen && isDateTimeFrozen) {
+        closeTimeSelector();
       }
-    }, [isDateTimeFrozen, isPickerOpen]);
+    }, [closeTimeSelector, isDateTimeFrozen, isTimeSelectorOpen]);
 
-    useImperativeHandle(ref, () => ({
-      scrollIntoView: () => {
-        datepickerRef.current?.scrollIntoView({
-          block: 'nearest',
-        });
-      },
-      focusSelector: () => {
-        setIsPickerOpen(true);
-      },
-    }));
+    const isOpeningTriggeredBySelf = useRef(false);
+
+    // If the time selector is opened from outside this component, scroll it into view
+    useEffect(() => {
+      if (isTimeSelectorOpen) {
+        if (!isOpeningTriggeredBySelf.current) {
+          datepickerRef.current?.scrollIntoView({
+            block: 'nearest',
+          });
+        } else {
+          isOpeningTriggeredBySelf.current = false;
+        }
+      }
+    }, [isTimeSelectorOpen]);
 
     return (
       <div
@@ -170,9 +168,14 @@ export const TimezoneSelection = memo(
           <div className="flex-1 flex items-center gap-1">
             <DateTimePicker
               inputRef={datepickerRef}
-              open={isPickerOpen && !isDateTimeFrozen}
-              onOpen={() => setIsPickerOpen(true)}
-              onClose={() => setIsPickerOpen(false)}
+              open={isTimeSelectorOpen && !isDateTimeFrozen}
+              onOpen={() => {
+                isOpeningTriggeredBySelf.current = true;
+                openTimeSelector(rowId);
+              }}
+              onClose={() => {
+                closeTimeSelector();
+              }}
               className="flex-1"
               value={currentSelection ? time : null}
               disabled={!currentSelection || isDateTimeFrozen}

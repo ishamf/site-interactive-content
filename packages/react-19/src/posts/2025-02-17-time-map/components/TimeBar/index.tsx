@@ -8,7 +8,17 @@ import { DAY_LENGTH } from '../../constants';
 
 const TEN_MINUTES = 10 * 60 * 1000;
 
-export function TimeBar({ time, setTime }: { time: DateTime; setTime: (time: DateTime) => void }) {
+export function TimeBar({
+  time,
+  setTime,
+  setToNow,
+  isTrackingCurrentTime,
+}: {
+  time: DateTime;
+  setTime: (time: DateTime) => void;
+  setToNow: () => void;
+  isTrackingCurrentTime: boolean;
+}) {
   const utcTime = time.toUTC();
 
   return (
@@ -28,7 +38,7 @@ export function TimeBar({ time, setTime }: { time: DateTime; setTime: (time: Dat
         <TimeRow className="text-neutral-900 dark:text-neutral-100 min-w-40">
           <TimeElement>{utcTime.toLocaleString(DateTime.DATETIME_FULL)}</TimeElement>{' '}
           <TimeElement>
-            (<RelativeTime time={utcTime} />)
+            ({isTrackingCurrentTime ? 'current time' : <RelativeTime time={utcTime} />})
           </TimeElement>
         </TimeRow>
 
@@ -52,7 +62,7 @@ export function TimeBar({ time, setTime }: { time: DateTime; setTime: (time: Dat
           <Button
             variant="outlined"
             onClick={() => {
-              setTime(DateTime.now());
+              setToNow();
             }}
           >
             Now

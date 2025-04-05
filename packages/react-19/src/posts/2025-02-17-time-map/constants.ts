@@ -42,3 +42,5 @@ export const dayDarkTextColors: Record<number, string> = {
 dayDarkTextColors[7] = dayDarkTextColors[0];
 
 export const dayBorderColors = dayLightTextColors;
+
+export const renderBehaviors = ['instant', 'animated', 'deferred'] as const;
