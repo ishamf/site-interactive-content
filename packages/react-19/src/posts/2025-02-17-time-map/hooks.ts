@@ -74,10 +74,9 @@ export function useTimeState() {
 
         const currentTime = DateTime.now();
 
-        const remainingTimeInCurrentMinute = currentTime.diff(
-          currentTime.endOf('minute'),
-          'milliseconds'
-        ).milliseconds;
+        const remainingTimeInCurrentMinute = currentTime
+          .endOf('minute')
+          .diff(currentTime, 'milliseconds').milliseconds;
 
         timeout = setTimeout(updateTimeTimeout, remainingTimeInCurrentMinute + 10);
       }
