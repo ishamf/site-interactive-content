@@ -35,6 +35,7 @@ type State = {
   renderingState: RenderingState;
   imageDataState: ImageDataState;
   hasRenderedOnce: boolean;
+  pendingNewTimeAfterAnimation?: Action & { type: 'newTime' };
 };
 
 type Action =
@@ -49,13 +50,22 @@ type Action =
 function reducer(state: State, action: Action): State {
   switch (action.type) {
     case 'newTime':
-      return {
-        ...state,
-        renderingState: {
-          state: action.skipLowRes ? 'renderingHighRes' : 'renderingLowRes',
-          time: action.time,
-        },
-      };
+      // If we are animating to a new time, we need to wait until the animation is done
+      // before we can set the new time
+      if (state.renderingState.state === 'animatingToTime') {
+        return {
+          ...state,
+          pendingNewTimeAfterAnimation: action,
+        };
+      } else {
+        return {
+          ...state,
+          renderingState: {
+            state: action.skipLowRes ? 'renderingHighRes' : 'renderingLowRes',
+            time: action.time,
+          },
+        };
+      }
     case 'animateToTime':
       return {
         ...state,
@@ -69,7 +79,7 @@ function reducer(state: State, action: Action): State {
         state.renderingState.state === 'animatingToTime' &&
         state.renderingState.time === action.time
       ) {
-        return {
+        const postAnimationState: State = {
           ...state,
           renderingState: {
             state: 'renderingLowRes',
@@ -77,6 +87,16 @@ function reducer(state: State, action: Action): State {
           },
           hasRenderedOnce: true,
         };
+
+        // If we have a pending new time, we need to set it now
+        if (state.pendingNewTimeAfterAnimation) {
+          return {
+            ...reducer(postAnimationState, state.pendingNewTimeAfterAnimation),
+            pendingNewTimeAfterAnimation: undefined,
+          };
+        } else {
+          return postAnimationState;
+        }
       } else {
         return state;
       }
