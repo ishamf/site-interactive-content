@@ -11,7 +11,7 @@ import classNames from 'classnames';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { memo, useEffect, useRef } from 'react';
-import { useUIStateStore } from '../../store';
+import { useTimeMapStore } from '../../store';
 
 export const TimezoneSelection = memo(
   ({
@@ -47,13 +47,13 @@ export const TimezoneSelection = memo(
 
     const datepickerRef = useRef<HTMLInputElement>(null);
 
-    const hiddenRows = useUIStateStore((state) => state.hiddenRows);
-    const isCitySelectorOpen = useUIStateStore((state) => state.rowWithOpenCitySelector === rowId);
-    const openCitySelector = useUIStateStore((state) => state.openCitySelector);
-    const closeCitySelector = useUIStateStore((state) => state.closeCitySelector);
-    const isTimeSelectorOpen = useUIStateStore((state) => state.rowWithOpenTimeSelector === rowId);
-    const openTimeSelector = useUIStateStore((state) => state.openTimeSelector);
-    const closeTimeSelector = useUIStateStore((state) => state.closeTimeSelector);
+    const hiddenRows = useTimeMapStore((state) => state.hiddenRows);
+    const isCitySelectorOpen = useTimeMapStore((state) => state.rowWithOpenCitySelector === rowId);
+    const openCitySelector = useTimeMapStore((state) => state.openCitySelector);
+    const closeCitySelector = useTimeMapStore((state) => state.closeCitySelector);
+    const isTimeSelectorOpen = useTimeMapStore((state) => state.rowWithOpenTimeSelector === rowId);
+    const openTimeSelector = useTimeMapStore((state) => state.openTimeSelector);
+    const closeTimeSelector = useTimeMapStore((state) => state.closeTimeSelector);
 
     const currentRowHiddenData = hiddenRows.get(rowId);
 

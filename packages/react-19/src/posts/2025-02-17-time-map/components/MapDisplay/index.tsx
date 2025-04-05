@@ -2,7 +2,7 @@ import { ComponentProps, useEffect, useMemo, useRef } from 'react';
 import { CircularProgress } from '@mui/material';
 import { canvasWidth, canvasHeight } from '../../constants';
 import { useMapUpdater } from './updater';
-import { HiddenRowInput, useUIStateStore, useSelectionStore } from '../../store';
+import { HiddenRowInput, useTimeMapStore } from '../../store';
 import { CityDisplay } from './CityDisplay';
 import { useCityDisplayStore } from './cityLayout';
 import { useElementSize } from '../../../../utils/hooks';
@@ -28,9 +28,9 @@ export function MapDisplay({
 }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
-  const selectedItems = useSelectionStore((state) => state.selectedItems);
+  const selectedItems = useTimeMapStore((state) => state.selectedItems);
 
-  const setHiddenRows = useUIStateStore((state) => state.setHiddenRows);
+  const setHiddenRows = useTimeMapStore((state) => state.setHiddenRows);
 
   const { registerContainerSize, registerDisplayItem, displayItemById, setValidRowIds } =
     useCityDisplayStore();

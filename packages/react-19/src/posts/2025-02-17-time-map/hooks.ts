@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { TimeState } from './types';
 import { DateTime } from 'luxon';
 import { useEventListener } from 'usehooks-ts';
-import { useUIStateStore } from './store';
+import { useTimeMapStore } from './store';
 
 export function useTimeState() {
   const [timeState, setTimeInternal] = useState<TimeState>(() => ({
@@ -14,7 +14,7 @@ export function useTimeState() {
   const [isTrackingCurrentTime, setIsTrackingCurrentTime] = useState(true);
   const [isDocumentVisible, setIsDocumentVisible] = useState(true);
 
-  const isAnyTimeSelectorOpen = useUIStateStore((state) => state.rowWithOpenTimeSelector !== null);
+  const isAnyTimeSelectorOpen = useTimeMapStore((state) => state.rowWithOpenTimeSelector !== null);
 
   const documentRef = useRef(document);
 
