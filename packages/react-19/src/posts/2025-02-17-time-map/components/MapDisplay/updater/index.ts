@@ -8,33 +8,35 @@ import { waitForMs } from '../../../utils';
 
 type RenderingState =
   | {
-      renderingState: 'idle';
+      state: 'idle';
       time: number;
     }
   | {
-      renderingState: 'animatingToTime';
+      state: 'animatingToTime';
       time: number;
     }
-  | { renderingState: 'renderingLowRes'; time: number }
-  | { renderingState: 'renderingHighRes'; time: number };
+  | { state: 'renderingLowRes'; time: number }
+  | { state: 'renderingHighRes'; time: number };
 
 type ImageDataState =
   | {
-      imageDataState: 'loading';
+      state: 'loading';
     }
   | {
-      imageDataState: 'smallLoaded';
+      state: 'smallLoaded';
       imageData: MapImageData;
     }
   | {
-      imageDataState: 'largeLoaded';
+      state: 'largeLoaded';
       imageData: MapImageData;
     };
 
-type State = RenderingState &
-  ImageDataState & {
-    hasRenderedOnce: boolean;
-  };
+type State = {
+  renderingState: RenderingState;
+  imageDataState: ImageDataState;
+  hasRenderedOnce: boolean;
+  pendingNewTimeAfterAnimation?: Action & { type: 'newTime' };
+};
 
 type Action =
   | { type: 'newTime'; time: number; skipLowRes: boolean }
@@ -48,55 +50,112 @@ type Action =
 function reducer(state: State, action: Action): State {
   switch (action.type) {
     case 'newTime':
-      return {
-        ...state,
-        renderingState: action.skipLowRes ? 'renderingHighRes' : 'renderingLowRes',
-        time: action.time,
-      };
-    case 'animateToTime':
-      return { ...state, renderingState: 'animatingToTime', time: action.time };
-    case 'doneAnimating':
-      if (state.renderingState === 'animatingToTime' && state.time === action.time) {
+      // If we are animating to a new time, we need to wait until the animation is done
+      // before we can set the new time
+      if (state.renderingState.state === 'animatingToTime') {
         return {
           ...state,
-          renderingState: 'renderingLowRes',
-          time: state.time,
+          pendingNewTimeAfterAnimation: action,
+        };
+      } else {
+        return {
+          ...state,
+          renderingState: {
+            state: action.skipLowRes ? 'renderingHighRes' : 'renderingLowRes',
+            time: action.time,
+          },
+        };
+      }
+    case 'animateToTime':
+      return {
+        ...state,
+        renderingState: {
+          state: 'animatingToTime',
+          time: action.time,
+        },
+      };
+    case 'doneAnimating':
+      if (
+        state.renderingState.state === 'animatingToTime' &&
+        state.renderingState.time === action.time
+      ) {
+        const postAnimationState: State = {
+          ...state,
+          renderingState: {
+            state: 'renderingLowRes',
+            time: state.renderingState.time,
+          },
           hasRenderedOnce: true,
         };
+
+        // If we have a pending new time, we need to set it now
+        if (state.pendingNewTimeAfterAnimation) {
+          return {
+            ...reducer(postAnimationState, state.pendingNewTimeAfterAnimation),
+            pendingNewTimeAfterAnimation: undefined,
+          };
+        } else {
+          return postAnimationState;
+        }
       } else {
         return state;
       }
     case 'doneRenderingLowRes':
-      if (state.renderingState === 'renderingLowRes' && state.time === action.time) {
+      if (
+        state.renderingState.state === 'renderingLowRes' &&
+        state.renderingState.time === action.time
+      ) {
         return {
           ...state,
-          renderingState: 'renderingHighRes',
-          time: state.time,
+          renderingState: {
+            state: 'renderingHighRes',
+            time: state.renderingState.time,
+          },
           hasRenderedOnce: true,
         };
       } else {
         return state;
       }
     case 'doneRenderingHighRes':
-      if (state.renderingState === 'renderingHighRes' && state.time === action.time) {
-        return { ...state, renderingState: 'idle', time: state.time, hasRenderedOnce: true };
+      if (
+        state.renderingState.state === 'renderingHighRes' &&
+        state.renderingState.time === action.time
+      ) {
+        return {
+          ...state,
+          renderingState: {
+            state: 'idle',
+            time: state.renderingState.time,
+          },
+          hasRenderedOnce: true,
+        };
       } else {
         return state;
       }
     case 'doneLoadingSmallImages': {
       return {
         ...state,
-        imageDataState: 'smallLoaded',
-        imageData: action.imageData,
-        renderingState: 'renderingLowRes',
+        imageDataState: {
+          state: 'smallLoaded',
+          imageData: action.imageData,
+        },
+        renderingState: {
+          ...state.renderingState,
+          state: 'renderingLowRes',
+        },
       };
     }
     case 'doneLoadingLargeImages': {
       return {
         ...state,
-        imageDataState: 'largeLoaded',
-        imageData: action.imageData,
-        renderingState: 'renderingLowRes',
+        imageDataState: {
+          state: 'largeLoaded',
+          imageData: action.imageData,
+        },
+        renderingState: {
+          ...state.renderingState,
+          state: 'renderingLowRes',
+        },
       };
     }
   }
@@ -109,12 +168,18 @@ export function useMapUpdater(
   time: number,
   renderBehavior: RenderBehavior
 ) {
-  const [state, dispatch] = useReducer<State, [Action]>(reducer, {
-    renderingState: 'idle',
-    imageDataState: 'loading',
-    time: 0,
+  const [state, dispatch] = useReducer(reducer, {
+    renderingState: {
+      state: 'idle',
+      time: 0,
+    },
+    imageDataState: {
+      state: 'loading',
+    },
     hasRenderedOnce: false,
   });
+
+  const { renderingState, imageDataState } = state;
 
   useEffect(() => {
     (async () => {
@@ -148,21 +213,21 @@ export function useMapUpdater(
   }, []);
 
   useEffect(() => {
-    if (time === state.time) return;
+    if (time === renderingState.time) return;
 
     if (renderBehavior === 'animated') {
       dispatch({ type: 'animateToTime', time });
     } else {
       dispatch({ type: 'newTime', time, skipLowRes: renderBehavior === 'deferred' });
     }
-  }, [time, state.time, renderBehavior]);
+  }, [time, renderingState.time, renderBehavior]);
 
   const currentRenderedSolarState = useRef<SunAndEarthState>(null);
 
   useEffect(() => {
-    if (state.renderingState !== 'animatingToTime') return;
-    if (state.imageDataState === 'loading') return;
-    const mapImageData = state.imageData;
+    if (renderingState.state !== 'animatingToTime') return;
+    if (imageDataState.state === 'loading') return;
+    const mapImageData = imageDataState.imageData;
 
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -174,10 +239,10 @@ export function useMapUpdater(
 
     const animationStart = Date.now();
 
-    const targetTime = state.time;
+    const targetTime = renderingState.time;
 
     const initialSolarState =
-      currentRenderedSolarState.current || getSunAndEarthStateAtTime(state.time);
+      currentRenderedSolarState.current || getSunAndEarthStateAtTime(renderingState.time);
     const targetSolarState = getSunAndEarthStateAtTime(targetTime);
 
     const springGenerator = spring({
@@ -211,7 +276,7 @@ export function useMapUpdater(
         .then(() => {
           currentRenderedSolarState.current = animatedSolarState;
           if (done || animationStopped) {
-            dispatch({ type: 'doneAnimating', time: state.time });
+            dispatch({ type: 'doneAnimating', time: renderingState.time });
           } else {
             animationCallback = requestAnimationFrame(animateMap);
           }
@@ -227,12 +292,12 @@ export function useMapUpdater(
       animationStopped = true;
       cancelAnimationFrame(animationCallback);
     };
-  }, [canvasRef, state]);
+  }, [canvasRef, imageDataState, renderingState]);
 
   useEffect(() => {
-    if (state.renderingState !== 'renderingLowRes') return;
-    if (state.imageDataState === 'loading') return;
-    const mapImageData = state.imageData;
+    if (renderingState.state !== 'renderingLowRes') return;
+    if (imageDataState.state === 'loading') return;
+    const mapImageData = imageDataState.imageData;
 
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -240,7 +305,7 @@ export function useMapUpdater(
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    const solarState = getSunAndEarthStateAtTime(state.time);
+    const solarState = getSunAndEarthStateAtTime(renderingState.time);
 
     drawMap({
       ctx,
@@ -251,17 +316,17 @@ export function useMapUpdater(
     })
       .then(() => {
         currentRenderedSolarState.current = solarState;
-        dispatch({ type: 'doneRenderingLowRes', time: state.time });
+        dispatch({ type: 'doneRenderingLowRes', time: renderingState.time });
       })
       .catch((e) => {
         console.error(e);
       });
-  }, [canvasRef, state]);
+  }, [canvasRef, imageDataState, renderingState]);
 
   useEffect(() => {
-    if (state.renderingState !== 'renderingHighRes') return;
-    if (state.imageDataState === 'loading') return;
-    const mapImageData = state.imageData;
+    if (renderingState.state !== 'renderingHighRes') return;
+    if (imageDataState.state === 'loading') return;
+    const mapImageData = imageDataState.imageData;
 
     let abortController: AbortController | undefined;
 
@@ -276,7 +341,7 @@ export function useMapUpdater(
 
       const definedAbortController = abortController;
 
-      const solarState = getSunAndEarthStateAtTime(state.time);
+      const solarState = getSunAndEarthStateAtTime(renderingState.time);
 
       drawMap({
         ctx,
@@ -289,7 +354,7 @@ export function useMapUpdater(
         .then(() => {
           if (!definedAbortController.signal.aborted) {
             currentRenderedSolarState.current = solarState;
-            dispatch({ type: 'doneRenderingHighRes', time: state.time });
+            dispatch({ type: 'doneRenderingHighRes', time: renderingState.time });
           }
         })
         .catch((e) => {
@@ -301,10 +366,10 @@ export function useMapUpdater(
       clearTimeout(timeout);
       abortController?.abort();
     };
-  }, [canvasRef, state]);
+  }, [canvasRef, imageDataState, renderingState]);
 
   return {
     hasRenderedOnce: state.hasRenderedOnce,
-    isLoadingImages: state.imageDataState === 'loading',
+    isLoadingImages: state.imageDataState.state === 'loading',
   };
 }
