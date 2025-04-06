@@ -136,6 +136,20 @@ export function CityDisplay({
   const dayColor = dayColors[colorIndex];
   const dayTextColor = dayDarkTextColors[colorIndex];
 
+  const labelCommonStyles = css`
+    position: absolute;
+    white-space: nowrap;
+    font-size: 0.75rem;
+  `;
+
+  const labelContents = (
+    <>
+      <span>{city.label}</span>
+      <br></br>
+      <span>{localTime.toLocaleString(DateTime.TIME_SIMPLE)}</span>
+    </>
+  );
+
   return (
     <>
       <div
@@ -166,7 +180,7 @@ export function CityDisplay({
             transform-origin: 2.5px 2.5px;
             transform: translate(-2.5px, -2.5px)
               rotate(${indicatorRotationBasedOnLabelPosition[labelPosition ?? 'bottomright']}deg);
-            filter: ${Array(1).fill('drop-shadow(0 0 2px rgba(0, 0, 0, 1))').join(' ')};
+            filter: drop-shadow(0 0 2px rgba(0, 0, 0, 1));
           `}
           viewBox="0 0 50 20"
         >
@@ -183,6 +197,34 @@ export function CityDisplay({
           <circle style={{ fill: dayColor }} cx="10" cy="10" r="10" />
         </svg>
 
+        {/* Label's background */}
+        <div
+          style={{
+            ...styleByLabelPosition[labelPosition ?? 'bottomright'],
+            visibility: labelHidden ? 'hidden' : 'visible',
+          }}
+          css={css`
+            ${labelCommonStyles}
+            z-index: 19;
+            opacity: 0.8;
+
+            pointer-events: none;
+            user-select: none;
+            color: rgba(0, 0, 0, 0);
+
+            /* filter: blur(2px); */
+
+            & span {
+              display: inline-block;
+              background-color: #000;
+              padding: 0.05rem 0.2rem;
+              margin: -0.05rem -0.2rem;
+            }
+          `}
+        >
+          {labelContents}
+        </div>
+
         <button
           ref={labelRef}
           onClick={onLabelClick}
@@ -191,14 +233,13 @@ export function CityDisplay({
             visibility: labelHidden ? 'hidden' : 'visible',
           }}
           css={css`
-            position: absolute;
+            ${labelCommonStyles}
             z-index: 20;
 
             color: ${dayTextColor};
-            text-shadow: ${Array(5).fill('0 0 7px #000000').join(',')};
+            /* Set a min-width here so that the label size doesn't change based on time */
+            min-width: 4rem;
             border-radius: 0.5rem;
-            font-size: 0.75rem;
-            white-space: nowrap;
             cursor: pointer;
 
             &:hover {
@@ -206,9 +247,7 @@ export function CityDisplay({
             }
           `}
         >
-          <p>{city.label}</p>
-          {/* Set a min-width here so that the label size doesn't change based on time */}
-          <p className="min-w-14">{localTime.toLocaleString(DateTime.TIME_SIMPLE)}</p>
+          {labelContents}
         </button>
       </div>
     </>
