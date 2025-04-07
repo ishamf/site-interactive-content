@@ -105,8 +105,6 @@ export function useGrabTime({
     (event: React.PointerEvent) => {
       if (!stateRef.current || event.pointerId !== stateRef.current.pointerId) return;
 
-      console.log('pointer cancel');
-
       if (stateRef.current.hasMoved) {
         if (stateRef.current.isTrackingCurrentTimeAtStart) {
           trackCurrentTime();
