@@ -99,6 +99,8 @@ export async function drawMap({
   ctx.globalCompositeOperation = 'destination-over';
   ctx.drawImage(mapImageData.nightImageBitmap, 0, 0, canvasWidth, canvasHeight);
 
+  alphaBitmap.close();
+
   // const end = performance.now();
 
   // console.log('Rendered map with alphaSize', alphaSize, 'in', end - start);

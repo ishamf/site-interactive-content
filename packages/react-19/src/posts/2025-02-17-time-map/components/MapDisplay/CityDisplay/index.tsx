@@ -7,7 +7,7 @@ import { CitySelectionData } from '../../../assets';
 import { dayColors, dayDarkTextColors } from '../../../constants';
 import { CSSProperties, useEffect, useRef } from 'react';
 import { useElementSize } from '../../../../../utils/hooks';
-import { LabelPosition } from '../cityLayout';
+import { LabelPosition } from '../../../store';
 import classNames from 'classnames';
 
 const indicatorRotationBasedOnLabelPosition = {
@@ -206,13 +206,13 @@ export function CityDisplay({
           css={css`
             ${labelCommonStyles}
             z-index: 19;
-            opacity: 0.8;
+            opacity: 0.6;
 
             pointer-events: none;
             user-select: none;
             color: rgba(0, 0, 0, 0);
 
-            /* filter: blur(2px); */
+            filter: blur(3px);
 
             & span {
               display: inline-block;

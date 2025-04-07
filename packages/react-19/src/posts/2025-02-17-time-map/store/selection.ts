@@ -1,47 +1,8 @@
-import { create, StateCreator } from 'zustand';
-
-import { persist } from 'zustand/middleware';
-import { nanoid } from 'nanoid';
 import { arrayMove } from '@dnd-kit/sortable';
-import { LoadableSelectionData } from './assets';
-
-interface Selection {
-  itemId: string | null;
-  rowId: string;
-}
-
-export interface SelectionState {
-  selectedItems: Selection[];
-
-  addInitialCitiesIfEmpty: (data: LoadableSelectionData) => void;
-  addNewSelection: (itemId: string) => void;
-  updateSelection: (rowId: string, itemId: string | null) => void;
-  removeSelection: (rowId: string) => void;
-  reorderSelection: (fromId: string, toId: string) => void;
-}
-
-export type HiddenRowData =
-  | { reason: 'intersect'; intersectingLabels: string[] }
-  | { reason: 'duplicate' };
-
-export type HiddenRowInput = {
-  rowId: string;
-  data: HiddenRowData;
-};
-
-export interface UIState {
-  hiddenRows: Map<string, HiddenRowData>;
-  rowWithOpenCitySelector: string | null;
-  rowWithOpenTimeSelector: string | null;
-
-  setHiddenRows: (hiddenRows: HiddenRowInput[]) => void;
-  openCitySelector: (rowId: string) => void;
-  closeCitySelector: () => void;
-  openTimeSelector: (rowId: string) => void;
-  closeTimeSelector: () => void;
-}
-
-type PersistedState = Pick<SelectionState, 'selectedItems'>;
+import { nanoid } from 'nanoid';
+import { StateCreator } from 'zustand';
+import { LoadableSelectionData } from '../assets';
+import { AppState, Mutators, SelectionState } from './types';
 
 const INITIAL_CITY_DATA = [
   { id: '5368361', timezone: 'America/Los_Angeles' },
@@ -60,12 +21,10 @@ export const INITIAL_DISPLAY_LENGTH =
   // Initial cities
   INITIAL_CITY_DATA.length;
 
-const createSelectionSlice: StateCreator<
-  SelectionState & UIState,
-  [['zustand/persist', unknown]],
-  [],
-  SelectionState
-> = (set, get) => ({
+export const createSelectionSlice: StateCreator<AppState, Mutators, [], SelectionState> = (
+  set,
+  get
+) => ({
   selectedItems: [],
   addInitialCitiesIfEmpty: (data: LoadableSelectionData) => {
     if (get().selectedItems.length > 0) {
@@ -112,6 +71,8 @@ const createSelectionSlice: StateCreator<
       rowWithOpenTimeSelector:
         state.rowWithOpenTimeSelector === rowId ? null : state.rowWithOpenTimeSelector,
     }));
+
+    get().queueRecalculatePositions();
   },
   reorderSelection: (fromId: string, toId: string) => {
     set((state) => {
@@ -124,46 +85,7 @@ const createSelectionSlice: StateCreator<
 
       return { selectedItems: arrayMove(state.selectedItems, fromIndex, toIndex) };
     });
+
+    get().queueRecalculatePositions();
   },
 });
-
-const createUISlice: StateCreator<
-  SelectionState & UIState,
-  [['zustand/persist', unknown]],
-  [],
-  UIState
-> = (set) => ({
-  hiddenRows: new Map<string, HiddenRowData>(),
-  rowWithOpenCitySelector: null,
-  rowWithOpenTimeSelector: null,
-  setHiddenRows: (hiddenRows: HiddenRowInput[]) => {
-    set({ hiddenRows: new Map(hiddenRows.map(({ rowId, data }) => [rowId, data])) });
-  },
-  openCitySelector: (rowId: string) => {
-    set({ rowWithOpenCitySelector: rowId });
-  },
-  closeCitySelector: () => {
-    set({ rowWithOpenCitySelector: null });
-  },
-  openTimeSelector: (rowId: string) => {
-    set({ rowWithOpenTimeSelector: rowId });
-  },
-  closeTimeSelector: () => {
-    set({ rowWithOpenTimeSelector: null });
-  },
-});
-
-export const useTimeMapStore = create<SelectionState & UIState>()(
-  persist(
-    (...a) => ({
-      ...createSelectionSlice(...a),
-      ...createUISlice(...a),
-    }),
-    {
-      name: 'time-map-selection',
-      partialize: (state): PersistedState => ({
-        selectedItems: state.selectedItems,
-      }),
-    }
-  )
-);

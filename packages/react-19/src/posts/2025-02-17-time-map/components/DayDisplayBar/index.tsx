@@ -14,10 +14,14 @@ export function DayDisplayBar({
   time,
   setTime,
   onTimeDragEnd,
+  isTrackingCurrentTime,
+  trackCurrentTime,
 }: {
   time: number;
   setTime: (time: number) => void;
   onTimeDragEnd?: () => void;
+  isTrackingCurrentTime: boolean;
+  trackCurrentTime: () => void;
 }) {
   const currentDaysSinceEpoch = Math.floor(time / DAY_LENGTH);
   const dayPercentage = (flMod(time, DAY_LENGTH) / DAY_LENGTH) * 100;
@@ -43,6 +47,8 @@ export function DayDisplayBar({
     time,
     setTime,
     onDragEnd: onTimeDragEnd,
+    isTrackingCurrentTime,
+    trackCurrentTime,
   });
 
   const leftTextColorIndex = isTextShowingNextDay ? currentDayColorIndex : prevDayColorIndex;
