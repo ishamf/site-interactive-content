@@ -1,3 +1,5 @@
+import { LabelPosition } from './store';
+
 export const DAY_LENGTH = 24 * 3600 * 1000;
 
 export const EPOCH_START_DAY = 4; // Thursday
@@ -44,3 +46,41 @@ dayDarkTextColors[7] = dayDarkTextColors[0];
 export const dayBorderColors = dayLightTextColors;
 
 export const renderBehaviors = ['instant', 'animated', 'deferred'] as const;
+
+interface PossibleOffsets {
+  top?: number;
+  left?: number;
+  right?: number;
+  bottom?: number;
+}
+
+export const offsetsByPosition: Record<LabelPosition, PossibleOffsets> = {
+  topleft: {
+    bottom: 2,
+    right: 8,
+  },
+  topright: {
+    bottom: 2,
+    left: 8,
+  },
+  bottomleft: {
+    top: 2,
+    right: 8,
+  },
+  bottomright: {
+    top: 2,
+    left: 8,
+  },
+  left: {
+    right: 8,
+  },
+  top: {
+    bottom: 4,
+  },
+  right: {
+    left: 8,
+  },
+  bottom: {
+    top: 4,
+  },
+};

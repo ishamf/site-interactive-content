@@ -4,7 +4,7 @@ import { css } from '@emotion/react';
 
 import { DateTime } from 'luxon';
 import { CitySelectionData } from '../../../assets';
-import { dayColors, dayDarkTextColors } from '../../../constants';
+import { dayColors, dayDarkTextColors, offsetsByPosition } from '../../../constants';
 import { CSSProperties, useEffect, useRef } from 'react';
 import { useElementSize } from '../../../../../utils/hooks';
 import { LabelPosition } from '../../../store';
@@ -22,82 +22,58 @@ const indicatorRotationBasedOnLabelPosition = {
 };
 
 const leftPosStyle: CSSProperties = {
-  right: 0,
   textAlign: 'right',
-  paddingRight: '0.5rem',
 };
 
 const rightPosStyle: CSSProperties = {
-  left: 0,
   textAlign: 'left',
-  paddingLeft: '0.5rem',
 };
 
 const centerPosStyle: CSSProperties = {
   left: 0,
   transform: 'translateX(-50%)',
   textAlign: 'center',
-  paddingLeft: '0.25rem',
-  paddingRight: '0.25rem',
 };
 
 const verticalCenterAlignStyle: CSSProperties = {
   top: 0,
   transform: 'translateY(-50%)',
-  paddingTop: '0.125rem',
-  paddingBottom: '0.125rem',
-};
-
-// The padding on these two are intentionally in the wrong direction
-// to reserve space for the top and bottom positions
-const topPosStyle: CSSProperties = {
-  bottom: 0,
-  paddingTop: '0.125rem',
-  paddingBottom: '0.125rem',
-};
-
-const bottomPosStyle: CSSProperties = {
-  top: 0,
-  paddingTop: '0.125rem',
-  paddingBottom: '0.125rem',
 };
 
 const styleByLabelPosition: Record<LabelPosition, CSSProperties> = {
   topleft: {
-    ...topPosStyle,
+    ...offsetsByPosition.topleft,
     ...leftPosStyle,
   },
   topright: {
-    ...topPosStyle,
+    ...offsetsByPosition.topright,
     ...rightPosStyle,
   },
   bottomleft: {
-    ...bottomPosStyle,
+    ...offsetsByPosition.bottomleft,
     ...leftPosStyle,
   },
   bottomright: {
-    ...bottomPosStyle,
+    ...offsetsByPosition.bottomright,
     ...rightPosStyle,
   },
   left: {
+    ...offsetsByPosition.left,
     ...verticalCenterAlignStyle,
     ...leftPosStyle,
   },
   right: {
+    ...offsetsByPosition.right,
     ...verticalCenterAlignStyle,
     ...rightPosStyle,
   },
   top: {
-    ...topPosStyle,
+    ...offsetsByPosition.top,
     ...centerPosStyle,
-    paddingTop: '0',
-    paddingBottom: '0.25rem',
   },
   bottom: {
-    ...bottomPosStyle,
+    ...offsetsByPosition.bottom,
     ...centerPosStyle,
-    paddingBottom: '0',
-    paddingTop: '0.25rem',
   },
 };
 
