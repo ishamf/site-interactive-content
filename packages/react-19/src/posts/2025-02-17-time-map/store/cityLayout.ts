@@ -453,7 +453,10 @@ function optimizeLabelDisplays(
         const currentItem = boxRectsByPosition[itemLabelPositions[i]][i];
         const otherItemRect = boxRectsByPosition[itemLabelPositions[j]][j];
 
-        return getBoxIntersection(currentItem, otherItemRect) > 0;
+        return (
+          getBoxIntersection(currentItem, otherItemRect) >
+          currentItem.width * currentItem.height * 0.05
+        );
       })
       .map((x) => x.rowId),
   }));
