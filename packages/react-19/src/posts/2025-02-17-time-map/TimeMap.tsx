@@ -180,6 +180,7 @@ export function TimeMap() {
           renderBehavior={timeState.renderBehavior}
           onRowFocus={onRowFocus}
           isTrackingCurrentTime={isTrackingCurrentTime}
+          trackCurrentTime={trackCurrentTime}
         />
         <DayDisplayBar
           time={timeState.time.valueOf()}
@@ -193,6 +194,8 @@ export function TimeMap() {
           onTimeDragEnd={() => {
             setTimeNoLongerRapidlyChanging();
           }}
+          isTrackingCurrentTime={isTrackingCurrentTime}
+          trackCurrentTime={trackCurrentTime}
         ></DayDisplayBar>
         <div className="mt-4 hidden md:block" ref={timeBarContainerRef}>
           {timeBarNode}

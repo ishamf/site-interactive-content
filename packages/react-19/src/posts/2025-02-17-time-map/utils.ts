@@ -10,17 +10,24 @@ interface DragState {
 
   roundedInitialTime: number;
   roundedInitialX: number;
+
+  hasMoved: boolean;
+  isTrackingCurrentTimeAtStart: boolean;
 }
 
 export function useGrabTime({
   container,
   time,
+  isTrackingCurrentTime,
   setTime,
+  trackCurrentTime,
   onDragEnd,
 }: {
   container: HTMLElement | null;
   time: number;
+  isTrackingCurrentTime: boolean;
   setTime: (time: number) => void;
+  trackCurrentTime: () => void;
   onDragEnd?: () => void;
 }) {
   const [isGrabbing, setIsGrabbing] = useState(false);
@@ -51,13 +58,15 @@ export function useGrabTime({
 
       stateRef.current = {
         initialTime: time,
+        isTrackingCurrentTimeAtStart: isTrackingCurrentTime,
         initialX: offsetX,
         pointerId: event.pointerId,
         roundedInitialTime,
         roundedInitialX: Math.round(offsetX / offsetAccuracyLimit) * offsetAccuracyLimit,
+        hasMoved: false,
       };
     },
-    [container, time]
+    [container, isTrackingCurrentTime, time]
   );
 
   const onPointerMove = useCallback(
@@ -76,7 +85,10 @@ export function useGrabTime({
 
       const newTime = stateRef.current.roundedInitialTime - roundedDeltaT;
 
-      setTime(newTime);
+      if (stateRef.current.hasMoved || roundedDeltaT !== 0) {
+        setTime(newTime);
+        stateRef.current.hasMoved = true;
+      }
     },
     [container, setTime]
   );
@@ -93,11 +105,19 @@ export function useGrabTime({
     (event: React.PointerEvent) => {
       if (!stateRef.current || event.pointerId !== stateRef.current.pointerId) return;
 
-      setTime(stateRef.current.initialTime);
+      console.log('pointer cancel');
+
+      if (stateRef.current.hasMoved) {
+        if (stateRef.current.isTrackingCurrentTimeAtStart) {
+          trackCurrentTime();
+        } else {
+          setTime(stateRef.current.initialTime);
+        }
+      }
       setIsGrabbing(false);
       stateRef.current = null;
     },
-    [setTime]
+    [setTime, trackCurrentTime]
   );
 
   return {

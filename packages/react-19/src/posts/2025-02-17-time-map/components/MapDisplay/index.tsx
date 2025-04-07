@@ -20,6 +20,7 @@ export function MapDisplay({
   onTimeDragEnd,
   renderBehavior,
   isTrackingCurrentTime,
+  trackCurrentTime,
 }: {
   time: number;
   selectionDataById: Record<string, SelectionData | undefined>;
@@ -27,7 +28,8 @@ export function MapDisplay({
   onRowFocus: (rowId: string) => void;
   onTimeDragEnd?: () => void;
   renderBehavior: RenderBehavior;
-  isTrackingCurrentTime?: boolean;
+  isTrackingCurrentTime: boolean;
+  trackCurrentTime: () => void;
 }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -128,6 +130,8 @@ export function MapDisplay({
     time,
     setTime,
     onDragEnd: onTimeDragEnd,
+    isTrackingCurrentTime,
+    trackCurrentTime,
   });
 
   return (
