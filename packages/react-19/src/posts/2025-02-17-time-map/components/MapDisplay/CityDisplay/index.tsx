@@ -7,7 +7,7 @@ import { CitySelectionData } from '../../../assets';
 import { dayColors, dayDarkTextColors } from '../../../constants';
 import { CSSProperties, useEffect, useRef } from 'react';
 import { useElementSize } from '../../../../../utils/hooks';
-import { LabelPosition } from '../cityLayout';
+import { LabelPosition } from '../../../store';
 import classNames from 'classnames';
 
 const indicatorRotationBasedOnLabelPosition = {

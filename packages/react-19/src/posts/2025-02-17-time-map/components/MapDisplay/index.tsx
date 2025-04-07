@@ -6,7 +6,6 @@ import { canvasWidth, canvasHeight } from '../../constants';
 import { useMapUpdater } from './updater';
 import { HiddenRowInput, useTimeMapStore } from '../../store';
 import { CityDisplay } from './CityDisplay';
-import { useCityDisplayStore } from './cityLayout';
 import { useElementSize } from '../../../../utils/hooks';
 import { SelectionData } from '../../assets';
 import { useGrabTime } from '../../utils';
@@ -38,13 +37,11 @@ export function MapDisplay({
 
   const setHiddenRows = useTimeMapStore((state) => state.setHiddenRows);
 
-  const {
-    registerContainerSize,
-    registerDisplayItem,
-    displayItemById,
-    setValidRowIds,
-    setObstructions,
-  } = useCityDisplayStore();
+  const registerContainerSize = useTimeMapStore((state) => state.registerContainerSize);
+  const registerDisplayItem = useTimeMapStore((state) => state.registerDisplayItem);
+  const displayItemById = useTimeMapStore((state) => state.displayItemById);
+  const setValidRowIds = useTimeMapStore((state) => state.setValidRowIds);
+  const setObstructions = useTimeMapStore((state) => state.setObstructions);
 
   const { uniqueSelectedItems, duplicatedSelectedItems } = useMemo(() => {
     const seenItems = new Set<string>();

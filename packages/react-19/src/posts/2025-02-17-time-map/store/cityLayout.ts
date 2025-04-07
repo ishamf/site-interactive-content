@@ -1,188 +1,149 @@
-import { useRef } from 'react';
-import { create } from 'zustand';
-import { CitySelectionData } from '../../assets';
+import { StateCreator } from 'zustand';
+import {
+  AppState,
+  BoxRect,
+  BoxRectKey,
+  boxRectKeys,
+  BoxSize,
+  CityDisplayItem,
+  CityDisplayState,
+  LabelPosition,
+  labelPositions,
+  Mutators,
+} from './types';
 
-const labelPositions = [
-  'topleft',
-  'topright',
-  'bottomleft',
-  'bottomright',
-  'left',
-  'top',
-  'right',
-  'bottom',
-] as const;
-export type LabelPosition = (typeof labelPositions)[number];
+export const createCityLayoutSlice: StateCreator<AppState, Mutators, [], CityDisplayState> = (
+  set,
+  get
+) => ({
+  containerSize: null,
 
-export type BoxSize = { width: number; height: number };
+  displayItemById: {},
+  validRowIds: new Set(),
+  obstructions: [],
 
-const boxRectKeys = [...labelPositions, 'potential'] as const;
-type BoxRectKey = (typeof boxRectKeys)[number];
+  setObstructions(obstructions) {
+    set({ obstructions });
+  },
 
-type BoxRect = BoxSize & { left: number; top: number };
+  setValidRowIds(rowIds) {
+    set((state) => {
+      const newValidRowIds = new Set(rowIds);
+      const newDisplayItemById = Object.fromEntries(
+        Object.entries(state.displayItemById).filter(([rowId]) => newValidRowIds.has(rowId))
+      );
 
-type DisplayItem = {
-  rowId: string;
-  city: CitySelectionData;
-  labelPosition: LabelPosition | null;
-  intersections: string[];
-  size: BoxSize;
-};
+      return {
+        displayItemById: newDisplayItemById,
+        validRowIds: newValidRowIds,
+      };
+    });
 
-interface CityDisplayStore {
-  containerSize: BoxSize | null;
-  validRowIds: Set<string>;
-  displayItemById: Record<string, DisplayItem | undefined>;
-  obstructions: BoxRect[];
-  setObstructions: (obstructions: BoxRect[]) => void;
-  setValidRowIds: (rowIds: string[]) => void;
-  registerContainerSize(size: BoxSize): void;
-  registerDisplayItem(rowId: string, item: { size: BoxSize; city: CitySelectionData } | null): void;
-  queueRecalculatePositions(): void;
-  recalculatePositions(): void;
-}
+    get().queueRecalculatePositions();
+  },
 
-function createStore() {
-  return create<CityDisplayStore>()((set, get) => ({
-    containerSize: null,
+  registerContainerSize(size) {
+    set({ containerSize: size });
 
-    displayItemById: {},
-    validRowIds: new Set(),
-    obstructions: [],
+    get().queueRecalculatePositions();
+  },
 
-    setObstructions(obstructions) {
-      set({ obstructions });
-    },
+  registerDisplayItem(rowId, item) {
+    let isChanged = false;
 
-    setValidRowIds(rowIds) {
-      set((state) => {
-        const newValidRowIds = new Set(rowIds);
-        const newDisplayItemById = Object.fromEntries(
-          Object.entries(state.displayItemById).filter(([rowId]) => newValidRowIds.has(rowId))
-        );
+    set((state) => {
+      if (!state.validRowIds.has(rowId)) {
+        return state;
+      }
 
-        return {
-          displayItemById: newDisplayItemById,
-          validRowIds: newValidRowIds,
-        };
-      });
+      if (item) {
+        const currentItem = state.displayItemById[rowId];
 
-      get().queueRecalculatePositions();
-    },
-
-    registerContainerSize(size) {
-      set({ containerSize: size });
-
-      get().queueRecalculatePositions();
-    },
-
-    registerDisplayItem(rowId, item) {
-      let isChanged = false;
-
-      set((state) => {
-        if (!state.validRowIds.has(rowId)) {
+        if (currentItem && currentItem.city === item.city && currentItem.size === item.size) {
           return state;
         }
 
-        if (item) {
-          const currentItem = state.displayItemById[rowId];
+        isChanged = true;
 
-          if (currentItem && currentItem.city === item.city && currentItem.size === item.size) {
-            return state;
-          }
-
-          isChanged = true;
-
-          return {
-            displayItemById: {
-              ...state.displayItemById,
-              [rowId]: {
-                rowId,
-                city: item.city,
-                size: item.size,
-                labelPosition: state.displayItemById[rowId]?.labelPosition ?? null,
-                intersections: state.displayItemById[rowId]?.intersections ?? [],
-              },
+        return {
+          displayItemById: {
+            ...state.displayItemById,
+            [rowId]: {
+              rowId,
+              city: item.city,
+              size: item.size,
+              labelPosition: state.displayItemById[rowId]?.labelPosition ?? null,
+              intersections: state.displayItemById[rowId]?.intersections ?? [],
             },
-          };
-        } else {
-          const { [rowId]: _, ...rest } = state.displayItemById;
+          },
+        };
+      } else {
+        const { [rowId]: _, ...rest } = state.displayItemById;
 
-          isChanged = true;
+        isChanged = true;
 
-          return { displayItemById: rest };
-        }
-      });
-
-      if (isChanged) {
-        get().queueRecalculatePositions();
+        return { displayItemById: rest };
       }
-    },
+    });
 
-    // If the queueRecalculatePositions is called multiple times in a row,
-    // we only want to call recalculatePositions twice, once at start and once at end
-    queueRecalculatePositions: (() => {
-      let state: 'idle' | 'calledOnce' | 'pendingEndCall' = 'idle';
-      return () => {
-        if (state === 'calledOnce') {
-          state = 'pendingEndCall';
-          return;
-        }
+    if (isChanged) {
+      get().queueRecalculatePositions();
+    }
+  },
 
-        if (state === 'pendingEndCall') {
-          return;
-        }
-
-        get().recalculatePositions();
-
-        state = 'calledOnce';
-
-        setTimeout(() => {
-          if (state === 'pendingEndCall') {
-            get().recalculatePositions();
-          }
-          state = 'idle';
-        }, 0);
-      };
-    })(),
-
-    recalculatePositions() {
-      if (!this.containerSize) {
+  // If the queueRecalculatePositions is called multiple times in a row,
+  // we only want to call recalculatePositions twice, once at start and once at end
+  queueRecalculatePositions: (() => {
+    let state: 'idle' | 'calledOnce' | 'pendingEndCall' = 'idle';
+    return () => {
+      if (state === 'calledOnce') {
+        state = 'pendingEndCall';
         return;
       }
 
-      const optimizedDisplayItems = optimizeLabelDisplays(
-        this.containerSize,
-        Object.values(get().displayItemById).filter((item): item is DisplayItem => !!item),
-        get().obstructions
-      );
+      if (state === 'pendingEndCall') {
+        return;
+      }
 
-      set({
-        displayItemById: optimizedDisplayItems.reduce(
-          (acc, item) => {
-            acc[item.rowId] = item;
-            return acc;
-          },
-          {} as Record<string, DisplayItem>
-        ),
-      });
-    },
-  }));
-}
+      get().recalculatePositions();
 
-export function useCityDisplayStore() {
-  const storeRef = useRef<ReturnType<typeof createStore>>(null);
+      state = 'calledOnce';
 
-  if (!storeRef.current) {
-    storeRef.current = createStore();
-  }
+      setTimeout(() => {
+        if (state === 'pendingEndCall') {
+          get().recalculatePositions();
+        }
+        state = 'idle';
+      }, 0);
+    };
+  })(),
 
-  return storeRef.current();
-}
+  recalculatePositions() {
+    if (!this.containerSize) {
+      return;
+    }
+
+    const optimizedDisplayItems = optimizeLabelDisplays(
+      this.containerSize,
+      Object.values(get().displayItemById).filter((item): item is CityDisplayItem => !!item),
+      get().obstructions
+    );
+
+    set({
+      displayItemById: optimizedDisplayItems.reduce(
+        (acc, item) => {
+          acc[item.rowId] = item;
+          return acc;
+        },
+        {} as Record<string, CityDisplayItem>
+      ),
+    });
+  },
+});
 
 function getLabelRect(
   containerSize: BoxSize,
-  displayItem: Omit<DisplayItem, 'labelPosition'>,
+  displayItem: Omit<CityDisplayItem, 'labelPosition'>,
   position: BoxRectKey
 ) {
   const cityX = (displayItem.city.longitude / 360 + 0.5) * containerSize.width;
@@ -337,9 +298,9 @@ type CandidateAction = {
  */
 function optimizeLabelDisplays(
   containerSize: BoxSize,
-  items: DisplayItem[],
+  items: CityDisplayItem[],
   obstructions: BoxRect[]
-): DisplayItem[] {
+): CityDisplayItem[] {
   // const start = performance.now();
 
   const boxRectsByPosition = boxRectKeys.reduce(

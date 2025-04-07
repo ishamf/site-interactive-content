@@ -1,12 +1,7 @@
 import { StateCreator } from 'zustand';
-import { SelectionState, UIState, HiddenRowData, HiddenRowInput } from './types';
+import { UIState, HiddenRowData, HiddenRowInput, Mutators, AppState } from './types';
 
-export const createUISlice: StateCreator<
-  SelectionState & UIState,
-  [['zustand/persist', unknown]],
-  [],
-  UIState
-> = (set) => ({
+export const createUISlice: StateCreator<AppState, Mutators, [], UIState> = (set) => ({
   hiddenRows: new Map<string, HiddenRowData>(),
   rowWithOpenCitySelector: null,
   rowWithOpenTimeSelector: null,

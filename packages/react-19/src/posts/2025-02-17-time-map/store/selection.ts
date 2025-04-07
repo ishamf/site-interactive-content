@@ -2,7 +2,7 @@ import { arrayMove } from '@dnd-kit/sortable';
 import { nanoid } from 'nanoid';
 import { StateCreator } from 'zustand';
 import { LoadableSelectionData } from '../assets';
-import { SelectionState, UIState } from './types';
+import { AppState, Mutators, SelectionState } from './types';
 
 const INITIAL_CITY_DATA = [
   { id: '5368361', timezone: 'America/Los_Angeles' },
@@ -21,12 +21,10 @@ export const INITIAL_DISPLAY_LENGTH =
   // Initial cities
   INITIAL_CITY_DATA.length;
 
-export const createSelectionSlice: StateCreator<
-  SelectionState & UIState,
-  [['zustand/persist', unknown]],
-  [],
-  SelectionState
-> = (set, get) => ({
+export const createSelectionSlice: StateCreator<AppState, Mutators, [], SelectionState> = (
+  set,
+  get
+) => ({
   selectedItems: [],
   addInitialCitiesIfEmpty: (data: LoadableSelectionData) => {
     if (get().selectedItems.length > 0) {
