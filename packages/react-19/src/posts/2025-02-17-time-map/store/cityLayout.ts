@@ -12,6 +12,7 @@ import {
   Mutators,
 } from './types';
 import { arrayMove } from '@dnd-kit/sortable';
+import { offsetsByPosition } from '../constants';
 
 export const createCityLayoutSlice: StateCreator<AppState, Mutators, [], CityDisplayState> = (
   set,
@@ -203,53 +204,63 @@ function getLabelRect(
   const cityX = (displayItem.city.longitude / 360 + 0.5) * containerSize.width;
   const cityY = (displayItem.city.latitude / -180 + 0.5) * containerSize.height;
 
+  const {
+    top: offsetTop = 0,
+    left: offsetLeft = 0,
+    right: offsetRight = 0,
+    bottom: offsetBottom = 0,
+  } = position === 'potential' ? {} : offsetsByPosition[position];
+
+  const deltaX = offsetLeft - offsetRight;
+  const deltaY = offsetTop - offsetBottom;
+
   switch (position) {
     case 'topleft':
       return {
-        left: cityX - displayItem.size.width,
-        top: cityY - displayItem.size.height,
+        left: cityX - displayItem.size.width + deltaX,
+        top: cityY - displayItem.size.height + deltaY,
         ...displayItem.size,
       };
     case 'topright':
       return {
-        left: cityX,
-        top: cityY - displayItem.size.height,
+        left: cityX + deltaX,
+        top: cityY - displayItem.size.height + deltaY,
         ...displayItem.size,
       };
     case 'bottomleft':
       return {
-        left: cityX - displayItem.size.width,
-        top: cityY,
+        left: cityX - displayItem.size.width + deltaX,
+        top: cityY + deltaY,
         ...displayItem.size,
       };
     case 'bottomright':
       return {
-        left: cityX,
-        top: cityY,
+        left: cityX + deltaX,
+        top: cityY + deltaY,
         ...displayItem.size,
       };
     case 'left':
       return {
-        left: cityX - displayItem.size.width,
-        top: cityY - displayItem.size.height / 2,
+        left: cityX - displayItem.size.width + deltaX,
+        top: cityY - displayItem.size.height / 2 + deltaY,
         ...displayItem.size,
       };
     case 'top':
       return {
-        left: cityX - displayItem.size.width / 2,
-        top: cityY - displayItem.size.height,
+        left: cityX - displayItem.size.width / 2 + deltaX,
+        top: cityY - displayItem.size.height + deltaY,
         ...displayItem.size,
       };
     case 'right':
       return {
-        left: cityX,
-        top: cityY - displayItem.size.height / 2,
+        left: cityX + deltaX,
+        top: cityY - displayItem.size.height / 2 + deltaY,
         ...displayItem.size,
       };
     case 'bottom':
       return {
-        left: cityX - displayItem.size.width / 2,
-        top: cityY,
+        left: cityX - displayItem.size.width / 2 + deltaX,
+        top: cityY + deltaY,
         ...displayItem.size,
       };
     case 'potential':
