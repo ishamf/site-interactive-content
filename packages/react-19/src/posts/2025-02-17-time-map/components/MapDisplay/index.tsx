@@ -85,7 +85,7 @@ export function MapDisplay({
   // This is separated from the above to prevent recreating onLabelSizeChange when displayItemById changes
   // which would cause an infinite loop
   const cityDisplayItems = useMemo(() => {
-    return cityDisplayItemsWithoutPosition.map((item) => {
+    const result = cityDisplayItemsWithoutPosition.map((item) => {
       if (!item) return null;
 
       const displayItem = displayItemById[item.rowId];
@@ -96,6 +96,11 @@ export function MapDisplay({
         labelHidden: !displayItem?.labelPosition || !!displayItem?.hidden,
       };
     });
+
+    // Render the items in reverse order to ensure that the first item is on top
+    result.reverse();
+
+    return result;
   }, [cityDisplayItemsWithoutPosition, displayItemById]);
 
   const { hasRenderedOnce, isLoadingImages } = useMapUpdater(canvasRef, time, renderBehavior);
