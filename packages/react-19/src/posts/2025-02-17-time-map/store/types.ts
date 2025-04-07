@@ -18,21 +18,10 @@ export interface SelectionState {
 
 // UI state types
 
-export type HiddenRowData =
-  | { reason: 'intersect'; intersectingLabels: string[] }
-  | { reason: 'duplicate' };
-
-export type HiddenRowInput = {
-  rowId: string;
-  data: HiddenRowData;
-};
-
 export interface UIState {
-  hiddenRows: Map<string, HiddenRowData>;
   rowWithOpenCitySelector: string | null;
   rowWithOpenTimeSelector: string | null;
 
-  setHiddenRows: (hiddenRows: HiddenRowInput[]) => void;
   openCitySelector: (rowId: string) => void;
   closeCitySelector: () => void;
   openTimeSelector: (rowId: string) => void;
@@ -62,21 +51,24 @@ export type BoxRectKey = (typeof boxRectKeys)[number];
 
 export type BoxRect = BoxSize & { left: number; top: number };
 
+export type HiddenData =
+  | { reason: 'intersect'; intersectingLabels: string[] }
+  | { reason: 'duplicate' };
+
 export type CityDisplayItem = {
   rowId: string;
   city: CitySelectionData;
   labelPosition: LabelPosition | null;
   intersections: string[];
+  hidden?: HiddenData;
   size: BoxSize;
 };
 
 export interface CityDisplayState {
   containerSize: BoxSize | null;
-  validRowIds: Set<string>;
   displayItemById: Record<string, CityDisplayItem | undefined>;
   obstructions: BoxRect[];
   setObstructions: (obstructions: BoxRect[]) => void;
-  setValidRowIds: (rowIds: string[]) => void;
   registerContainerSize(size: BoxSize): void;
   registerDisplayItem(rowId: string, item: { size: BoxSize; city: CitySelectionData } | null): void;
   queueRecalculatePositions(): void;

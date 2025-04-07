@@ -47,7 +47,6 @@ export const TimezoneSelection = memo(
 
     const datepickerRef = useRef<HTMLInputElement>(null);
 
-    const hiddenRows = useTimeMapStore((state) => state.hiddenRows);
     const isCitySelectorOpen = useTimeMapStore((state) => state.rowWithOpenCitySelector === rowId);
     const openCitySelector = useTimeMapStore((state) => state.openCitySelector);
     const closeCitySelector = useTimeMapStore((state) => state.closeCitySelector);
@@ -55,7 +54,7 @@ export const TimezoneSelection = memo(
     const openTimeSelector = useTimeMapStore((state) => state.openTimeSelector);
     const closeTimeSelector = useTimeMapStore((state) => state.closeTimeSelector);
 
-    const currentRowHiddenData = hiddenRows.get(rowId);
+    const currentRowHiddenData = useTimeMapStore((state) => state.displayItemById[rowId]?.hidden);
 
     useEffect(() => {
       if (isTimeSelectorOpen && isDateTimeFrozen) {

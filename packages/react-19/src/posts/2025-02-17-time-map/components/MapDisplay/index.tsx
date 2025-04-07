@@ -4,7 +4,7 @@ import { css } from '@emotion/react';
 import { CircularProgress } from '@mui/material';
 import { canvasWidth, canvasHeight } from '../../constants';
 import { useMapUpdater } from './updater';
-import { HiddenRowInput, useTimeMapStore } from '../../store';
+import { useTimeMapStore } from '../../store';
 import { CityDisplay } from './CityDisplay';
 import { useElementSize } from '../../../../utils/hooks';
 import { SelectionData } from '../../assets';
@@ -35,43 +35,14 @@ export function MapDisplay({
 
   const selectedItems = useTimeMapStore((state) => state.selectedItems);
 
-  const setHiddenRows = useTimeMapStore((state) => state.setHiddenRows);
-
   const registerContainerSize = useTimeMapStore((state) => state.registerContainerSize);
   const registerDisplayItem = useTimeMapStore((state) => state.registerDisplayItem);
   const displayItemById = useTimeMapStore((state) => state.displayItemById);
-  const setValidRowIds = useTimeMapStore((state) => state.setValidRowIds);
+
   const setObstructions = useTimeMapStore((state) => state.setObstructions);
 
-  const { uniqueSelectedItems, duplicatedSelectedItems } = useMemo(() => {
-    const seenItems = new Set<string>();
-
-    const duplicatedSelectedItems: typeof selectedItems = [];
-
-    const uniqueSelectedItems = selectedItems.filter((item) => {
-      if (!item.itemId) {
-        return false;
-      }
-
-      if (seenItems.has(item.itemId)) {
-        duplicatedSelectedItems.push(item);
-        return false;
-      }
-
-      seenItems.add(item.itemId);
-
-      return true;
-    });
-
-    return { uniqueSelectedItems, duplicatedSelectedItems };
-  }, [selectedItems]);
-
-  useEffect(() => {
-    setValidRowIds(uniqueSelectedItems.map((x) => x.rowId));
-  }, [setValidRowIds, uniqueSelectedItems]);
-
-  const cityDisplayItems = useMemo(() => {
-    return uniqueSelectedItems.map((selectionItem) => {
+  const cityDisplayItemsWithoutPosition = useMemo(() => {
+    return selectedItems.map((selectionItem) => {
       if (!selectionItem.itemId) {
         return null;
       }
@@ -107,58 +78,23 @@ export function MapDisplay({
 
       return { rowId: selectionItem.rowId, displayProps };
     });
-  }, [onRowFocus, registerDisplayItem, selectionDataById, uniqueSelectedItems]);
+  }, [onRowFocus, registerDisplayItem, selectedItems, selectionDataById]);
 
-  const cityDisplayItemsWithPositions = useMemo(() => {
-    const renderedItems: Record<string, boolean> = {};
+  // This is separated from the above to prevent recreating onLabelSizeChange when displayItemById changes
+  // which would cause an infinite loop
+  const cityDisplayItems = useMemo(() => {
+    return cityDisplayItemsWithoutPosition.map((item) => {
+      if (!item) return null;
 
-    const result = cityDisplayItems.map((cityItem) => {
-      if (!cityItem) {
-        return null;
-      }
-
-      const displayItem = displayItemById[cityItem.rowId];
-
-      const blockingItems = displayItem?.intersections.filter((id) => renderedItems[id]) || [];
-
-      const isBlocked = blockingItems.length > 0;
-
-      renderedItems[cityItem.rowId] = !!(displayItem && !isBlocked);
+      const displayItem = displayItemById[item.rowId];
 
       return {
-        ...cityItem,
-        labelPosition: displayItem?.labelPosition || null,
-        labelIntersectsOthers: isBlocked,
-        intersectingLabels: blockingItems.map((rowId) => displayItemById[rowId]?.city.label || ''),
+        ...item,
+        labelPosition: displayItem?.labelPosition,
+        labelHidden: !displayItem?.labelPosition || !!displayItem?.hidden,
       };
     });
-
-    // Render the items in reverse order to ensure that the first item is on top
-    result.reverse();
-
-    return result;
-  }, [cityDisplayItems, displayItemById]);
-
-  useEffect(() => {
-    const intersectionRows = cityDisplayItemsWithPositions
-      .filter(
-        (item): item is Exclude<(typeof cityDisplayItemsWithPositions)[number], null> =>
-          !!item && item.labelIntersectsOthers
-      )
-      .map(
-        (item): HiddenRowInput => ({
-          rowId: item.rowId,
-          data: { reason: 'intersect', intersectingLabels: item.intersectingLabels },
-        })
-      );
-
-    const duplicateRowIds = duplicatedSelectedItems.map((item) => item.rowId);
-
-    setHiddenRows([
-      ...intersectionRows,
-      ...duplicateRowIds.map((rowId): HiddenRowInput => ({ rowId, data: { reason: 'duplicate' } })),
-    ]);
-  }, [cityDisplayItemsWithPositions, duplicatedSelectedItems, setHiddenRows]);
+  }, [cityDisplayItemsWithoutPosition, displayItemById]);
 
   const { hasRenderedOnce, isLoadingImages } = useMapUpdater(canvasRef, time, renderBehavior);
 
@@ -240,19 +176,19 @@ export function MapDisplay({
       </div>
 
       {hasRenderedOnce
-        ? cityDisplayItemsWithPositions.map((displayItem) => {
+        ? cityDisplayItems.map((displayItem) => {
             if (!displayItem) return null;
 
-            const { rowId, displayProps, labelPosition, labelIntersectsOthers } = displayItem;
+            const { rowId, displayProps, labelPosition, labelHidden } = displayItem;
 
             return (
               <CityDisplay
                 {...displayProps}
-                disabled={isGrabbing || labelIntersectsOthers}
-                labelHidden={labelIntersectsOthers}
+                labelPosition={labelPosition ?? null}
+                labelHidden={labelHidden}
+                disabled={isGrabbing || labelHidden}
                 key={rowId}
                 time={time}
-                labelPosition={labelPosition}
               ></CityDisplay>
             );
           })

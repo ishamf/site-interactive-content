@@ -19,25 +19,10 @@ export const createCityLayoutSlice: StateCreator<AppState, Mutators, [], CityDis
   containerSize: null,
 
   displayItemById: {},
-  validRowIds: new Set(),
   obstructions: [],
 
   setObstructions(obstructions) {
     set({ obstructions });
-  },
-
-  setValidRowIds(rowIds) {
-    set((state) => {
-      const newValidRowIds = new Set(rowIds);
-      const newDisplayItemById = Object.fromEntries(
-        Object.entries(state.displayItemById).filter(([rowId]) => newValidRowIds.has(rowId))
-      );
-
-      return {
-        displayItemById: newDisplayItemById,
-        validRowIds: newValidRowIds,
-      };
-    });
 
     get().queueRecalculatePositions();
   },
@@ -52,10 +37,6 @@ export const createCityLayoutSlice: StateCreator<AppState, Mutators, [], CityDis
     let isChanged = false;
 
     set((state) => {
-      if (!state.validRowIds.has(rowId)) {
-        return state;
-      }
-
       if (item) {
         const currentItem = state.displayItemById[rowId];
 
@@ -119,24 +100,86 @@ export const createCityLayoutSlice: StateCreator<AppState, Mutators, [], CityDis
   })(),
 
   recalculatePositions() {
-    if (!this.containerSize) {
+    const { obstructions, containerSize, selectedItems, displayItemById } = get();
+
+    if (!containerSize) {
       return;
     }
 
-    const optimizedDisplayItems = optimizeLabelDisplays(
-      this.containerSize,
-      Object.values(get().displayItemById).filter((item): item is CityDisplayItem => !!item),
-      get().obstructions
+    const newDisplayItems = selectedItems
+      .filter((x) => x.itemId)
+      .map((x) => displayItemById[x.rowId])
+      .map((x): CityDisplayItem | undefined => x && { ...x, hidden: undefined });
+
+    const newDisplayItemById = newDisplayItems.reduce(
+      (acc, item) => {
+        if (item) {
+          acc[item.rowId] = item;
+        }
+        return acc;
+      },
+      {} as Record<string, CityDisplayItem | undefined>
     );
 
-    set({
-      displayItemById: optimizedDisplayItems.reduce(
-        (acc, item) => {
-          acc[item.rowId] = item;
-          return acc;
-        },
-        {} as Record<string, CityDisplayItem>
+    // Hide based on duplicates
+    const seenItemIds = new Set<string>();
+    const duplicatedRowIds = new Set<string>();
+    for (const item of newDisplayItems) {
+      if (!item) continue;
+
+      if (seenItemIds.has(item.city.id)) {
+        duplicatedRowIds.add(item.rowId);
+      } else {
+        seenItemIds.add(item.city.id);
+      }
+    }
+
+    const renderedRowIds = new Set<string>();
+    const blockedRowIds = new Set<string>();
+
+    const itemUpdates = optimizeLabelDisplays(
+      containerSize,
+      newDisplayItems.filter(
+        (item): item is CityDisplayItem => !!item && !duplicatedRowIds.has(item.rowId)
       ),
+      obstructions
+    );
+
+    for (const update of itemUpdates) {
+      const item = newDisplayItemById[update.rowId];
+
+      if (!item) continue;
+
+      item.labelPosition = update.labelPosition;
+      item.intersections = update.intersections;
+
+      if (item.intersections.filter((x) => renderedRowIds.has(x)).length > 0) {
+        blockedRowIds.add(item.rowId);
+      } else {
+        renderedRowIds.add(item.rowId);
+      }
+    }
+
+    const aboveItems = new Set<string>();
+
+    for (const item of newDisplayItems) {
+      if (!item) continue;
+      if (blockedRowIds.has(item.rowId)) {
+        item.hidden = {
+          reason: 'intersect',
+          intersectingLabels: item.intersections
+            .filter((rowId) => aboveItems.has(rowId))
+            .map((rowId) => newDisplayItemById[rowId]?.city.label ?? rowId),
+        };
+      } else if (duplicatedRowIds.has(item.rowId)) {
+        item.hidden = { reason: 'duplicate' };
+      }
+
+      aboveItems.add(item.rowId);
+    }
+
+    set({
+      displayItemById: newDisplayItemById,
     });
   },
 });
@@ -300,8 +343,8 @@ function optimizeLabelDisplays(
   containerSize: BoxSize,
   items: CityDisplayItem[],
   obstructions: BoxRect[]
-): CityDisplayItem[] {
-  // const start = performance.now();
+): Pick<CityDisplayItem, 'rowId' | 'labelPosition' | 'intersections'>[] {
+  const start = performance.now();
 
   const boxRectsByPosition = boxRectKeys.reduce(
     (acc, position) => {
@@ -385,10 +428,10 @@ function optimizeLabelDisplays(
     itemLabelPositions[bestCandidateAction.index] = bestCandidateAction.position;
   }
 
-  // console.log('Optimization iterations:', iter, 'Time:', performance.now() - start);
+  console.log('Optimization iterations:', iter, 'Time:', performance.now() - start);
 
-  return items.map((item, i) => ({
-    ...item,
+  return items.map(({ rowId }, i) => ({
+    rowId,
     labelPosition: itemLabelPositions[i],
     intersections: items
       .filter((_, j) => {
