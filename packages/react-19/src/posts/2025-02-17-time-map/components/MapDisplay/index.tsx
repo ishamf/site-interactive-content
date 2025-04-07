@@ -1,4 +1,6 @@
+/** @jsxImportSource @emotion/react */
 import { ComponentProps, useEffect, useMemo, useRef } from 'react';
+import { css } from '@emotion/react';
 import { CircularProgress } from '@mui/material';
 import { canvasWidth, canvasHeight } from '../../constants';
 import { useMapUpdater } from './updater';
@@ -18,6 +20,7 @@ export function MapDisplay({
   onRowFocus,
   onTimeDragEnd,
   renderBehavior,
+  isTrackingCurrentTime,
 }: {
   time: number;
   selectionDataById: Record<string, SelectionData | undefined>;
@@ -25,15 +28,23 @@ export function MapDisplay({
   onRowFocus: (rowId: string) => void;
   onTimeDragEnd?: () => void;
   renderBehavior: RenderBehavior;
+  isTrackingCurrentTime?: boolean;
 }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  const liveLabelRef = useRef<HTMLDivElement>(null);
 
   const selectedItems = useTimeMapStore((state) => state.selectedItems);
 
   const setHiddenRows = useTimeMapStore((state) => state.setHiddenRows);
 
-  const { registerContainerSize, registerDisplayItem, displayItemById, setValidRowIds } =
-    useCityDisplayStore();
+  const {
+    registerContainerSize,
+    registerDisplayItem,
+    displayItemById,
+    setValidRowIds,
+    setObstructions,
+  } = useCityDisplayStore();
 
   const { uniqueSelectedItems, duplicatedSelectedItems } = useMemo(() => {
     const seenItems = new Set<string>();
@@ -158,11 +169,26 @@ export function MapDisplay({
     ref: canvasRef,
   });
 
+  const liveLabelSize = useElementSize({
+    ref: liveLabelRef,
+  });
+
   useEffect(() => {
     if (containerSize) {
       registerContainerSize(containerSize);
     }
-  }, [containerSize, registerContainerSize]);
+    if (liveLabelRef.current && liveLabelSize) {
+      const liveLabel = liveLabelRef.current;
+      setObstructions([
+        {
+          top: liveLabel.offsetTop,
+          left: liveLabel.offsetLeft,
+          width: liveLabelSize.width,
+          height: liveLabelSize.height,
+        },
+      ]);
+    }
+  }, [containerSize, liveLabelSize, registerContainerSize, setObstructions]);
 
   const { isGrabbing, listeners } = useGrabTime({
     container: canvasRef.current,
@@ -188,6 +214,34 @@ export function MapDisplay({
           <CircularProgress></CircularProgress>
         </div>
       ) : null}
+
+      <div
+        ref={liveLabelRef}
+        className={classNames('absolute top-1 right-1 text-red-500 text-xs font-bold', {
+          invisible: !isTrackingCurrentTime,
+        })}
+        css={css`
+          z-index: 10;
+
+          &::before {
+            content: '';
+            position: absolute;
+            z-index: -1;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #000;
+            opacity: 0.6;
+            filter: blur(3px);
+            padding: 0.05rem 0.2rem;
+            margin: -0.05rem -0.2rem;
+          }
+        `}
+      >
+        <span>LIVE</span>
+      </div>
+
       {hasRenderedOnce
         ? cityDisplayItemsWithPositions.map((displayItem) => {
             if (!displayItem) return null;

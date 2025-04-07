@@ -33,6 +33,8 @@ interface CityDisplayStore {
   containerSize: BoxSize | null;
   validRowIds: Set<string>;
   displayItemById: Record<string, DisplayItem | undefined>;
+  obstructions: BoxRect[];
+  setObstructions: (obstructions: BoxRect[]) => void;
   setValidRowIds: (rowIds: string[]) => void;
   registerContainerSize(size: BoxSize): void;
   registerDisplayItem(rowId: string, item: { size: BoxSize; city: CitySelectionData } | null): void;
@@ -46,6 +48,11 @@ function createStore() {
 
     displayItemById: {},
     validRowIds: new Set(),
+    obstructions: [],
+
+    setObstructions(obstructions) {
+      set({ obstructions });
+    },
 
     setValidRowIds(rowIds) {
       set((state) => {
@@ -146,7 +153,8 @@ function createStore() {
 
       const optimizedDisplayItems = optimizeLabelDisplays(
         this.containerSize,
-        Object.values(get().displayItemById).filter((item): item is DisplayItem => !!item)
+        Object.values(get().displayItemById).filter((item): item is DisplayItem => !!item),
+        get().obstructions
       );
 
       set({
@@ -253,6 +261,7 @@ function getBoxIntersection(box1: BoxRect, box2: BoxRect): number {
 
 function calculateItemCost({
   containerSize,
+  obstructions,
   currentItem,
   currentItemIndex,
   currentItemPosition,
@@ -261,6 +270,7 @@ function calculateItemCost({
   ignorePotential,
 }: {
   containerSize: BoxSize;
+  obstructions: BoxRect[];
   currentItem: BoxRect;
   currentItemIndex: number;
   currentItemPosition: LabelPosition;
@@ -299,6 +309,14 @@ function calculateItemCost({
       (ignorePotential ? 0 : getBoxIntersection(currentItem, allItems['potential'][i]) * 1);
   }
 
+  // Cost for intersection with obstructions
+  for (const obstruction of obstructions) {
+    const obstructionIntersection = getBoxIntersection(currentItem, obstruction);
+    if (obstructionIntersection > 0) {
+      cost += obstructionIntersection * 50;
+    }
+  }
+
   // Cost for going out of bounds
   cost +=
     (currentItem.width * currentItem.height -
@@ -317,7 +335,11 @@ type CandidateAction = {
 /**
  * Greedy algorithm to optimize label displays
  */
-function optimizeLabelDisplays(containerSize: BoxSize, items: DisplayItem[]): DisplayItem[] {
+function optimizeLabelDisplays(
+  containerSize: BoxSize,
+  items: DisplayItem[],
+  obstructions: BoxRect[]
+): DisplayItem[] {
   // const start = performance.now();
 
   const boxRectsByPosition = boxRectKeys.reduce(
@@ -341,6 +363,7 @@ function optimizeLabelDisplays(containerSize: BoxSize, items: DisplayItem[]): Di
       const currentPosition = itemLabelPositions[i];
       const currentCost = calculateItemCost({
         containerSize,
+        obstructions,
         currentItem: boxRectsByPosition[currentPosition][i],
         currentItemIndex: i,
         currentItemPosition: currentPosition,
@@ -358,6 +381,7 @@ function optimizeLabelDisplays(containerSize: BoxSize, items: DisplayItem[]): Di
 
         const candidateCost = calculateItemCost({
           containerSize,
+          obstructions,
           currentItem: boxRectsByPosition[candidatePosition][i],
           currentItemIndex: i,
           currentItemPosition: candidatePosition,

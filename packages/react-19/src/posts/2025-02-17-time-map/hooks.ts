@@ -91,7 +91,7 @@ export function useTimeState() {
     }
   }, [isTrackingCurrentTime, isDocumentVisible, isAnyTimeSelectorOpen, updateTimeToCurrentMinute]);
 
-  const setTime = useCallback((newTime: Parameters<typeof setTimeInternal>[0]) => {
+  const setTime = useCallback((newTime: TimeState) => {
     setTimeInternal(newTime);
     setIsTrackingCurrentTime(false);
   }, []);
@@ -101,11 +101,16 @@ export function useTimeState() {
     setIsTrackingCurrentTime(true);
   }, [updateTimeToCurrentMinute]);
 
+  const setTimeNoLongerRapidlyChanging = useCallback(() => {
+    setTimeInternal((state) => ({ ...state, isRapidlyChanging: false }));
+  }, []);
+
   return {
     timeState,
     setTime,
     slowlyChangingTime,
     isTrackingCurrentTime,
     trackCurrentTime,
+    setTimeNoLongerRapidlyChanging,
   };
 }

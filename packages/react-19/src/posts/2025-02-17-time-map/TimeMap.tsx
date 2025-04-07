@@ -17,8 +17,14 @@ import { TimezoneSelectionSkeleton } from './components/TimezoneSelectionSkeleto
 import { useTimeState } from './hooks';
 
 export function TimeMap() {
-  const { timeState, setTime, slowlyChangingTime, trackCurrentTime, isTrackingCurrentTime } =
-    useTimeState();
+  const {
+    timeState,
+    setTime,
+    slowlyChangingTime,
+    trackCurrentTime,
+    isTrackingCurrentTime,
+    setTimeNoLongerRapidlyChanging,
+  } = useTimeState();
 
   const selectedItems = useTimeMapStore((s) => s.selectedItems);
   const addInitialCitiesIfEmpty = useTimeMapStore((s) => s.addInitialCitiesIfEmpty);
@@ -169,10 +175,11 @@ export function TimeMap() {
             });
           }}
           onTimeDragEnd={() => {
-            setTime((state) => ({ ...state, isRapidlyChanging: false }));
+            setTimeNoLongerRapidlyChanging();
           }}
           renderBehavior={timeState.renderBehavior}
           onRowFocus={onRowFocus}
+          isTrackingCurrentTime={isTrackingCurrentTime}
         />
         <DayDisplayBar
           time={timeState.time.valueOf()}
@@ -184,7 +191,7 @@ export function TimeMap() {
             });
           }}
           onTimeDragEnd={() => {
-            setTime((state) => ({ ...state, isRapidlyChanging: false }));
+            setTimeNoLongerRapidlyChanging();
           }}
         ></DayDisplayBar>
         <div className="mt-4 hidden md:block" ref={timeBarContainerRef}>

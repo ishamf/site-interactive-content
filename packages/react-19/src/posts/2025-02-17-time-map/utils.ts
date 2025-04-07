@@ -92,6 +92,7 @@ export function useGrabTime({
   const onPointerCancel = useCallback(
     (event: React.PointerEvent) => {
       if (!stateRef.current || event.pointerId !== stateRef.current.pointerId) return;
+
       setTime(stateRef.current.initialTime);
       setIsGrabbing(false);
       stateRef.current = null;

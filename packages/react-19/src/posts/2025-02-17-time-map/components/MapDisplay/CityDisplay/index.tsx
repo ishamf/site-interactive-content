@@ -206,13 +206,13 @@ export function CityDisplay({
           css={css`
             ${labelCommonStyles}
             z-index: 19;
-            opacity: 0.8;
+            opacity: 0.6;
 
             pointer-events: none;
             user-select: none;
             color: rgba(0, 0, 0, 0);
 
-            /* filter: blur(2px); */
+            filter: blur(3px);
 
             & span {
               display: inline-block;
