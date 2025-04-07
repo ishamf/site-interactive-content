@@ -150,9 +150,12 @@ export function MapDisplay({
 
       <div
         ref={liveLabelRef}
-        className={classNames('absolute top-1 right-1 text-red-500 text-xs font-bold', {
-          invisible: !isTrackingCurrentTime,
-        })}
+        className={classNames(
+          'absolute top-1 right-1 text-red-500 text-xs font-bold contain-content',
+          {
+            invisible: !isTrackingCurrentTime,
+          }
+        )}
         css={css`
           z-index: 10;
 

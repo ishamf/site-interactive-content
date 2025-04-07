@@ -71,6 +71,8 @@ export const createSelectionSlice: StateCreator<AppState, Mutators, [], Selectio
       rowWithOpenTimeSelector:
         state.rowWithOpenTimeSelector === rowId ? null : state.rowWithOpenTimeSelector,
     }));
+
+    get().queueRecalculatePositions();
   },
   reorderSelection: (fromId: string, toId: string) => {
     set((state) => {
@@ -83,5 +85,7 @@ export const createSelectionSlice: StateCreator<AppState, Mutators, [], Selectio
 
       return { selectedItems: arrayMove(state.selectedItems, fromIndex, toIndex) };
     });
+
+    get().queueRecalculatePositions();
   },
 });

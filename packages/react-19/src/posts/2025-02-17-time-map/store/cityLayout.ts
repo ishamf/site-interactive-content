@@ -11,6 +11,7 @@ import {
   labelPositions,
   Mutators,
 } from './types';
+import { arrayMove } from '@dnd-kit/sortable';
 
 export const createCityLayoutSlice: StateCreator<AppState, Mutators, [], CityDisplayState> = (
   set,
@@ -68,6 +69,7 @@ export const createCityLayoutSlice: StateCreator<AppState, Mutators, [], CityDis
     });
 
     if (isChanged) {
+      // console.log('Registering display item:', rowId, item);
       get().queueRecalculatePositions();
     }
   },
@@ -100,6 +102,7 @@ export const createCityLayoutSlice: StateCreator<AppState, Mutators, [], CityDis
   })(),
 
   recalculatePositions() {
+    // const start = performance.now();
     const { obstructions, containerSize, selectedItems, displayItemById } = get();
 
     if (!containerSize) {
@@ -109,7 +112,10 @@ export const createCityLayoutSlice: StateCreator<AppState, Mutators, [], CityDis
     const newDisplayItems = selectedItems
       .filter((x) => x.itemId)
       .map((x) => displayItemById[x.rowId])
-      .map((x): CityDisplayItem | undefined => x && { ...x, hidden: undefined });
+      .map(
+        (x): CityDisplayItem | undefined =>
+          x && { ...x, hidden: undefined, labelPosition: null, intersections: [] }
+      );
 
     const newDisplayItemById = newDisplayItems.reduce(
       (acc, item) => {
@@ -134,49 +140,54 @@ export const createCityLayoutSlice: StateCreator<AppState, Mutators, [], CityDis
       }
     }
 
-    const renderedRowIds = new Set<string>();
-    const blockedRowIds = new Set<string>();
-
-    const itemUpdates = optimizeLabelDisplays(
-      containerSize,
-      newDisplayItems.filter(
-        (item): item is CityDisplayItem => !!item && !duplicatedRowIds.has(item.rowId)
-      ),
-      obstructions
+    const uniqueDisplayItems = newDisplayItems.filter(
+      (item): item is CityDisplayItem => !!item && !duplicatedRowIds.has(item.rowId)
     );
 
-    for (const update of itemUpdates) {
-      const item = newDisplayItemById[update.rowId];
+    const { result, blockedItems } = iterativelyOptimizeLabelState({
+      containerSize,
+      items: uniqueDisplayItems,
+      obstructions,
+      useUnblockPass: true,
+    });
 
-      if (!item) continue;
+    const resultItemByID = result.reduce(
+      (acc, item) => {
+        acc[item.rowId] = item;
 
-      item.labelPosition = update.labelPosition;
-      item.intersections = update.intersections;
+        return acc;
+      },
+      {} as Record<string, CityDisplayItem | undefined>
+    );
 
-      if (item.intersections.filter((x) => renderedRowIds.has(x)).length > 0) {
-        blockedRowIds.add(item.rowId);
-      } else {
-        renderedRowIds.add(item.rowId);
-      }
-    }
-
-    const aboveItems = new Set<string>();
+    const resolvedBlockedItems = resolveBlockedItems({
+      blockedItems,
+      containerSize,
+      items: uniqueDisplayItems,
+      obstructions,
+    });
 
     for (const item of newDisplayItems) {
       if (!item) continue;
-      if (blockedRowIds.has(item.rowId)) {
+
+      const currentItem = resultItemByID[item.rowId];
+      if (currentItem) {
+        item.labelPosition = currentItem.labelPosition;
+        item.intersections = currentItem.intersections;
+      }
+
+      if (resolvedBlockedItems.has(item.rowId)) {
         item.hidden = {
           reason: 'intersect',
-          intersectingLabels: item.intersections
-            .filter((rowId) => aboveItems.has(rowId))
-            .map((rowId) => newDisplayItemById[rowId]?.city.label ?? rowId),
+          intersectingLabel:
+            newDisplayItemById[resolvedBlockedItems.get(item.rowId) ?? '']?.city.label ?? '',
         };
       } else if (duplicatedRowIds.has(item.rowId)) {
         item.hidden = { reason: 'duplicate' };
       }
-
-      aboveItems.add(item.rowId);
     }
+
+    // console.log('Recalculation done, time:', performance.now() - start);
 
     set({
       displayItemById: newDisplayItemById,
@@ -343,8 +354,8 @@ function optimizeLabelDisplays(
   containerSize: BoxSize,
   items: CityDisplayItem[],
   obstructions: BoxRect[]
-): Pick<CityDisplayItem, 'rowId' | 'labelPosition' | 'intersections'>[] {
-  const start = performance.now();
+): CityDisplayItem[] {
+  // const start = performance.now();
 
   const boxRectsByPosition = boxRectKeys.reduce(
     (acc, position) => {
@@ -428,10 +439,10 @@ function optimizeLabelDisplays(
     itemLabelPositions[bestCandidateAction.index] = bestCandidateAction.position;
   }
 
-  console.log('Optimization iterations:', iter, 'Time:', performance.now() - start);
+  // console.log('Optimization iterations:', iter, 'Time:', performance.now() - start);
 
-  return items.map(({ rowId }, i) => ({
-    rowId,
+  return items.map((item, i) => ({
+    ...item,
     labelPosition: itemLabelPositions[i],
     intersections: items
       .filter((_, j) => {
@@ -442,11 +453,164 @@ function optimizeLabelDisplays(
         const currentItem = boxRectsByPosition[itemLabelPositions[i]][i];
         const otherItemRect = boxRectsByPosition[itemLabelPositions[j]][j];
 
-        return (
-          getBoxIntersection(currentItem, otherItemRect) >
-          currentItem.width * currentItem.height * 0.1
-        );
+        return getBoxIntersection(currentItem, otherItemRect) > 0;
       })
       .map((x) => x.rowId),
   }));
+}
+
+function computeBlockedRowIds(displayItems: CityDisplayItem[]) {
+  const renderedRowIds = new Set<string>();
+  const blockedRowIds = new Set<string>();
+
+  for (const item of displayItems) {
+    if (item.intersections.filter((x) => renderedRowIds.has(x)).length > 0) {
+      blockedRowIds.add(item.rowId);
+    } else {
+      renderedRowIds.add(item.rowId);
+    }
+  }
+
+  return blockedRowIds;
+}
+
+function iterativelyOptimizeLabelState({
+  containerSize,
+  items,
+  obstructions,
+  useUnblockPass,
+}: {
+  containerSize: BoxSize;
+  items: CityDisplayItem[];
+  obstructions: BoxRect[];
+  useUnblockPass: boolean;
+}): { result: CityDisplayItem[]; blockedItems: Map<string, string> } {
+  const blockedItems = new Map<string, string>();
+
+  let currentItems = items;
+
+  // Optimize label positions until there are no more intersections
+  for (let iteration = 0; iteration < items.length; iteration++) {
+    currentItems = optimizeLabelDisplays(
+      containerSize,
+      items.filter((item) => !blockedItems.has(item.rowId)),
+      obstructions
+    );
+
+    const newBlockedRowIds = computeBlockedRowIds(currentItems);
+
+    if (newBlockedRowIds.size === 0) {
+      break;
+    }
+
+    const lastBlockedIndex = currentItems.findLastIndex((item) => newBlockedRowIds.has(item.rowId));
+
+    // Should never happen, just to satisfy typescript
+    if (lastBlockedIndex === -1) {
+      console.error('No blocked items found, this should never happen');
+      break;
+    }
+
+    const lastBlocked = currentItems[lastBlockedIndex];
+
+    blockedItems.set(
+      lastBlocked.rowId,
+      lastBlocked.intersections.findLast((intersectingRowId) => {
+        const rowIndex = currentItems.findIndex((item) => item.rowId === intersectingRowId);
+
+        return rowIndex !== -1 && rowIndex < lastBlockedIndex;
+      }) || lastBlocked.intersections[0]
+    );
+  }
+
+  // Try to unblock items that were blocked first
+  // to see if there's space after other items were blocked
+  if (useUnblockPass) {
+    const testedForUnblock = new Set<string>();
+
+    const maxIters = blockedItems.size;
+
+    for (let iteration = 0; iteration < maxIters; iteration++) {
+      const itemToTryUnblock = items.findLast(
+        (item) => blockedItems.has(item.rowId) && !testedForUnblock.has(item.rowId)
+      );
+
+      if (!itemToTryUnblock) {
+        break;
+      }
+
+      testedForUnblock.add(itemToTryUnblock.rowId);
+
+      const potentialCurrentItems = optimizeLabelDisplays(
+        containerSize,
+        items.filter(
+          (item) => !blockedItems.has(item.rowId) || item.rowId === itemToTryUnblock.rowId
+        ),
+        obstructions
+      );
+
+      const newBlockedRowIds = computeBlockedRowIds(potentialCurrentItems);
+
+      if (!newBlockedRowIds.has(itemToTryUnblock.rowId)) {
+        blockedItems.delete(itemToTryUnblock.rowId);
+        currentItems = potentialCurrentItems;
+      }
+    }
+  }
+
+  return {
+    result: currentItems,
+    blockedItems: blockedItems,
+  };
+}
+
+/**
+ * Resolve blocked items by trying the movement until they are unblocked
+ */
+function resolveBlockedItems({
+  blockedItems,
+  containerSize,
+  items,
+  obstructions,
+}: {
+  blockedItems: Map<string, string>;
+  containerSize: BoxSize;
+  items: CityDisplayItem[];
+  obstructions: BoxRect[];
+}) {
+  const newBlockedItems = new Map(blockedItems.entries());
+
+  for (const [key, initialTarget] of blockedItems.entries()) {
+    let target = initialTarget;
+
+    for (let iteration = 0; iteration < items.length; iteration++) {
+      const currentIndex = items.findIndex((item) => item.rowId === key);
+      const targetIndex = items.findIndex((item) => item.rowId === target);
+
+      if (currentIndex === -1 || targetIndex === -1) {
+        break;
+      }
+
+      const newItems = arrayMove(items, currentIndex, targetIndex);
+
+      const { blockedItems } = iterativelyOptimizeLabelState({
+        containerSize,
+        obstructions,
+        items: newItems,
+        useUnblockPass: false,
+      });
+
+      const newTarget = blockedItems.get(key);
+
+      if (!newTarget) {
+        break;
+      } else {
+        target = newTarget;
+      }
+    }
+
+    newBlockedItems.set(key, target);
+  }
+
+  return newBlockedItems;
 }

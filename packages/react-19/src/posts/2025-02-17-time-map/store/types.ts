@@ -52,7 +52,7 @@ export type BoxRectKey = (typeof boxRectKeys)[number];
 export type BoxRect = BoxSize & { left: number; top: number };
 
 export type HiddenData =
-  | { reason: 'intersect'; intersectingLabels: string[] }
+  | { reason: 'intersect'; intersectingLabel: string }
   | { reason: 'duplicate' };
 
 export type CityDisplayItem = {
