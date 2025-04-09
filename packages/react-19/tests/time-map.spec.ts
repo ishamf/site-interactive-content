@@ -14,7 +14,10 @@ test('local city is added', async ({ page }) => {
   await expect(page.getByLabel('City', { exact: true }).nth(0)).toHaveValue('Makassar');
 });
 
-test('time changes from local time', async ({ page }) => {
+test('time changes from local time', async ({ page, browserName }) => {
+  // Linux webkit cannot render correct locale time
+  test.skip(browserName === 'webkit' && process.platform === 'linux');
+
   await page.goto('http://localhost:5175/');
   await expect(page.getByLabel('City', { exact: true }).nth(0)).toHaveValue('Makassar');
 
@@ -28,7 +31,10 @@ test('time changes from local time', async ({ page }) => {
   await expect(page.locator('xif-time-map').first()).toHaveScreenshot({ maxDiffPixels: 10 });
 });
 
-test('time changes from specific city', async ({ page }) => {
+test('time changes from specific city', async ({ page, browserName }) => {
+  // Linux webkit cannot render correct locale time
+  test.skip(browserName === 'webkit' && process.platform === 'linux');
+
   await page.goto('http://localhost:5175/');
   await expect(page.getByLabel('City', { exact: true }).nth(0)).toHaveValue('Makassar');
 

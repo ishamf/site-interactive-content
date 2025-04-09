@@ -41,7 +41,21 @@ export default defineConfig({
 
     {
       name: 'firefox',
-      use: { ...devices['Desktop Firefox'] },
+      use: {
+        ...devices['Desktop Firefox'],
+
+        // https://github.com/microsoft/playwright/issues/7769#issuecomment-966098074
+        ...(process.platform === 'linux'
+          ? {
+              launchOptions: {
+                firefoxUserPrefs: {
+                  'ui.primaryPointerCapabilities': 0x02 | 0x04,
+                  'ui.allPointerCapabilities': 0x02 | 0x04,
+                },
+              },
+            }
+          : {}),
+      },
     },
 
     {
