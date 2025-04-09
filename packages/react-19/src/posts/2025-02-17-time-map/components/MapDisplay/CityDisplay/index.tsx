@@ -5,7 +5,7 @@ import { css } from '@emotion/react';
 import { DateTime } from 'luxon';
 import { CitySelectionData } from '../../../assets';
 import { dayColors, dayDarkTextColors, offsetsByPosition } from '../../../constants';
-import { CSSProperties, useEffect, useRef } from 'react';
+import { CSSProperties, MouseEventHandler, useEffect, useRef } from 'react';
 import { useElementSize } from '../../../../../utils/hooks';
 import { LabelPosition } from '../../../store';
 import classNames from 'classnames';
@@ -91,7 +91,7 @@ export function CityDisplay({
   city: CitySelectionData;
   labelPosition: LabelPosition | null;
   onLabelSizeChange: (size: { width: number; height: number } | null) => void;
-  onLabelClick: () => void;
+  onLabelClick: MouseEventHandler<HTMLButtonElement>;
   className?: string;
   disabled?: boolean;
   labelHidden?: boolean;

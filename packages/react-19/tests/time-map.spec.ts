@@ -61,3 +61,24 @@ test('time changes from specific city', async ({ page, browserName }) => {
 
   await expect(page.locator('xif-time-map').first()).toHaveScreenshot({ maxDiffPixels: 10 });
 });
+
+test('clicking another city while the selector is open should work', async ({ page }) => {
+  // Reduce animation for faster tests
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+
+  await page.goto('http://localhost:5175/');
+
+  await page.getByRole('figure').getByRole('button', { name: 'Jakarta' }).click();
+  await expect(page.getByRole('listbox', { name: 'Select hours' })).toBeVisible();
+
+  await page.getByRole('figure').getByRole('button', { name: 'London' }).click();
+
+  // The old datepicker should be closing, the new one should open
+  await expect(page.getByRole('listbox', { name: 'Select hours' })).toHaveCount(2);
+
+  // After a while, the old one should close
+  await expect(page.getByRole('listbox', { name: 'Select hours' })).toHaveCount(1);
+
+  // Picker for new city should be visible
+  await expect(page.getByRole('listbox', { name: 'Select hours' })).toBeVisible();
+});

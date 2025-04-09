@@ -66,8 +66,9 @@ export function MapDisplay({
         'city' | 'onLabelClick' | 'onLabelSizeChange'
       > = {
         city,
-        onLabelClick: () => {
+        onLabelClick: (event) => {
           onRowFocus(selectionItem.rowId);
+          event.stopPropagation();
         },
         onLabelSizeChange: (size) => {
           if (size) {
@@ -140,7 +141,7 @@ export function MapDisplay({
   });
 
   return (
-    <div className="max-w-full relative">
+    <figure className="max-w-full relative">
       <canvas
         {...listeners}
         className={classNames('max-w-full select-none touch-pan-y touch-pinch-zoom', {
@@ -205,6 +206,6 @@ export function MapDisplay({
             );
           })
         : null}
-    </div>
+    </figure>
   );
 }
