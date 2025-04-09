@@ -66,8 +66,9 @@ export function MapDisplay({
         'city' | 'onLabelClick' | 'onLabelSizeChange'
       > = {
         city,
-        onLabelClick: () => {
+        onLabelClick: (event) => {
           onRowFocus(selectionItem.rowId);
+          event.stopPropagation();
         },
         onLabelSizeChange: (size) => {
           if (size) {
