@@ -6,7 +6,7 @@ test.use({
 });
 
 test.beforeEach(async ({ page }) => {
-  page.clock.install({ time: 1744189200000 });
+  await page.clock.install({ time: 1744189200000 });
 });
 
 test('local city is added', async ({ page }) => {
