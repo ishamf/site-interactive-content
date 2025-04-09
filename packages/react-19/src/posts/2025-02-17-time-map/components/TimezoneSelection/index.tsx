@@ -78,10 +78,9 @@ export const TimezoneSelection = memo(
     }, [isTimeSelectorOpen]);
 
     return (
-      <div
+      <li
         className="flex flex-col gap-2"
         ref={setNodeRef}
-        {...attributes}
         style={{ transform: CSS.Transform.toString(translateOnlyTransform), transition }}
       >
         <div className="flex flex-row gap-4 items-center">
@@ -91,7 +90,7 @@ export const TimezoneSelection = memo(
               'cursor-grab': !isNew && !isDragging,
               'cursor-grabbing': isDragging,
             })}
-            {...(isNew ? {} : listeners)}
+            {...(isNew ? {} : { ...attributes, ...listeners })}
           >
             <div
               className="w-2 h-2 rounded-full"
@@ -167,6 +166,7 @@ export const TimezoneSelection = memo(
           <div className="flex-1 flex items-center gap-1">
             <DateTimePicker
               inputRef={datepickerRef}
+              label="Time"
               open={isTimeSelectorOpen && !isDateTimeFrozen}
               onOpen={() => {
                 isOpeningTriggeredBySelf.current = true;
@@ -212,7 +212,7 @@ export const TimezoneSelection = memo(
             )}
           </p>
         ) : null}
-      </div>
+      </li>
     );
   }
 );
