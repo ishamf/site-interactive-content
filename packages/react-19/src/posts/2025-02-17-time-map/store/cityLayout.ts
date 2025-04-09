@@ -555,17 +555,23 @@ function iterativelyOptimizeLabelState({
 
       testedForUnblock.add(itemToTryUnblock.rowId);
 
+      const itemsListToTest = items.filter(
+        (item) => !blockedItems.has(item.rowId) || item.rowId === itemToTryUnblock.rowId
+      );
+
       const potentialCurrentItems = optimizeLabelDisplays(
         containerSize,
-        items.filter(
-          (item) => !blockedItems.has(item.rowId) || item.rowId === itemToTryUnblock.rowId
-        ),
+        itemsListToTest,
         obstructions
       );
 
       const newBlockedRowIds = computeBlockedRowIds(potentialCurrentItems);
 
-      if (!newBlockedRowIds.has(itemToTryUnblock.rowId)) {
+      const didNotAddNewBlocks = Array.from(newBlockedRowIds).every((rowId) =>
+        blockedItems.has(rowId)
+      );
+
+      if (didNotAddNewBlocks && !newBlockedRowIds.has(itemToTryUnblock.rowId)) {
         blockedItems.delete(itemToTryUnblock.rowId);
         currentItems = potentialCurrentItems;
       }
