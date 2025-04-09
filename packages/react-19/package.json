@@ -10,7 +10,9 @@
     "format": "prettier --write .",
     "lint": "prettier --check . && eslint .",
     "check": "tsc -b",
-    "preview": "vite preview"
+    "install-playwright-browsers": "playwright install",
+    "preview": "vite preview",
+    "e2e-test": "playwright test"
   },
   "dependencies": {
     "@ant-design/cssinjs": "^1.23.0",
@@ -42,7 +44,9 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.19.0",
+    "@playwright/test": "^1.50.1",
     "@tailwindcss/vite": "^4.0.6",
+    "@types/node": "^20.12.8",
     "@types/react": "^19.0.8",
     "@types/react-dom": "^19.0.3",
     "@vitejs/plugin-react-swc": "^3.5.0",

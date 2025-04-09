@@ -203,36 +203,40 @@ export function TimeMap() {
       </div>
       <div className="flex-1 md:pt-4 pb-4 min-h-0 md:max-w-[30rem] flex flex-col gap-4">
         <div className="mt-4 md:hidden">{timeBarNode}</div>
-        {selectionDataQuery.isSuccess ? (
-          <>
-            <DndContext {...dndContextProps}>
-              <SortableContext items={sortableContextItems}>
-                {selectedItemsRenderElements.map(
-                  ({ item: { itemId, rowId }, functionProps, isNew }) => {
-                    return (
-                      <TimezoneSelection
-                        key={rowId}
-                        rowId={rowId}
-                        {...functionProps}
-                        selectionData={selectionDataQuery.data.selectionData}
-                        currentSelection={
-                          itemId ? selectionDataQuery.data.selectionDataById[itemId] : null
-                        }
-                        isDateTimeFrozen={timeState.isRapidlyChanging}
-                        time={slowlyChangingTime}
-                        isNew={isNew}
-                      ></TimezoneSelection>
-                    );
-                  }
-                )}
-              </SortableContext>
-            </DndContext>
-          </>
-        ) : (
-          Array((selectedItems.length || INITIAL_DISPLAY_LENGTH) + 1)
-            .fill(null)
-            .map((_, index) => <TimezoneSelectionSkeleton key={index}></TimezoneSelectionSkeleton>)
-        )}
+        <ul className="flex flex-col gap-4">
+          {selectionDataQuery.isSuccess ? (
+            <>
+              <DndContext {...dndContextProps}>
+                <SortableContext items={sortableContextItems}>
+                  {selectedItemsRenderElements.map(
+                    ({ item: { itemId, rowId }, functionProps, isNew }) => {
+                      return (
+                        <TimezoneSelection
+                          key={rowId}
+                          rowId={rowId}
+                          {...functionProps}
+                          selectionData={selectionDataQuery.data.selectionData}
+                          currentSelection={
+                            itemId ? selectionDataQuery.data.selectionDataById[itemId] : null
+                          }
+                          isDateTimeFrozen={timeState.isRapidlyChanging}
+                          time={slowlyChangingTime}
+                          isNew={isNew}
+                        ></TimezoneSelection>
+                      );
+                    }
+                  )}
+                </SortableContext>
+              </DndContext>
+            </>
+          ) : (
+            Array((selectedItems.length || INITIAL_DISPLAY_LENGTH) + 1)
+              .fill(null)
+              .map((_, index) => (
+                <TimezoneSelectionSkeleton key={index}></TimezoneSelectionSkeleton>
+              ))
+          )}
+        </ul>
       </div>
     </div>
   );
