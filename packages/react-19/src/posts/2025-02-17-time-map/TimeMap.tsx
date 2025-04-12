@@ -141,6 +141,11 @@ export function TimeMap() {
     ></TimeBar>
   );
 
+  const stickyCss = css`
+    position: sticky;
+    top: var(--sticky-top-margin, 0);
+  `;
+
   return (
     <div className="flex max-w-full flex-col px-4 gap-x-4 items-stretch justify-center md:flex-row md:items-start bg-neutral-50 dark:bg-neutral-900">
       <div
@@ -150,15 +155,13 @@ export function TimeMap() {
         }}
         css={css`
           @media ((width >= 48rem) and (height >= 20rem)) {
-            position: sticky;
-            top: 0;
+            ${stickyCss}
           }
 
           ${!isAnyCitySelectorOpen
             ? css`
                 @media (height >= 100vw) {
-                  position: sticky;
-                  top: 0;
+                  ${stickyCss}
                 }
               `
             : ''}

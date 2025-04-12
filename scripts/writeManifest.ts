@@ -31,8 +31,12 @@ async function calculateMD5Hash(filePath: string): Promise<string> {
   });
 }
 
-async function main() {
-  const distPath = resolveFromRoot("dist");
+async function main(project?: string) {
+  function resolveFromBase(...p: string[]) {
+    return resolveFromRoot(...(project ? ["packages", project] : []), ...p);
+  }
+
+  const distPath = resolveFromBase("dist");
 
   const files = globSync("**/*", {
     cwd: distPath,
@@ -58,11 +62,11 @@ async function main() {
   await writeFile(manifestPath, JSON.stringify(manifest, null, 2));
 
   console.log(
-    `Manifest written to ${relative(resolveFromRoot(), manifestPath)}`
+    `Manifest written to ${relative(resolveFromBase(), manifestPath)}`
   );
 }
 
-main().catch((error) => {
+main(process.argv[2]).catch((error) => {
   console.error("Error generating manifest:", error);
   process.exit(1);
 });
