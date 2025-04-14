@@ -134,11 +134,19 @@ test('lower priority items should be removed first', async ({ page }) => {
     'Mumbai',
   ];
 
+  const itemsExpectedToBeInvisible = ['Mumbai'];
+
   for (const item of testItems) {
     await addItem(page, item);
   }
 
   for (const item of testItems.slice(0, -1)) {
-    await expect(page.getByRole('figure').getByRole('button', { name: item })).toBeVisible();
+    const locator = page.getByRole('figure').getByRole('button', { name: item });
+
+    if (itemsExpectedToBeInvisible.includes(item)) {
+      await expect(locator).not.toBeVisible();
+    } else {
+      await expect(locator).toBeVisible();
+    }
   }
 });
