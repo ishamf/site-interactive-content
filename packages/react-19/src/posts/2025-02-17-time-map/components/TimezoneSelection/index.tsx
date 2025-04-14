@@ -204,8 +204,12 @@ export const TimezoneSelection = memo(
           >
             {currentRowHiddenData.reason === 'intersect' ? (
               <>
-                There's not enough space to show this city on the map! Drag it above{' '}
-                {currentRowHiddenData.intersectingLabel} to show it.
+                There's not enough space to show this city on the map!{' '}
+                {currentRowHiddenData.intersectingLabel ? (
+                  <>Drag it above {currentRowHiddenData.intersectingLabel} to show it.</>
+                ) : (
+                  <>Drag it above other items to show it.</>
+                )}
               </>
             ) : (
               <>This row is duplicated with another row above.</>
