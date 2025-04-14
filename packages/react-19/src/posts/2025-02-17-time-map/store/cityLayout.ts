@@ -208,7 +208,8 @@ function recalculatePositions({
       item.hidden = {
         reason: 'intersect',
         intersectingLabel:
-          newDisplayItemById[resolvedBlockedItems.get(item.rowId) ?? '']?.city.label ?? '',
+          newDisplayItemById[resolvedBlockedItems.get(item.rowId)?.reasonRowId ?? '']?.city.label ??
+          '',
       };
     } else if (duplicatedRowIds.has(item.rowId)) {
       item.hidden = { reason: 'duplicate' };
@@ -510,6 +511,8 @@ function computeBlockedRowIds(displayItems: CityDisplayItem[]) {
   return blockedRowIds;
 }
 
+type BlockedItems = Map<string, { reasonRowId?: string }>;
+
 function iterativelyOptimizeLabelState({
   containerSize,
   items,
@@ -520,8 +523,8 @@ function iterativelyOptimizeLabelState({
   items: CityDisplayItem[];
   obstructions: BoxRect[];
   useUnblockPass: boolean;
-}): { result: CityDisplayItem[]; blockedItems: Map<string, string> } {
-  const blockedItems = new Map<string, string>();
+}): { result: CityDisplayItem[]; blockedItems: BlockedItems } {
+  const blockedItems: BlockedItems = new Map();
 
   let currentItems = items;
 
@@ -549,14 +552,14 @@ function iterativelyOptimizeLabelState({
 
     const lastBlocked = currentItems[lastBlockedIndex];
 
-    blockedItems.set(
-      lastBlocked.rowId,
-      lastBlocked.intersections.findLast((intersectingRowId) => {
-        const rowIndex = currentItems.findIndex((item) => item.rowId === intersectingRowId);
+    blockedItems.set(lastBlocked.rowId, {
+      reasonRowId:
+        lastBlocked.intersections.findLast((intersectingRowId) => {
+          const rowIndex = currentItems.findIndex((item) => item.rowId === intersectingRowId);
 
-        return rowIndex !== -1 && rowIndex < lastBlockedIndex;
-      }) || lastBlocked.intersections[0]
-    );
+          return rowIndex !== -1 && rowIndex < lastBlockedIndex;
+        }) || lastBlocked.intersections[0],
+    });
   }
 
   // Try to unblock items that were blocked first
@@ -615,7 +618,7 @@ function resolveBlockedItems({
   items,
   obstructions,
 }: {
-  blockedItems: Map<string, string>;
+  blockedItems: BlockedItems;
   containerSize: BoxSize;
   items: CityDisplayItem[];
   obstructions: BoxRect[];
@@ -623,9 +626,11 @@ function resolveBlockedItems({
   const newBlockedItems = new Map(blockedItems.entries());
 
   for (const [key, initialTarget] of blockedItems.entries()) {
-    let target = initialTarget;
+    let target = initialTarget.reasonRowId;
 
     for (let iteration = 0; iteration < items.length; iteration++) {
+      if (!target) break;
+
       const currentIndex = items.findIndex((item) => item.rowId === key);
       const targetIndex = items.findIndex((item) => item.rowId === target);
 
@@ -647,11 +652,11 @@ function resolveBlockedItems({
       if (!newTarget) {
         break;
       } else {
-        target = newTarget;
+        target = newTarget.reasonRowId;
       }
     }
 
-    newBlockedItems.set(key, target);
+    newBlockedItems.set(key, { reasonRowId: target });
   }
 
   return newBlockedItems;
