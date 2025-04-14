@@ -598,20 +598,20 @@ function resolveBlockedItems({
 }) {
   const newBlockedItems = new Map(blockedItems.entries());
 
-  for (const [key, initialTarget] of blockedItems.entries()) {
-    let target = initialTarget.reasonRowId;
+  for (const [key, blockedData] of blockedItems.entries()) {
+    let reasonRowId = blockedData.reasonRowId;
 
     for (let iteration = 0; iteration < items.length; iteration++) {
-      if (!target) break;
+      if (!reasonRowId) break;
 
       const currentIndex = items.findIndex((item) => item.rowId === key);
-      const targetIndex = items.findIndex((item) => item.rowId === target);
+      const reasonIndex = items.findIndex((item) => item.rowId === reasonRowId);
 
-      if (currentIndex === -1 || targetIndex === -1) {
+      if (currentIndex === -1 || reasonIndex === -1) {
         break;
       }
 
-      const newItems = arrayMove(items, currentIndex, targetIndex);
+      const newItems = arrayMove(items, currentIndex, reasonIndex);
 
       const { blockedItems } = iterativelyOptimizeLabelState({
         containerSize,
@@ -619,16 +619,16 @@ function resolveBlockedItems({
         items: newItems,
       });
 
-      const newTarget = blockedItems.get(key);
+      const newBlockedData = blockedItems.get(key);
 
-      if (!newTarget) {
+      if (!newBlockedData) {
         break;
       } else {
-        target = newTarget.reasonRowId;
+        reasonRowId = newBlockedData.reasonRowId;
       }
     }
 
-    newBlockedItems.set(key, { reasonRowId: target });
+    newBlockedItems.set(key, { reasonRowId: reasonRowId });
   }
 
   return newBlockedItems;
