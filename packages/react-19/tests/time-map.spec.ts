@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test, expect, Page } from '@playwright/test';
 
 test.use({
   timezoneId: 'Asia/Makassar',
@@ -8,6 +8,8 @@ test.use({
 test.beforeEach(async ({ page }) => {
   await page.clock.install({ time: 1744189200000 });
 });
+
+const initialItemCount = 7;
 
 test('local city is added', async ({ page }) => {
   await page.goto('http://localhost:5175/');
@@ -81,4 +83,70 @@ test('clicking another city while the selector is open should work', async ({ pa
 
   // Picker for new city should be visible
   await expect(page.getByRole('listbox', { name: 'Select hours' })).toBeVisible();
+});
+
+async function deleteAllInitialItems(page: Page) {
+  await expect(page.getByRole('combobox')).toHaveCount(initialItemCount + 1); // With new item
+
+  for (let i = 0; i < initialItemCount; i++) {
+    await page.getByRole('combobox').first().hover();
+    await page.getByRole('button', { name: 'Clear' }).click();
+  }
+
+  await expect(page.getByRole('combobox')).toHaveCount(1);
+}
+
+async function addItem(page: Page, name: string) {
+  const newRowBox = page.getByRole('combobox').last();
+
+  await newRowBox.click();
+
+  await newRowBox.fill(name);
+
+  await page.getByRole('option').first().click();
+}
+
+test('deleting all cities and reload should preload', async ({ page }) => {
+  await page.goto('http://localhost:5175/');
+
+  await deleteAllInitialItems(page);
+
+  await page.goto('http://localhost:5175/');
+
+  await expect(page.getByRole('combobox')).toHaveCount(initialItemCount + 1); // With new item
+});
+
+test('lower priority items should be removed first', async ({ page }) => {
+  await page.setViewportSize({ width: 380, height: 695 });
+
+  await page.goto('http://localhost:5175/');
+
+  await deleteAllInitialItems(page);
+
+  const testItems = [
+    'Jakarta',
+    'New York City',
+    'Los Angeles',
+    'London',
+    'Tokyo',
+    'Berlin',
+    'Vienna',
+    'Mumbai',
+  ];
+
+  const itemsExpectedToBeInvisible = ['Mumbai'];
+
+  for (const item of testItems) {
+    await addItem(page, item);
+  }
+
+  for (const item of testItems.slice(0, -1)) {
+    const locator = page.getByRole('figure').getByRole('button', { name: item });
+
+    if (itemsExpectedToBeInvisible.includes(item)) {
+      await expect(locator).not.toBeVisible();
+    } else {
+      await expect(locator).toBeVisible();
+    }
+  }
 });
