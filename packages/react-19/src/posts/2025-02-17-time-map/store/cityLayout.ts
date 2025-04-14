@@ -1,5 +1,6 @@
 import { StateCreator } from 'zustand';
 import {
+  AppSelection,
   AppState,
   BoxRect,
   BoxRectKey,
@@ -110,83 +111,12 @@ export const createCityLayoutSlice: StateCreator<AppState, Mutators, [], CityDis
       return;
     }
 
-    const newDisplayItems = selectedItems
-      .filter((x) => x.itemId)
-      .map((x) => displayItemById[x.rowId])
-      .map(
-        (x): CityDisplayItem | undefined =>
-          x && { ...x, hidden: undefined, labelPosition: null, intersections: [] }
-      );
-
-    const newDisplayItemById = newDisplayItems.reduce(
-      (acc, item) => {
-        if (item) {
-          acc[item.rowId] = item;
-        }
-        return acc;
-      },
-      {} as Record<string, CityDisplayItem | undefined>
-    );
-
-    // Hide based on duplicates
-    const seenItemIds = new Set<string>();
-    const duplicatedRowIds = new Set<string>();
-    for (const item of newDisplayItems) {
-      if (!item) continue;
-
-      if (seenItemIds.has(item.city.id)) {
-        duplicatedRowIds.add(item.rowId);
-      } else {
-        seenItemIds.add(item.city.id);
-      }
-    }
-
-    const uniqueDisplayItems = newDisplayItems.filter(
-      (item): item is CityDisplayItem => !!item && !duplicatedRowIds.has(item.rowId)
-    );
-
-    const { result, blockedItems } = iterativelyOptimizeLabelState({
+    const newDisplayItemById = recalculatePositions({
       containerSize,
-      items: uniqueDisplayItems,
       obstructions,
-      useUnblockPass: true,
+      selectedItems,
+      displayItemById,
     });
-
-    const resultItemByID = result.reduce(
-      (acc, item) => {
-        acc[item.rowId] = item;
-
-        return acc;
-      },
-      {} as Record<string, CityDisplayItem | undefined>
-    );
-
-    const resolvedBlockedItems = resolveBlockedItems({
-      blockedItems,
-      containerSize,
-      items: uniqueDisplayItems,
-      obstructions,
-    });
-
-    for (const item of newDisplayItems) {
-      if (!item) continue;
-
-      const currentItem = resultItemByID[item.rowId];
-      if (currentItem) {
-        item.labelPosition = currentItem.labelPosition;
-        item.intersections = currentItem.intersections;
-      }
-
-      if (resolvedBlockedItems.has(item.rowId)) {
-        item.hidden = {
-          reason: 'intersect',
-          intersectingLabel:
-            newDisplayItemById[resolvedBlockedItems.get(item.rowId) ?? '']?.city.label ?? '',
-        };
-      } else if (duplicatedRowIds.has(item.rowId)) {
-        item.hidden = { reason: 'duplicate' };
-      }
-    }
 
     // console.log('Recalculation done, time:', performance.now() - start);
 
@@ -195,6 +125,98 @@ export const createCityLayoutSlice: StateCreator<AppState, Mutators, [], CityDis
     });
   },
 });
+
+function recalculatePositions({
+  containerSize,
+  obstructions,
+  selectedItems,
+  displayItemById,
+}: {
+  selectedItems: AppSelection[];
+  containerSize: BoxSize;
+  displayItemById: Record<string, CityDisplayItem | undefined>;
+  obstructions: BoxRect[];
+}): Record<string, CityDisplayItem | undefined> {
+  const newDisplayItems = selectedItems
+    .filter((x) => x.itemId)
+    .map((x) => displayItemById[x.rowId])
+    .map(
+      (x): CityDisplayItem | undefined =>
+        x && { ...x, hidden: undefined, labelPosition: null, intersections: [] }
+    );
+
+  const newDisplayItemById = newDisplayItems.reduce(
+    (acc, item) => {
+      if (item) {
+        acc[item.rowId] = item;
+      }
+      return acc;
+    },
+    {} as Record<string, CityDisplayItem | undefined>
+  );
+
+  // Hide based on duplicates
+  const seenItemIds = new Set<string>();
+  const duplicatedRowIds = new Set<string>();
+  for (const item of newDisplayItems) {
+    if (!item) continue;
+
+    if (seenItemIds.has(item.city.id)) {
+      duplicatedRowIds.add(item.rowId);
+    } else {
+      seenItemIds.add(item.city.id);
+    }
+  }
+
+  const uniqueDisplayItems = newDisplayItems.filter(
+    (item): item is CityDisplayItem => !!item && !duplicatedRowIds.has(item.rowId)
+  );
+
+  const { result, blockedItems } = iterativelyOptimizeLabelState({
+    containerSize,
+    items: uniqueDisplayItems,
+    obstructions,
+    useUnblockPass: true,
+  });
+
+  const resultItemByID = result.reduce(
+    (acc, item) => {
+      acc[item.rowId] = item;
+
+      return acc;
+    },
+    {} as Record<string, CityDisplayItem | undefined>
+  );
+
+  const resolvedBlockedItems = resolveBlockedItems({
+    blockedItems,
+    containerSize,
+    items: uniqueDisplayItems,
+    obstructions,
+  });
+
+  for (const item of newDisplayItems) {
+    if (!item) continue;
+
+    const currentItem = resultItemByID[item.rowId];
+    if (currentItem) {
+      item.labelPosition = currentItem.labelPosition;
+      item.intersections = currentItem.intersections;
+    }
+
+    if (resolvedBlockedItems.has(item.rowId)) {
+      item.hidden = {
+        reason: 'intersect',
+        intersectingLabel:
+          newDisplayItemById[resolvedBlockedItems.get(item.rowId) ?? '']?.city.label ?? '',
+      };
+    } else if (duplicatedRowIds.has(item.rowId)) {
+      item.hidden = { reason: 'duplicate' };
+    }
+  }
+
+  return newDisplayItemById;
+}
 
 function getLabelRect(
   containerSize: BoxSize,

@@ -1,13 +1,13 @@
 import { CitySelectionData, LoadableSelectionData } from '../assets';
 
 // Selection types
-interface Selection {
+export interface AppSelection {
   itemId: string | null;
   rowId: string;
 }
 
 export interface SelectionState {
-  selectedItems: Selection[];
+  selectedItems: AppSelection[];
 
   addInitialCitiesIfEmpty: (data: LoadableSelectionData) => void;
   addNewSelection: (itemId: string) => void;
