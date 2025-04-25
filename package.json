@@ -11,12 +11,15 @@
         "test": "pnpm run -r test",
         "e2e-test": "pnpm run -r --no-bail e2e-test",
         "install-playwright-browsers": "pnpm -r --workspace-concurrency=1 run install-playwright-browsers",
-        "build": "pnpm run -r build && pnpm run unify-dist",
-        "unify-dist": "tsx scripts/unifyDist.ts"
+        "build": "pnpm run -r build && pnpm run unify-dist && pnpm run write-manifest",
+        "unify-dist": "tsx scripts/unifyDist.ts",
+        "write-manifest": "tsx scripts/writeManifest.ts"
     },
     "devDependencies": {
         "@types/fs-extra": "^11.0.4",
+        "@types/glob": "^8.1.0",
         "fs-extra": "^11.2.0",
+        "glob": "^11.0.1",
         "husky": "^9.0.11",
         "lint-staged": "^15.2.7",
         "tsx": "^4.19.2"
