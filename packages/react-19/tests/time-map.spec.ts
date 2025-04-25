@@ -12,7 +12,7 @@ test.beforeEach(async ({ page }) => {
 const initialItemCount = 7;
 
 test('local city is added', async ({ page }) => {
-  await page.goto('http://localhost:5175/');
+  await page.goto('http://localhost:5175/time-map');
   await expect(page.getByLabel('City', { exact: true }).nth(0)).toHaveValue('Makassar');
 });
 
@@ -20,7 +20,7 @@ test('time changes from local time', async ({ page, browserName }) => {
   // Linux webkit cannot render correct locale time
   test.skip(browserName === 'webkit' && process.platform === 'linux');
 
-  await page.goto('http://localhost:5175/');
+  await page.goto('http://localhost:5175/time-map');
   await expect(page.getByLabel('City', { exact: true }).nth(0)).toHaveValue('Makassar');
 
   await page.getByLabel('Time', { exact: true }).nth(0).fill('04/09/2025 01:00 PM');
@@ -37,7 +37,7 @@ test('time changes from specific city', async ({ page, browserName }) => {
   // Linux webkit cannot render correct locale time
   test.skip(browserName === 'webkit' && process.platform === 'linux');
 
-  await page.goto('http://localhost:5175/');
+  await page.goto('http://localhost:5175/time-map');
   await expect(page.getByLabel('City', { exact: true }).nth(0)).toHaveValue('Makassar');
 
   const inputValues = await page
@@ -68,7 +68,7 @@ test('clicking another city while the selector is open should work', async ({ pa
   // Reduce animation for faster tests
   await page.emulateMedia({ reducedMotion: 'reduce' });
 
-  await page.goto('http://localhost:5175/');
+  await page.goto('http://localhost:5175/time-map');
 
   await page.getByRole('figure').getByRole('button', { name: 'Jakarta' }).click();
   await expect(page.getByRole('listbox', { name: 'Select hours' })).toBeVisible();
@@ -107,11 +107,11 @@ async function addItem(page: Page, name: string) {
 }
 
 test('deleting all cities and reload should preload', async ({ page }) => {
-  await page.goto('http://localhost:5175/');
+  await page.goto('http://localhost:5175/time-map');
 
   await deleteAllInitialItems(page);
 
-  await page.goto('http://localhost:5175/');
+  await page.goto('http://localhost:5175/time-map');
 
   await expect(page.getByRole('combobox')).toHaveCount(initialItemCount + 1); // With new item
 });
@@ -119,7 +119,7 @@ test('deleting all cities and reload should preload', async ({ page }) => {
 test('lower priority items should be removed first', async ({ page }) => {
   await page.setViewportSize({ width: 380, height: 695 });
 
-  await page.goto('http://localhost:5175/');
+  await page.goto('http://localhost:5175/time-map');
 
   await deleteAllInitialItems(page);
 
