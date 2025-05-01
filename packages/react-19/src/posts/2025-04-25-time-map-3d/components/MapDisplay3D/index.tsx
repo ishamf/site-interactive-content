@@ -1,15 +1,22 @@
+/** @jsxImportSource @emotion/react */
+import { useEffect, useRef, useState } from 'react';
+import { css } from '@emotion/react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { CameraControls } from '@react-three/drei';
 
 import { CanvasTexture } from 'three';
 
 import { MapDisplayComponent } from '../../../2025-02-17-time-map/TimeMap';
-import { ComponentRef, useEffect, useRef, useState } from 'react';
 import { canvasHeight, canvasWidth } from '../../../2025-02-17-time-map/constants';
 import { useMapUpdater } from '../../../2025-02-17-time-map/components/MapDisplay/updater';
 import { CircularProgress } from '@mui/material';
+import classNames from 'classnames';
 
-export const MapDisplay3D: MapDisplayComponent = ({ time, renderBehavior }) => {
+export const MapDisplay3D: MapDisplayComponent = ({
+  time,
+  renderBehavior,
+  isTrackingCurrentTime,
+}) => {
   const mapCanvasRef = useRef<OffscreenCanvas>(null);
 
   if (!mapCanvasRef.current) {
@@ -41,6 +48,35 @@ export const MapDisplay3D: MapDisplayComponent = ({ time, renderBehavior }) => {
           <CircularProgress></CircularProgress>
         </div>
       ) : null}
+
+      <div
+        className={classNames(
+          'absolute top-1 right-1 text-red-500 text-xs font-bold contain-content',
+          {
+            invisible: !isTrackingCurrentTime,
+          }
+        )}
+        css={css`
+          z-index: 10;
+
+          &::before {
+            content: '';
+            position: absolute;
+            z-index: -1;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #000;
+            opacity: 0.6;
+            filter: blur(3px);
+            padding: 0.05rem 0.2rem;
+            margin: -0.05rem -0.2rem;
+          }
+        `}
+      >
+        <span>LIVE</span>
+      </div>
     </figure>
   );
 };
