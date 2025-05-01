@@ -1,10 +1,10 @@
-import { Canvas, useFrame } from '@react-three/fiber';
+import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { CameraControls } from '@react-three/drei';
 
 import { CanvasTexture } from 'three';
 
 import { MapDisplayComponent } from '../../../2025-02-17-time-map/TimeMap';
-import { useEffect, useRef, useState } from 'react';
+import { ComponentRef, useEffect, useRef, useState } from 'react';
 import { canvasHeight, canvasWidth } from '../../../2025-02-17-time-map/constants';
 import { useMapUpdater } from '../../../2025-02-17-time-map/components/MapDisplay/updater';
 import { CircularProgress } from '@mui/material';
@@ -23,8 +23,8 @@ export const MapDisplay3D: MapDisplayComponent = ({ time, renderBehavior }) => {
   );
 
   return (
-    <figure className="max-w-full relative aspect-[2] h-auto">
-      <Canvas flat gl={{ alpha: false }}>
+    <figure className="w-full relative aspect-[2] h-auto">
+      <Canvas flat gl={{ alpha: false }} frameloop={isAnimating ? 'always' : 'demand'}>
         <mesh>
           <sphereGeometry args={[3, 32, 32]} />
           <GlobeMaterial
@@ -54,6 +54,8 @@ function GlobeMaterial({
   isAnimating: boolean;
   renderedImageVersion: number;
 }) {
+  const { invalidate } = useThree();
+
   const renderingStateRef = useRef({
     isAnimating,
     renderedImageVersion,
@@ -62,6 +64,7 @@ function GlobeMaterial({
   useEffect(() => {
     renderingStateRef.current.isAnimating = isAnimating;
     renderingStateRef.current.renderedImageVersion = renderedImageVersion;
+    invalidate();
   }, [isAnimating, renderedImageVersion]);
 
   const [texture, setTexture] = useState<CanvasTexture | null>(null);
