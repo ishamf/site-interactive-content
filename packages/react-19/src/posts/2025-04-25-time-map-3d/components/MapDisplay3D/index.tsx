@@ -16,7 +16,7 @@ export const MapDisplay3D: MapDisplayComponent = ({ time, renderBehavior }) => {
     mapCanvasRef.current = new OffscreenCanvas(canvasWidth, canvasHeight);
   }
 
-  const { isAnimating, isRendering, isLoadingImages } = useMapUpdater(
+  const { isAnimating, renderedImageVersion, isLoadingImages } = useMapUpdater(
     mapCanvasRef,
     time,
     renderBehavior
@@ -30,7 +30,7 @@ export const MapDisplay3D: MapDisplayComponent = ({ time, renderBehavior }) => {
           <GlobeMaterial
             canvasRef={mapCanvasRef}
             isAnimating={isAnimating}
-            isRendering={isRendering}
+            renderedImageVersion={renderedImageVersion}
           />
         </mesh>
         <CameraControls />
@@ -48,37 +48,38 @@ export const MapDisplay3D: MapDisplayComponent = ({ time, renderBehavior }) => {
 function GlobeMaterial({
   canvasRef,
   isAnimating,
-  isRendering,
+  renderedImageVersion,
 }: {
   canvasRef: React.RefObject<OffscreenCanvas | null>;
   isAnimating: boolean;
-  isRendering: boolean;
+  renderedImageVersion: number;
 }) {
   const renderingStateRef = useRef({
     isAnimating,
-    isRendering,
+    renderedImageVersion,
   });
 
   useEffect(() => {
     renderingStateRef.current.isAnimating = isAnimating;
-    renderingStateRef.current.isRendering = isRendering;
-  }, [isAnimating, isRendering]);
+    renderingStateRef.current.renderedImageVersion = renderedImageVersion;
+  }, [isAnimating, renderedImageVersion]);
 
   const [texture, setTexture] = useState<CanvasTexture | null>(null);
 
-  const prevRenderingRef = useRef(false);
+  const prevImageVersionRef = useRef(0);
 
   useFrame(() => {
     const needUpdate =
       renderingStateRef.current.isAnimating ||
-      renderingStateRef.current.isRendering ||
-      (prevRenderingRef.current && !renderingStateRef.current.isRendering);
+      renderingStateRef.current.renderedImageVersion !== prevImageVersionRef.current;
 
     if (needUpdate && texture) {
       texture.needsUpdate = true;
     }
 
-    prevRenderingRef.current = renderingStateRef.current.isRendering;
+    if (renderingStateRef.current.renderedImageVersion !== prevImageVersionRef.current) {
+      prevImageVersionRef.current = renderingStateRef.current.renderedImageVersion;
+    }
   });
 
   useEffect(() => {
