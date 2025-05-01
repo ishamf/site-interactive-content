@@ -33,7 +33,7 @@ export const MapDisplay3D: MapDisplayComponent = ({
     <figure className="w-full relative aspect-[2] h-auto">
       <Canvas flat gl={{ alpha: false }} frameloop={isAnimating ? 'always' : 'demand'}>
         <mesh>
-          <sphereGeometry args={[3, 32, 32]} />
+          <sphereGeometry args={[3, 64, 64]} />
           <GlobeMaterial
             canvasRef={mapCanvasRef}
             isAnimating={isAnimating}
@@ -90,7 +90,7 @@ function GlobeMaterial({
   isAnimating: boolean;
   renderedImageVersion: number;
 }) {
-  const { invalidate } = useThree();
+  const invalidate = useThree((s) => s.invalidate);
 
   const renderingStateRef = useRef({
     isAnimating,
