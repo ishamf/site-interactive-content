@@ -2,6 +2,7 @@
 import { useEffect, useRef } from 'react';
 import { css } from '@emotion/react';
 import { Canvas } from '@react-three/fiber';
+import '../../three';
 import { CameraControls } from '@react-three/drei';
 
 import { MapDisplayComponent } from '../../../2025-02-17-time-map/TimeMap';
