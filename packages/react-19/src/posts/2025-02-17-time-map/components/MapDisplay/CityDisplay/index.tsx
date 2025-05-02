@@ -80,6 +80,7 @@ const styleByLabelPosition: Record<LabelPosition, CSSProperties> = {
 export function CityDisplay({
   time,
   city,
+  overridePosition,
   labelPosition,
   onLabelSizeChange,
   onLabelClick,
@@ -89,6 +90,7 @@ export function CityDisplay({
 }: {
   time: number;
   city: CitySelectionData;
+  overridePosition?: { xPercentage: number; yPercentage: number };
   labelPosition: LabelPosition | null;
   onLabelSizeChange: (size: { width: number; height: number } | null) => void;
   onLabelClick: MouseEventHandler<HTMLButtonElement>;
@@ -106,6 +108,8 @@ export function CityDisplay({
 
   const localTime = DateTime.fromMillis(time, { zone: city.timezone });
   const { longitude, latitude } = city;
+  const leftPercentage = overridePosition?.xPercentage ?? (longitude * 100) / 360 + 50;
+  const topPercentage = overridePosition?.yPercentage ?? (latitude * -100) / 180 + 50;
 
   const colorIndex = localTime.weekday;
 
@@ -137,8 +141,8 @@ export function CityDisplay({
           ${!labelPosition ? 'visibility: hidden;' : ''}
         `}
         style={{
-          left: `${(longitude * 100) / 360 + 50}%`,
-          top: `${(latitude * -100) / 180 + 50}%`,
+          left: `${leftPercentage}%`,
+          top: `${topPercentage}%`,
         }}
         className={classNames(
           {

@@ -1,21 +1,25 @@
 /** @jsxImportSource @emotion/react */
-import { useEffect, useRef, useState } from 'react';
+import { useRef } from 'react';
 import { css } from '@emotion/react';
-import { Canvas, useFrame, useThree } from '@react-three/fiber';
+import { Canvas } from '@react-three/fiber';
 import { CameraControls } from '@react-three/drei';
-
-import { CanvasTexture } from 'three';
 
 import { MapDisplayComponent } from '../../../2025-02-17-time-map/TimeMap';
 import { canvasHeight, canvasWidth } from '../../../2025-02-17-time-map/constants';
 import { useMapUpdater } from '../../../2025-02-17-time-map/components/MapDisplay/updater';
 import { CircularProgress } from '@mui/material';
 import classNames from 'classnames';
+import { GlobeMaterial } from '../GlobeMaterial';
+import { CityItemsRenderer } from '../CityItemsRenderer';
+import { CityPinsRenderer } from '../CityPinsRenderer';
+import { SPHERE_RADIUS } from '../../constants';
 
 export const MapDisplay3D: MapDisplayComponent = ({
   time,
   renderBehavior,
   isTrackingCurrentTime,
+  selectionDataById,
+  onRowFocus,
 }) => {
   const mapCanvasRef = useRef<OffscreenCanvas>(null);
 
@@ -33,14 +37,15 @@ export const MapDisplay3D: MapDisplayComponent = ({
     <figure className="w-full relative aspect-[2] h-auto">
       <Canvas flat gl={{ alpha: false }} frameloop={isAnimating ? 'always' : 'demand'}>
         <mesh>
-          <sphereGeometry args={[3, 64, 64]} />
+          <sphereGeometry args={[SPHERE_RADIUS, 64, 64]} />
           <GlobeMaterial
             canvasRef={mapCanvasRef}
             isAnimating={isAnimating}
             renderedImageVersion={renderedImageVersion}
           />
         </mesh>
-        <CameraControls />
+        <CityPinsRenderer selectionDataById={selectionDataById}></CityPinsRenderer>
+        <CameraControls minDistance={SPHERE_RADIUS + 0.5} />
       </Canvas>
 
       {isLoadingImages ? (
@@ -48,6 +53,12 @@ export const MapDisplay3D: MapDisplayComponent = ({
           <CircularProgress></CircularProgress>
         </div>
       ) : null}
+
+      <CityItemsRenderer
+        time={time}
+        selectionDataById={selectionDataById}
+        onRowFocus={onRowFocus}
+      ></CityItemsRenderer>
 
       <div
         className={classNames(
@@ -80,61 +91,3 @@ export const MapDisplay3D: MapDisplayComponent = ({
     </figure>
   );
 };
-
-function GlobeMaterial({
-  canvasRef,
-  isAnimating,
-  renderedImageVersion,
-}: {
-  canvasRef: React.RefObject<OffscreenCanvas | null>;
-  isAnimating: boolean;
-  renderedImageVersion: number;
-}) {
-  const invalidate = useThree((s) => s.invalidate);
-
-  const renderingStateRef = useRef({
-    isAnimating,
-    renderedImageVersion,
-  });
-
-  useEffect(() => {
-    renderingStateRef.current.isAnimating = isAnimating;
-    renderingStateRef.current.renderedImageVersion = renderedImageVersion;
-    invalidate();
-  }, [isAnimating, renderedImageVersion]);
-
-  const [texture, setTexture] = useState<CanvasTexture | null>(null);
-
-  const prevImageVersionRef = useRef(0);
-
-  useFrame(() => {
-    const needUpdate =
-      renderingStateRef.current.isAnimating ||
-      renderingStateRef.current.renderedImageVersion !== prevImageVersionRef.current;
-
-    if (needUpdate && texture) {
-      texture.needsUpdate = true;
-    }
-
-    if (renderingStateRef.current.renderedImageVersion !== prevImageVersionRef.current) {
-      prevImageVersionRef.current = renderingStateRef.current.renderedImageVersion;
-    }
-  });
-
-  useEffect(() => {
-    if (!canvasRef.current) {
-      console.error('Map canvas ref is null');
-      return;
-    }
-
-    const texture = new CanvasTexture(canvasRef.current);
-
-    setTexture(texture);
-
-    return () => {
-      texture.dispose();
-    };
-  }, []);
-
-  return <meshBasicMaterial map={texture} color={'#ffffff'}></meshBasicMaterial>;
-}
