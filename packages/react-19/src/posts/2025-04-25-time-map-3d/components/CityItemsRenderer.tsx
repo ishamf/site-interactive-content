@@ -18,6 +18,7 @@ export function CityItemsRenderer({
   const selectedItems = useTimeMapStore((state) => state.selectedItems);
 
   const registerDisplayItem = useTimeMapStore((state) => state.registerDisplayItem);
+  const displayItemById = useTimeMapStore((state) => state.displayItemById);
 
   const citiesProjectedPositions = useCityProjectedPositions((s) => s.cities);
 
@@ -39,37 +40,9 @@ export function CityItemsRenderer({
         return null;
       }
 
-      const displayProps: Pick<
-        ComponentProps<typeof CityDisplay>,
-        'city' | 'onLabelClick' | 'onLabelSizeChange'
-      > = {
-        city,
-        onLabelClick: (event) => {
-          onRowFocus(selectionItem.rowId);
-          event.stopPropagation();
-        },
-        onLabelSizeChange: (size) => {
-          if (size) {
-            registerDisplayItem(selectionItem.rowId, { city, size });
-          } else {
-            registerDisplayItem(selectionItem.rowId, null);
-          }
-        },
-      };
+      const projectedPosition = citiesProjectedPositions[city.id];
 
-      return { rowId: selectionItem.rowId, displayProps };
-    });
-  }, [onRowFocus, registerDisplayItem, selectedItems, selectionDataById]);
-
-  // This is separated from the above to prevent recreating onLabelSizeChange when citiesProjectedPositions changes
-  // which may cause an infinite loop
-  const cityDisplayItems = useMemo(() => {
-    const result = cityDisplayItemsWithoutPosition.map((item) => {
-      if (!item) return null;
-
-      const projectedPosition = citiesProjectedPositions[item.displayProps.city.id];
-
-      if (!projectedPosition || projectedPosition.hidden) {
+      if (!projectedPosition) {
         return null;
       }
 
@@ -78,11 +51,43 @@ export function CityItemsRenderer({
         yPercentage: projectedPosition.y,
       };
 
+      const displayProps: Pick<
+        ComponentProps<typeof CityDisplay>,
+        'city' | 'onLabelClick' | 'onLabelSizeChange' | 'overridePosition'
+      > = {
+        city,
+        overridePosition,
+        onLabelClick: (event) => {
+          onRowFocus(selectionItem.rowId);
+          event.stopPropagation();
+        },
+        onLabelSizeChange: (size) => {
+          if (size && overridePosition && !projectedPosition.hidden) {
+            registerDisplayItem(selectionItem.rowId, { overridePosition, city, size });
+          } else {
+            registerDisplayItem(selectionItem.rowId, null);
+          }
+        },
+      };
+
+      return { rowId: selectionItem.rowId, displayProps };
+    });
+  }, [citiesProjectedPositions, onRowFocus, registerDisplayItem, selectedItems, selectionDataById]);
+
+  // This is separated from the above to prevent recreating onLabelSizeChange when displayItemById changes
+  // which would cause an infinite loop
+  const cityDisplayItems = useMemo(() => {
+    const result = cityDisplayItemsWithoutPosition.map((item) => {
+      if (!item) return null;
+
       //   console.log(item.displayProps.city.label, overridePosition);
+
+      const displayItem = displayItemById[item.rowId];
 
       return {
         ...item,
-        overridePosition,
+        labelPosition: displayItem?.labelPosition,
+        labelHidden: !displayItem?.labelPosition || !!displayItem?.hidden,
       };
     });
 
@@ -90,20 +95,20 @@ export function CityItemsRenderer({
     result.reverse();
 
     return result;
-  }, [citiesProjectedPositions, cityDisplayItemsWithoutPosition]);
+  }, [cityDisplayItemsWithoutPosition, displayItemById]);
 
   return (
     <>
       {cityDisplayItems.map((displayItem) => {
         if (!displayItem) return null;
 
-        const { rowId, displayProps, overridePosition } = displayItem;
+        const { rowId, displayProps, labelHidden, labelPosition } = displayItem;
 
         return (
           <CityDisplay
             {...displayProps}
-            labelPosition={'bottomright'}
-            overridePosition={overridePosition}
+            labelPosition={labelPosition ?? null}
+            labelHidden={labelHidden}
             key={rowId}
             time={time}
           ></CityDisplay>

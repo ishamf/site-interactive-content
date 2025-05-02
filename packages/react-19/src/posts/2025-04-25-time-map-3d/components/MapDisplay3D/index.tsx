@@ -1,5 +1,5 @@
 /** @jsxImportSource @emotion/react */
-import { useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { css } from '@emotion/react';
 import { Canvas } from '@react-three/fiber';
 import { CameraControls } from '@react-three/drei';
@@ -13,6 +13,8 @@ import { GlobeMaterial } from '../GlobeMaterial';
 import { CityItemsRenderer } from '../CityItemsRenderer';
 import { CityPinsRenderer } from '../CityPinsRenderer';
 import { SPHERE_RADIUS } from '../../constants';
+import { useElementSize } from '../../../../utils/hooks';
+import { useTimeMapStore } from '../../../2025-02-17-time-map/store';
 
 export const MapDisplay3D: MapDisplayComponent = ({
   time,
@@ -21,7 +23,21 @@ export const MapDisplay3D: MapDisplayComponent = ({
   selectionDataById,
   onRowFocus,
 }) => {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
   const mapCanvasRef = useRef<OffscreenCanvas>(null);
+  const liveLabelRef = useRef<HTMLDivElement>(null);
+
+  const containerSize = useElementSize({ ref: canvasRef });
+
+  const registerContainerSize = useTimeMapStore((state) => state.registerContainerSize);
+  const setRecalculationDelay = useTimeMapStore((state) => state.setRecalculationDelay);
+  const setObstructions = useTimeMapStore((state) => state.setObstructions);
+
+  useEffect(() => {
+    // For the 3D map, add a little delay since there's some camera damping
+    // that can repeatedly trigger the recalculation
+    setRecalculationDelay(100);
+  }, [setRecalculationDelay]);
 
   if (!mapCanvasRef.current) {
     mapCanvasRef.current = new OffscreenCanvas(canvasWidth, canvasHeight);
@@ -33,9 +49,35 @@ export const MapDisplay3D: MapDisplayComponent = ({
     renderBehavior
   );
 
+  const liveLabelSize = useElementSize({
+    ref: liveLabelRef,
+  });
+
+  useEffect(() => {
+    if (containerSize) {
+      registerContainerSize(containerSize);
+    }
+    if (liveLabelRef.current && liveLabelSize) {
+      const liveLabel = liveLabelRef.current;
+      setObstructions([
+        {
+          top: liveLabel.offsetTop,
+          left: liveLabel.offsetLeft,
+          width: liveLabelSize.width,
+          height: liveLabelSize.height,
+        },
+      ]);
+    }
+  }, [containerSize, liveLabelSize, registerContainerSize, setObstructions]);
+
   return (
     <figure className="w-full relative aspect-[2] h-auto">
-      <Canvas flat gl={{ alpha: false }} frameloop={isAnimating ? 'always' : 'demand'}>
+      <Canvas
+        ref={canvasRef}
+        flat
+        gl={{ alpha: false }}
+        frameloop={isAnimating ? 'always' : 'demand'}
+      >
         <mesh>
           <sphereGeometry args={[SPHERE_RADIUS, 64, 64]} />
           <GlobeMaterial
@@ -45,7 +87,7 @@ export const MapDisplay3D: MapDisplayComponent = ({
           />
         </mesh>
         <CityPinsRenderer selectionDataById={selectionDataById}></CityPinsRenderer>
-        <CameraControls minDistance={SPHERE_RADIUS + 0.5} />
+        <CameraControls minDistance={SPHERE_RADIUS + 0.5} maxDistance={SPHERE_RADIUS * 2} />
       </Canvas>
 
       {isLoadingImages ? (
@@ -61,6 +103,7 @@ export const MapDisplay3D: MapDisplayComponent = ({
       ></CityItemsRenderer>
 
       <div
+        ref={liveLabelRef}
         className={classNames(
           'absolute top-1 right-1 text-red-500 text-xs font-bold contain-content',
           {

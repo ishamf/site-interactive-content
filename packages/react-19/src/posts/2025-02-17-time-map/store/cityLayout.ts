@@ -24,10 +24,16 @@ export const createCityLayoutSlice: StateCreator<AppState, Mutators, [], CityDis
   displayItemById: {},
   obstructions: [],
 
+  recalculationDelay: 0,
+
   setObstructions(obstructions) {
     set({ obstructions });
 
     get().queueRecalculatePositions();
+  },
+
+  setRecalculationDelay(delay) {
+    set({ recalculationDelay: delay });
   },
 
   registerContainerSize(size) {
@@ -43,7 +49,20 @@ export const createCityLayoutSlice: StateCreator<AppState, Mutators, [], CityDis
       if (item) {
         const currentItem = state.displayItemById[rowId];
 
-        if (currentItem && currentItem.city === item.city && currentItem.size === item.size) {
+        if (
+          currentItem &&
+          currentItem.city === item.city &&
+          currentItem.size === item.size &&
+          ((!currentItem.overridePosition && !item.overridePosition) ||
+            (currentItem.overridePosition &&
+              item.overridePosition &&
+              Math.abs(
+                currentItem.overridePosition.xPercentage - item.overridePosition.xPercentage
+              ) < 1 &&
+              Math.abs(
+                currentItem.overridePosition.yPercentage - item.overridePosition.yPercentage
+              ) < 1))
+        ) {
           return state;
         }
 
@@ -56,6 +75,7 @@ export const createCityLayoutSlice: StateCreator<AppState, Mutators, [], CityDis
               rowId,
               city: item.city,
               size: item.size,
+              overridePosition: item.overridePosition,
               labelPosition: state.displayItemById[rowId]?.labelPosition ?? null,
               intersections: state.displayItemById[rowId]?.intersections ?? [],
               potentialSpaceIntersections:
@@ -101,7 +121,7 @@ export const createCityLayoutSlice: StateCreator<AppState, Mutators, [], CityDis
           get().recalculatePositions();
         }
         state = 'idle';
-      }, 0);
+      }, get().recalculationDelay);
     };
   })(),
 
@@ -225,8 +245,14 @@ function getLabelRect(
   displayItem: Omit<CityDisplayItem, 'labelPosition'>,
   position: BoxRectKey
 ) {
-  const cityX = (displayItem.city.longitude / 360 + 0.5) * containerSize.width;
-  const cityY = (displayItem.city.latitude / -180 + 0.5) * containerSize.height;
+  const cityXNormalized = displayItem.overridePosition
+    ? displayItem.overridePosition.xPercentage / 100
+    : displayItem.city.longitude / 360 + 0.5;
+  const cityYNormalized = displayItem.overridePosition
+    ? displayItem.overridePosition.yPercentage / 100
+    : displayItem.city.latitude / -180 + 0.5;
+  const cityX = cityXNormalized * containerSize.width;
+  const cityY = cityYNormalized * containerSize.height;
 
   const {
     top: offsetTop = 0,
