@@ -2,7 +2,7 @@
 import { useEffect, useRef, useCallback } from 'react';
 import { css } from '@emotion/react';
 import { DateTime } from 'luxon';
-import { MapDisplay as DefaultMapDisplay } from './components/MapDisplay';
+import { MapDisplay } from './components/MapDisplay';
 import { useQuery } from '@tanstack/react-query';
 import { loadSelectionData } from './assets';
 import { DayDisplayBar } from './components/DayDisplayBar';
@@ -13,9 +13,7 @@ import { canvasWidth } from './constants';
 import { useTimeState } from './hooks';
 import { CityTimeList } from './components/CityTimeList';
 
-export type MapDisplayComponent = typeof DefaultMapDisplay;
-
-export function TimeMap({ MapDisplay = DefaultMapDisplay }: { MapDisplay?: MapDisplayComponent }) {
+export function TimeMap() {
   const {
     timeState,
     setTime,

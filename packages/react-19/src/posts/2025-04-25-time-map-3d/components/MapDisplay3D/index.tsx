@@ -8,7 +8,7 @@ import { CircularProgress } from '@mui/material';
 import classNames from 'classnames';
 
 import { useElementSize } from '../../../../utils/hooks';
-import { MapDisplayComponent } from '../../../2025-02-17-time-map/TimeMap';
+import { MapDisplay } from '../../../2025-02-17-time-map/components/MapDisplay';
 import { canvasHeight, canvasWidth } from '../../../2025-02-17-time-map/constants';
 import { useMapUpdater } from '../../../2025-02-17-time-map/components/MapDisplay/updater';
 import { useTimeMapStore } from '../../../2025-02-17-time-map/store';
@@ -18,7 +18,7 @@ import { CityPinsRenderer } from '../CityPinsRenderer';
 import { SPHERE_RADIUS } from '../../constants';
 import { Skybox } from '../Skybox';
 
-export const MapDisplay3D: MapDisplayComponent = ({
+export const MapDisplay3D: typeof MapDisplay = ({
   time,
   renderBehavior,
   isTrackingCurrentTime,
