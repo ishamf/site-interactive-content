@@ -57,5 +57,9 @@ export function GlobeMaterial({
     };
   }, [canvasRef]);
 
-  return <meshBasicMaterial map={texture} color={'#ffffff'}></meshBasicMaterial>;
+  return texture ? (
+    <meshBasicMaterial key="hasTexture" map={texture} color={'#ffffff'}></meshBasicMaterial>
+  ) : (
+    <meshBasicMaterial key="noTexture" color={'#000000'}></meshBasicMaterial>
+  );
 }
