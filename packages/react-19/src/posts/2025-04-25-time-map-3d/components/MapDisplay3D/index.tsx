@@ -88,7 +88,11 @@ export const MapDisplay3D: MapDisplayComponent = ({
           />
         </mesh>
         <CityPinsRenderer selectionDataById={selectionDataById}></CityPinsRenderer>
-        <CameraControls minDistance={SPHERE_RADIUS + 0.5} maxDistance={SPHERE_RADIUS * 2} />
+        <CameraControls
+          minDistance={SPHERE_RADIUS + 0.5}
+          maxDistance={SPHERE_RADIUS * 2}
+          truckSpeed={0}
+        />
       </Canvas>
 
       {isLoadingImages ? (
