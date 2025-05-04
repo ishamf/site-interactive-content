@@ -72,7 +72,7 @@ export const MapDisplay3D: MapDisplayComponent = ({
   }, [containerSize, liveLabelSize, registerContainerSize, setObstructions]);
 
   return (
-    <figure className="w-full relative aspect-[2] h-auto">
+    <figure className="relative flex-1 w-full overflow-hidden">
       <Canvas
         ref={canvasRef}
         flat
