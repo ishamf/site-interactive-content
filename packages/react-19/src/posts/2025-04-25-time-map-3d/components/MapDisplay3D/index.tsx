@@ -74,7 +74,7 @@ export const MapDisplay3D: typeof MapDisplay = ({
   }, [containerSize, liveLabelSize, registerContainerSize, setObstructions]);
 
   return (
-    <figure className="relative flex-1 w-full overflow-hidden touch-none">
+    <figure className="relative flex-1 w-full overflow-hidden touch-none contain-size">
       <Canvas
         ref={canvasRef}
         flat

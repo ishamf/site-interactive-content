@@ -70,7 +70,7 @@ export function TimeMap3D() {
   return (
     <div className="flex max-w-full flex-col px-4 gap-x-4 items-stretch justify-center md:flex-row md:items-start bg-neutral-50 dark:bg-neutral-900">
       <div
-        className="md:flex-1 max-w-full z-10 self-center md:self-start pt-4 pb-2 md:pb-4 flex items-stretch flex-col bg-neutral-50 dark:bg-neutral-900"
+        className="md:flex-1 w-full z-10 self-center md:self-start pt-4 pb-2 md:pb-4 flex items-stretch flex-col bg-neutral-50 dark:bg-neutral-900"
         css={css`
           height: min(100vw, 100svh - var(--sticky-top-margin, 0px));
 
