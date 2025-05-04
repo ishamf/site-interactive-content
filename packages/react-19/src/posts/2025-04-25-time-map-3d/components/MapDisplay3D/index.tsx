@@ -1,21 +1,22 @@
 /** @jsxImportSource @emotion/react */
-import { useEffect, useRef } from 'react';
+import { Suspense, useEffect, useRef } from 'react';
 import { css } from '@emotion/react';
 import { Canvas } from '@react-three/fiber';
 import '../../three';
 import { CameraControls } from '@react-three/drei';
+import { CircularProgress } from '@mui/material';
+import classNames from 'classnames';
 
+import { useElementSize } from '../../../../utils/hooks';
 import { MapDisplayComponent } from '../../../2025-02-17-time-map/TimeMap';
 import { canvasHeight, canvasWidth } from '../../../2025-02-17-time-map/constants';
 import { useMapUpdater } from '../../../2025-02-17-time-map/components/MapDisplay/updater';
-import { CircularProgress } from '@mui/material';
-import classNames from 'classnames';
+import { useTimeMapStore } from '../../../2025-02-17-time-map/store';
 import { GlobeMaterial } from '../GlobeMaterial';
 import { CityItemsRenderer } from '../CityItemsRenderer';
 import { CityPinsRenderer } from '../CityPinsRenderer';
 import { SPHERE_RADIUS } from '../../constants';
-import { useElementSize } from '../../../../utils/hooks';
-import { useTimeMapStore } from '../../../2025-02-17-time-map/store';
+import { Skybox } from '../Skybox';
 
 export const MapDisplay3D: MapDisplayComponent = ({
   time,
@@ -79,6 +80,7 @@ export const MapDisplay3D: MapDisplayComponent = ({
         gl={{ alpha: false }}
         frameloop={isAnimating ? 'always' : 'demand'}
       >
+        {/* Globe */}
         <mesh>
           <sphereGeometry args={[SPHERE_RADIUS, 64, 64]} />
           <GlobeMaterial
@@ -87,6 +89,12 @@ export const MapDisplay3D: MapDisplayComponent = ({
             renderedImageVersion={renderedImageVersion}
           />
         </mesh>
+
+        {/* Skybox */}
+        <Suspense fallback={null}>
+          <Skybox></Skybox>
+        </Suspense>
+
         <CityPinsRenderer selectionDataById={selectionDataById}></CityPinsRenderer>
         <CameraControls
           minDistance={SPHERE_RADIUS + 0.5}
