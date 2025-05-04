@@ -2,8 +2,26 @@ html {
   background-color: #fff;
 }
 
+main {
+  max-width: 40rem;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
 @media (prefers-color-scheme: dark) {
   html {
     background-color: rgb(21, 23, 25);
+  }
+
+  main {
+    color: #fff;
+  }
+
+  main a {
+    color: oklch(0.77 0.1206 283.2);
+  }
+
+  main a:visited {
+    color: oklch(0.65 0.1206 324.21);
   }
 }

@@ -35,6 +35,7 @@ type State = {
   renderingState: RenderingState;
   imageDataState: ImageDataState;
   hasRenderedOnce: boolean;
+  renderedImageVersion: number;
   pendingNewTimeAfterAnimation?: Action & { type: 'newTime' };
 };
 
@@ -85,6 +86,7 @@ function reducer(state: State, action: Action): State {
             state: 'renderingLowRes',
             time: state.renderingState.time,
           },
+          renderedImageVersion: state.renderedImageVersion + 1,
           hasRenderedOnce: true,
         };
 
@@ -111,6 +113,7 @@ function reducer(state: State, action: Action): State {
             state: 'renderingHighRes',
             time: state.renderingState.time,
           },
+          renderedImageVersion: state.renderedImageVersion + 1,
           hasRenderedOnce: true,
         };
       } else {
@@ -127,6 +130,7 @@ function reducer(state: State, action: Action): State {
             state: 'idle',
             time: state.renderingState.time,
           },
+          renderedImageVersion: state.renderedImageVersion + 1,
           hasRenderedOnce: true,
         };
       } else {
@@ -164,7 +168,7 @@ function reducer(state: State, action: Action): State {
 const ANIMATION_DURATION = 150;
 
 export function useMapUpdater(
-  canvasRef: RefObject<HTMLCanvasElement | null>,
+  canvasRef: RefObject<HTMLCanvasElement | OffscreenCanvas | null>,
   time: number,
   renderBehavior: RenderBehavior
 ) {
@@ -176,6 +180,7 @@ export function useMapUpdater(
     imageDataState: {
       state: 'loading',
     },
+    renderedImageVersion: 0,
     hasRenderedOnce: false,
   });
 
@@ -369,6 +374,9 @@ export function useMapUpdater(
   }, [canvasRef, imageDataState, renderingState]);
 
   return {
+    isRendering: renderingState.state !== 'idle',
+    renderedImageVersion: state.renderedImageVersion,
+    isAnimating: renderingState.state === 'animatingToTime',
     hasRenderedOnce: state.hasRenderedOnce,
     isLoadingImages: state.imageDataState.state === 'loading',
   };

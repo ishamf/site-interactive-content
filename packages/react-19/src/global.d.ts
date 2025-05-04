@@ -4,6 +4,7 @@ declare module React {
     interface IntrinsicElements {
       'xif-react-test-component': any;
       'xif-time-map': any;
+      'xif-time-map-3d': any;
     }
   }
 }

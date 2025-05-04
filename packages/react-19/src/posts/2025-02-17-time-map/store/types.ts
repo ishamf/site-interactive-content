@@ -58,6 +58,7 @@ export type HiddenData =
 export type CityDisplayItem = {
   rowId: string;
   city: CitySelectionData;
+  overridePosition?: { xPercentage: number; yPercentage: number };
   labelPosition: LabelPosition | null;
   intersections: string[];
   potentialSpaceIntersections: string[];
@@ -71,9 +72,14 @@ export interface CityDisplayState {
   obstructions: BoxRect[];
   setObstructions: (obstructions: BoxRect[]) => void;
   registerContainerSize(size: BoxSize): void;
-  registerDisplayItem(rowId: string, item: { size: BoxSize; city: CitySelectionData } | null): void;
+  registerDisplayItem(
+    rowId: string,
+    item: Pick<CityDisplayItem, 'size' | 'city' | 'overridePosition'> | null
+  ): void;
   queueRecalculatePositions(): void;
   recalculatePositions(): void;
+  recalculationDelay: number;
+  setRecalculationDelay: (delay: number) => void;
 }
 
 export type Mutators = [['zustand/persist', unknown]];

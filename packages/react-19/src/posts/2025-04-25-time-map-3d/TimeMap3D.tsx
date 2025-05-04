@@ -1,19 +1,18 @@
 /** @jsxImportSource @emotion/react */
-import { useEffect, useRef, useCallback } from 'react';
+import { useEffect, useCallback } from 'react';
 import { css } from '@emotion/react';
 import { DateTime } from 'luxon';
-import { MapDisplay } from './components/MapDisplay';
 import { useQuery } from '@tanstack/react-query';
-import { loadSelectionData } from './assets';
-import { DayDisplayBar } from './components/DayDisplayBar';
-import { useTimeMapStore } from './store';
-import { TimeBar } from './components/TimeBar';
-import { useElementSize } from '../../utils/hooks';
-import { canvasWidth } from './constants';
-import { useTimeState } from './hooks';
-import { CityTimeList } from './components/CityTimeList';
+import { useTimeState } from '../2025-02-17-time-map/hooks';
+import { loadSelectionData } from '../2025-02-17-time-map/assets';
+import { CityTimeList } from '../2025-02-17-time-map/components/CityTimeList';
+import { DayDisplayBar } from '../2025-02-17-time-map/components/DayDisplayBar';
+import { TimeBar } from '../2025-02-17-time-map/components/TimeBar';
+import { useTimeMapStore } from '../2025-02-17-time-map/store';
 
-export function TimeMap() {
+import { MapDisplay3D } from './components/MapDisplay3D';
+
+export function TimeMap3D() {
   const {
     timeState,
     setTime,
@@ -25,7 +24,6 @@ export function TimeMap() {
 
   const addInitialCitiesIfEmpty = useTimeMapStore((s) => s.addInitialCitiesIfEmpty);
 
-  const isAnyCitySelectorOpen = useTimeMapStore((state) => state.rowWithOpenCitySelector !== null);
   const openTimeSelector = useTimeMapStore((state) => state.openTimeSelector);
 
   const selectionDataQuery = useQuery({
@@ -43,13 +41,6 @@ export function TimeMap() {
       addInitialCitiesIfEmpty(selectionDataQuery.data);
     }
   }, [selectionDataQuery.data, selectionDataQuery.isSuccess, addInitialCitiesIfEmpty]);
-
-  const timeBarContainerRef = useRef<HTMLDivElement>(null);
-
-  const timeBarSize = useElementSize({
-    ref: timeBarContainerRef,
-  });
-  const timeBarHeight = timeBarSize?.height ?? 36.5;
 
   const onRowFocus = useCallback(
     (rowId: string) => {
@@ -79,25 +70,16 @@ export function TimeMap() {
   return (
     <div className="flex max-w-full flex-col px-4 gap-x-4 items-stretch justify-center md:flex-row md:items-start bg-neutral-50 dark:bg-neutral-900">
       <div
-        className="flex-1 z-10 self-center md:self-start pt-4 pb-2 md:pb-4 flex items-stretch flex-col bg-neutral-50 dark:bg-neutral-900"
-        style={{
-          maxWidth: `min(max(calc(200vh - 10rem - ${timeBarHeight * 2}px), min(30rem - ${timeBarHeight * 2}px, 100%)), ${canvasWidth}px)`,
-        }}
+        className="md:flex-1 w-full z-10 self-center md:self-start pt-4 pb-2 md:pb-4 flex items-stretch flex-col bg-neutral-50 dark:bg-neutral-900"
         css={css`
-          @media ((width >= 48rem) and (height >= 20rem)) {
+          height: min(100vw, 100svh - var(--sticky-top-margin, 0px));
+
+          @media (width >= 48rem) {
             ${stickyCss}
           }
-
-          ${!isAnyCitySelectorOpen
-            ? css`
-                @media (height >= 100vw) {
-                  ${stickyCss}
-                }
-              `
-            : ''}
         `}
       >
-        <MapDisplay
+        <MapDisplay3D
           time={timeState.time.valueOf()}
           selectionDataById={selectionDataQuery.data?.selectionDataById ?? {}}
           setTime={(ms) => {
@@ -130,9 +112,7 @@ export function TimeMap() {
           isTrackingCurrentTime={isTrackingCurrentTime}
           trackCurrentTime={trackCurrentTime}
         ></DayDisplayBar>
-        <div className="mt-4 hidden md:block" ref={timeBarContainerRef}>
-          {timeBarNode}
-        </div>
+        <div className="mt-4 hidden md:block">{timeBarNode}</div>
       </div>
       <div className="flex-1 md:pt-4 pb-4 min-h-0 md:max-w-[30rem] flex flex-col gap-4">
         <div className="mt-4 md:hidden">{timeBarNode}</div>

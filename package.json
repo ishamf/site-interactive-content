@@ -39,7 +39,8 @@
             "purescript"
         ],
         "patchedDependencies": {
-            "@r2wc/core": "patches/@r2wc__core.patch"
+            "@r2wc/core": "patches/@r2wc__core.patch",
+            "@react-three/fiber": "patches/@react-three__fiber.patch"
         }
     }
 }

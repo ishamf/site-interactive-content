@@ -57,7 +57,7 @@ export async function drawMap({
   abortSignal,
   mapImageData,
 }: {
-  ctx: CanvasRenderingContext2D;
+  ctx: CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D;
   state: SunAndEarthState;
   alphaSize: number;
   useWorker: boolean;
