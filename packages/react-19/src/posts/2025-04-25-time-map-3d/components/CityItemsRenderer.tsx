@@ -12,7 +12,7 @@ export function CityItemsRenderer({
 }: {
   time: number;
 
-  selectionDataById: Record<string, SelectionData | undefined>;
+  selectionDataById?: Record<string, SelectionData | undefined>;
   onRowFocus: (rowId: string) => void;
 }) {
   const selectedItems = useTimeMapStore((state) => state.selectedItems);
@@ -28,7 +28,7 @@ export function CityItemsRenderer({
         return null;
       }
 
-      const item = selectionDataById[selectionItem.itemId];
+      const item = selectionDataById?.[selectionItem.itemId];
 
       if (!item) {
         return null;
