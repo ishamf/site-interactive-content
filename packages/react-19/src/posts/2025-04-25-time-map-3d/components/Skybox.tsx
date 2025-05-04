@@ -1,9 +1,11 @@
 import { BackSide } from 'three';
-import skyboxImage from '../assets/skymap-low.jpg?no-inline';
+import skyboxImageRelativeUrl from '../assets/skymap-low.jpg?no-inline';
 import { useTexture } from '@react-three/drei';
 
+const skyboxImageUrl = new URL(skyboxImageRelativeUrl, import.meta.url).toString();
+
 export function Skybox() {
-  const { skyTexture } = useTexture({ skyTexture: skyboxImage });
+  const { skyTexture } = useTexture({ skyTexture: skyboxImageUrl });
 
   return (
     <mesh>
