@@ -17,6 +17,7 @@ import { CityItemsRenderer } from '../CityItemsRenderer';
 import { CityPinsRenderer } from '../CityPinsRenderer';
 import { SPHERE_RADIUS } from '../../constants';
 import { Skybox } from '../Skybox';
+import { InitialCamera } from '../InitialCamera';
 
 export const MapDisplay3D: typeof MapDisplay = ({
   time,
@@ -73,7 +74,7 @@ export const MapDisplay3D: typeof MapDisplay = ({
   }, [containerSize, liveLabelSize, registerContainerSize, setObstructions]);
 
   return (
-    <figure className="relative flex-1 w-full overflow-hidden">
+    <figure className="relative flex-1 w-full overflow-hidden touch-none">
       <Canvas
         ref={canvasRef}
         flat
@@ -100,7 +101,9 @@ export const MapDisplay3D: typeof MapDisplay = ({
           minDistance={SPHERE_RADIUS + 0.5}
           maxDistance={SPHERE_RADIUS * 2}
           truckSpeed={0}
+          makeDefault
         />
+        <InitialCamera selectionDataById={selectionDataById}></InitialCamera>
       </Canvas>
 
       {isLoadingImages ? (
