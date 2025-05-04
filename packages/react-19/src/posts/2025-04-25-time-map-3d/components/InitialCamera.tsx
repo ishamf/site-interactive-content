@@ -8,14 +8,14 @@ import { useTimeMapStore } from '../../2025-02-17-time-map/store';
 export function InitialCamera({
   selectionDataById,
 }: {
-  selectionDataById: Record<string, SelectionData | undefined>;
+  selectionDataById?: Record<string, SelectionData | undefined>;
 }) {
   const controls = useThree((state) => state.controls) as CameraControls | null;
   const selectedItems = useTimeMapStore((state) => state.selectedItems);
   const hasSetInitialCamera = useRef(false);
 
   useEffect(() => {
-    if (!controls || hasSetInitialCamera.current) {
+    if (!controls || !selectionDataById || hasSetInitialCamera.current) {
       return;
     }
 

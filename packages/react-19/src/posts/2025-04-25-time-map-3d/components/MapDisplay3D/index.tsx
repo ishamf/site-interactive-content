@@ -1,5 +1,5 @@
 /** @jsxImportSource @emotion/react */
-import { Suspense, useEffect, useRef } from 'react';
+import { ComponentProps, ComponentType, Suspense, useEffect, useRef } from 'react';
 import { css } from '@emotion/react';
 import { Canvas } from '@react-three/fiber';
 import '../../three';
@@ -18,14 +18,14 @@ import { CityPinsRenderer } from '../CityPinsRenderer';
 import { SPHERE_RADIUS } from '../../constants';
 import { Skybox } from '../Skybox';
 import { InitialCamera } from '../InitialCamera';
+type MapDisplayProps = ComponentProps<typeof MapDisplay>;
 
-export const MapDisplay3D: typeof MapDisplay = ({
-  time,
-  renderBehavior,
-  isTrackingCurrentTime,
-  selectionDataById,
-  onRowFocus,
-}) => {
+type OptionalMapDisplayProps = 'selectionDataById';
+
+export const MapDisplay3D: ComponentType<
+  Omit<MapDisplayProps, OptionalMapDisplayProps> &
+    Partial<Pick<MapDisplayProps, OptionalMapDisplayProps>>
+> = ({ time, renderBehavior, isTrackingCurrentTime, selectionDataById, onRowFocus }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const mapCanvasRef = useRef<OffscreenCanvas>(null);
   const liveLabelRef = useRef<HTMLDivElement>(null);
@@ -96,7 +96,9 @@ export const MapDisplay3D: typeof MapDisplay = ({
           <Skybox></Skybox>
         </Suspense>
 
-        <CityPinsRenderer selectionDataById={selectionDataById}></CityPinsRenderer>
+        {selectionDataById ? (
+          <CityPinsRenderer selectionDataById={selectionDataById}></CityPinsRenderer>
+        ) : null}
         <CameraControls
           minDistance={SPHERE_RADIUS + 0.5}
           maxDistance={SPHERE_RADIUS * 2}
@@ -106,7 +108,7 @@ export const MapDisplay3D: typeof MapDisplay = ({
         <InitialCamera selectionDataById={selectionDataById}></InitialCamera>
       </Canvas>
 
-      {isLoadingImages ? (
+      {isLoadingImages || !selectionDataById ? (
         <div className="absolute top-0 left-0 right-0 bottom-0 bg-neutral-900 flex items-center justify-center">
           <CircularProgress></CircularProgress>
         </div>

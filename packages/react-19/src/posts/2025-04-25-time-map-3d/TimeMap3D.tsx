@@ -81,7 +81,7 @@ export function TimeMap3D() {
       >
         <MapDisplay3D
           time={timeState.time.valueOf()}
-          selectionDataById={selectionDataQuery.data?.selectionDataById ?? {}}
+          selectionDataById={selectionDataQuery.data?.selectionDataById}
           setTime={(ms) => {
             setTime({
               time: DateTime.fromMillis(ms),
