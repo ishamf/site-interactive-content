@@ -93,7 +93,7 @@ export const MapDisplay3D: ComponentType<
         </mesh>
 
         {/* Sun */}
-        <SunPin time={time}></SunPin>
+        <SunPin time={time} renderBehavior={renderBehavior}></SunPin>
 
         {/* Skybox */}
         <Suspense fallback={null}>

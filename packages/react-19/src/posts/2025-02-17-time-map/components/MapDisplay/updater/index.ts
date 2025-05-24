@@ -5,6 +5,7 @@ import { getSunAndEarthStateAtTime, linearlyInterpolateSunAndEarthState } from '
 import { RenderBehavior, SunAndEarthState } from '../../../types';
 import { loadImageData, loadSmallImageData, MapImageData } from '../../../assets';
 import { waitForMs } from '../../../utils';
+import { MAP_ANIMATION_DURATION } from '../../../constants';
 
 type RenderingState =
   | {
@@ -165,8 +166,6 @@ function reducer(state: State, action: Action): State {
   }
 }
 
-const ANIMATION_DURATION = 150;
-
 export function useMapUpdater(
   canvasRef: RefObject<HTMLCanvasElement | OffscreenCanvas | null>,
   time: number,
@@ -252,7 +251,7 @@ export function useMapUpdater(
 
     const springGenerator = spring({
       keyframes: [0, 1],
-      visualDuration: ANIMATION_DURATION / 1000,
+      visualDuration: MAP_ANIMATION_DURATION / 1000,
       bounce: 0,
     });
 
