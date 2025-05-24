@@ -2,6 +2,8 @@ import { LabelPosition } from './store';
 
 export const DAY_LENGTH = 24 * 3600 * 1000;
 
+export const MAP_ANIMATION_DURATION = 150;
+
 export const EPOCH_START_DAY = 4; // Thursday
 
 export const canvasWidth = 3600;

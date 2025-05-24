@@ -18,6 +18,7 @@ import { CityPinsRenderer } from '../CityPinsRenderer';
 import { SPHERE_RADIUS } from '../../constants';
 import { Skybox } from '../Skybox';
 import { InitialCamera } from '../InitialCamera';
+import { SunPin } from '../SunPin';
 type MapDisplayProps = ComponentProps<typeof MapDisplay>;
 
 type OptionalMapDisplayProps = 'selectionDataById';
@@ -90,6 +91,9 @@ export const MapDisplay3D: ComponentType<
             renderedImageVersion={renderedImageVersion}
           />
         </mesh>
+
+        {/* Sun */}
+        <SunPin time={time} renderBehavior={renderBehavior}></SunPin>
 
         {/* Skybox */}
         <Suspense fallback={null}>
