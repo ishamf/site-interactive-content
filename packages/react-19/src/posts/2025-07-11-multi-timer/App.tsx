@@ -5,7 +5,7 @@ import { NavigationTabs } from './components/NavigationTabs';
 
 export function MultiTimer() {
   return (
-    <div>
+    <div className="max-w-2xl mx-auto flex flex-col gap-4 p-4">
       <HashRouter>
         <NavigationTabs></NavigationTabs>
         <Routes>

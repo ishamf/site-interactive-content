@@ -33,6 +33,20 @@ export const useTimerStore = create(
 
           return { id };
         },
+
+        updateTitle: (id: string, title: string) => {
+          set((state) => ({
+            multiTimers: state.multiTimers.map((timer) =>
+              timer.id === id ? { ...timer, title } : timer
+            ),
+          }));
+        },
+
+        deleteMultiTimer: (id: string) => {
+          set((state) => ({
+            multiTimers: state.multiTimers.filter((timer) => timer.id !== id),
+          }));
+        },
       })
     ),
     {
