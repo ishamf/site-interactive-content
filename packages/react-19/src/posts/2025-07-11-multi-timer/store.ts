@@ -22,6 +22,7 @@ export const useTimerStore = create(
       {
         multiTimers: [] as MultiTimer[],
         isStorageLoaded: false,
+        editingId: null as string | null,
       },
       (set) => ({
         createMultiTimer: () => {
@@ -29,6 +30,7 @@ export const useTimerStore = create(
 
           set((state) => ({
             multiTimers: [...state.multiTimers, multiTimerSchema.parse({ id })],
+            editingId: id,
           }));
 
           return { id };
@@ -46,6 +48,10 @@ export const useTimerStore = create(
           set((state) => ({
             multiTimers: state.multiTimers.filter((timer) => timer.id !== id),
           }));
+        },
+
+        setEditingId: (id: string | null) => {
+          set({ editingId: id });
         },
       })
     ),
